@@ -1,0 +1,49 @@
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+[data-nextjs-toast="true"] {
+  display: none !important;
+}
+
+[data-nextjs-toast="true"],
+[data-next-badge-root] {
+  display: none !important;
+}
+
+[data-nextjs-toast="true"] {
+  display: none !important;
+}
+
+[data-nextjs-toast-wrapper="true"] {
+  display: none !important;
+}
+
+nextjs-portal,
+nextjs-portal [data-nextjs-toast="true"],
+nextjs-portal button[aria-label="Open Next.js Dev Tools"] {
+  display: none !important;
+}

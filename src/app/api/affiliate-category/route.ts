@@ -1,4 +1,4 @@
-import { del, get, post } from '@/utils/apiClient';
+import { del, get, post } from '@/utils/request';
 import { getServer } from '@/utils/apiServer';
 import { AffiliateCategoryInput } from '@/utils/type';
 import { NextRequest, NextResponse } from 'next/server';

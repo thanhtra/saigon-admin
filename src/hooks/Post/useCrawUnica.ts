@@ -1,4 +1,4 @@
-import { post } from '@/utils/apiClient';
+import { post } from '@/utils/request';
 import { useCallback } from 'react';
 
 export type CrawUnica = {

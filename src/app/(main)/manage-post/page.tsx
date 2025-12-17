@@ -1,7 +1,7 @@
 'use client';
 
 import { CardItem, TitleMain, TitleSub } from '@/styles/common';
-import { post } from '@/utils/apiClient';
+import { post } from '@/utils/request';
 import { Button } from '@mui/material';
 import { useState } from 'react';
 import { toast } from 'react-toastify';

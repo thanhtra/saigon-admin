@@ -1,4 +1,4 @@
-import { post } from '@/utils/apiClient';
+import { post } from '@/utils/request';
 import { GroupFacebookPayload } from '@/utils/type';
 import { useCallback } from 'react';
 

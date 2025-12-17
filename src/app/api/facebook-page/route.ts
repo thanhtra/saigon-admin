@@ -1,4 +1,4 @@
-import { get, post, del } from '@/utils/apiClient';
+import { get, post, del } from '@/utils/request';
 import { FacebookPageInput } from '@/utils/type';
 import { NextRequest, NextResponse } from 'next/server';
 

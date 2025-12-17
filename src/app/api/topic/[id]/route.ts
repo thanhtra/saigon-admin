@@ -1,4 +1,4 @@
-import { get, put } from '@/utils/apiClient';
+import { get, put } from '@/utils/request';
 import { NextRequest, NextResponse } from 'next/server';
 
 // GET: Lấy chi tiết chủ đề theo ID

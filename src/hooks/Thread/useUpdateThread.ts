@@ -1,4 +1,4 @@
-import { put } from '@/utils/apiClient';
+import { put } from '@/utils/request';
 import { ThreadInput } from '@/utils/type';
 import { useCallback } from 'react';
 

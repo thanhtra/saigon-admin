@@ -1,4 +1,4 @@
-import { post } from '@/utils/apiClient';
+import { post } from '@/utils/request';
 import { AffiliateCategoryInput } from '@/utils/type';
 
 const useCreateAffiliateCategory = () => {

@@ -1,5 +1,5 @@
 // hooks/useUpdateYoutube.ts
-import { put } from '@/utils/apiClient';
+import { put } from '@/utils/request';
 import { YoutubeInput } from '@/utils/type';
 import { useCallback } from 'react';
 

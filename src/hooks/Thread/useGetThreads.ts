@@ -1,4 +1,4 @@
-import { get } from '@/utils/apiClient';
+import { get } from '@/utils/request';
 import { useCallback } from 'react';
 
 type GetThreadsParams = {

@@ -1,4 +1,4 @@
-import { del } from '@/utils/apiClient'; // đảm bảo bạn có hàm del trong apiClient
+import { del } from '@/utils/request'; // đảm bảo bạn có hàm del trong apiClient
 import { useCallback } from 'react';
 
 const useDeleteTopic = () => {

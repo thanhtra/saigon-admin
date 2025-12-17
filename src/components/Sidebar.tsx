@@ -26,24 +26,22 @@ const Sidebar: React.FC = () => {
     const [openFacebook, setOpenFacebook] = useState(false);
     const [openLinkedIn, setOpenLinkedIn] = useState(false);
     const [openYoutube, setOpenYoutube] = useState(false);
-    const [openData, setOpenData] = useState(true);
+    const [openData, setOpenData] = useState(false);
     const [openThreads, setOpenThreads] = useState(false);
     const [openPinterest, setOpenPinterest] = useState(false);
     const [openVideo, setOpenVideo] = useState(false);
+    const [openMarketing, setOpenMarketing] = useState(false);
 
-    // const toggleTiktok = () => setOpenTiktok(!openTiktok);
-    // const toggleFacebook = () => setOpenFacebook(!openFacebook);
-    // const toggleYoutube = () => setOpenYoutube(!openYoutube);
-    // const toggleData = () => setOpenData(!openData);
 
-    const toggleTiktok = () => setOpenTiktok(true);
-    const toggleFacebook = () => setOpenFacebook(true);
-    const toggleLinkedIn = () => setOpenLinkedIn(true);
-    const toggleYoutube = () => setOpenYoutube(true);
-    const toggleData = () => setOpenData(true);
-    const toggleThreads = () => setOpenThreads(true);
-    const togglePinterest = () => setOpenPinterest(true);
-    const toggleVideo = () => setOpenVideo(true);
+    const toggleTiktok = () => setOpenTiktok(!openTiktok);
+    const toggleFacebook = () => setOpenFacebook(!openFacebook);
+    const toggleLinkedIn = () => setOpenLinkedIn(!openLinkedIn);
+    const toggleYoutube = () => setOpenYoutube(!openYoutube);
+    const toggleData = () => setOpenData(!openData);
+    const toggleThreads = () => setOpenThreads(!openThreads);
+    const togglePinterest = () => setOpenPinterest(!openPinterest);
+    const toggleVideo = () => setOpenVideo(!openVideo);
+    const toggleMarketing = () => setOpenMarketing(!openMarketing);
 
 
     const pathname = usePathname();
@@ -65,6 +63,127 @@ const Sidebar: React.FC = () => {
             <Toolbar />
             <Box sx={{ overflow: 'auto', paddingTop: "10px", marginBottom: "50px", }}>
                 <List>
+                    {/* Marketing */}
+                    <ListItemButton onClick={toggleMarketing}>
+                        <ListItemText
+                            primary={
+                                <Typography style={{ fontWeight: 'bold' }}>
+                                    Marketing
+                                </Typography>
+                            }
+                        />
+                        {openMarketing ? <ExpandLess /> : <ExpandMore />}
+                    </ListItemButton>
+                    <Collapse in={openMarketing} timeout="auto" unmountOnExit>
+                        <ListItemButton
+                            sx={{ pl: 4 }}
+                            component={Link}
+                            href="/marketing/user"
+                            selected={isActive('/marketing/user')}
+                        >
+                            <ListItemText primary="Người dùng" />
+                        </ListItemButton>
+
+                        <ListItemButton
+                            sx={{ pl: 4 }}
+                            component={Link}
+                            href="/cron-job"
+                            selected={isActive('/cron-job')}
+                        >
+                            <ListItemText primary="Cron Job" />
+                        </ListItemButton>
+                        <List component="div" disablePadding>
+                            <ListItemButton
+                                sx={{ pl: 4 }}
+                                component={Link}
+                                href="/data/check"
+                                selected={isActive('/data/check')}
+                            >
+                                <ListItemText primary="Kiểm tra dữ liệu" />
+                            </ListItemButton>
+                            <ListItemButton
+                                sx={{ pl: 4 }}
+                                component={Link}
+                                href="/data/collaborator"
+                                selected={isActive('/data/collaborator')}
+                            >
+                                <ListItemText primary="Cộng tác viên" />
+                            </ListItemButton>
+                            <ListItemButton
+                                sx={{ pl: 4 }}
+                                component={Link}
+                                href="/data/topics"
+                                selected={isActive('/data/topics')}
+                            >
+                                <ListItemText primary="Chủ đề" />
+                            </ListItemButton>
+
+                            <ListItemButton
+                                sx={{ pl: 4 }}
+                                component={Link}
+                                href="/data/youtube"
+                                selected={isActive('/data/youtube')}
+                            >
+                                <ListItemText primary="Youtube" />
+                            </ListItemButton>
+                            <ListItemButton
+                                sx={{ pl: 4 }}
+                                component={Link}
+                                href="/data/affiliate-category"
+                                selected={isActive('/data/affiliate-category')}
+                            >
+                                <ListItemText primary="Danh mục affiliate" />
+                            </ListItemButton>
+                            <ListItemButton
+                                sx={{ pl: 4 }}
+                                component={Link}
+                                href="/data/affiliate"
+                                selected={isActive('/data/affiliate')}
+                            >
+                                <ListItemText primary="Affiliate" />
+                            </ListItemButton>
+                            <ListItemButton
+                                sx={{ pl: 4 }}
+                                component={Link}
+                                href="/data/shopee"
+                                selected={isActive('/data/shopee')}
+                            >
+                                <ListItemText primary="Shopee" />
+                            </ListItemButton>
+                            <ListItemButton
+                                sx={{ pl: 4 }}
+                                component={Link}
+                                href="/data/affiliate-category-topic"
+                                selected={isActive('/data/affiliate-category-topic')}
+                            >
+                                <ListItemText primary="Map Danh mục và Chủ đề" />
+                            </ListItemButton>
+                            <ListItemButton
+                                sx={{ pl: 4 }}
+                                component={Link}
+                                href="/data/post"
+                                selected={isActive('/data/post')}
+                            >
+                                <ListItemText primary="Bài đăng" />
+                            </ListItemButton>
+                            <ListItemButton
+                                sx={{ pl: 4 }}
+                                component={Link}
+                                href="/data/broker"
+                                selected={isActive('/data/broker')}
+                            >
+                                <ListItemText primary="Môi giới BDS" />
+                            </ListItemButton>
+                            <ListItemButton
+                                sx={{ pl: 4 }}
+                                component={Link}
+                                href="/data/gmail"
+                                selected={isActive('/data/gmail')}
+                            >
+                                <ListItemText primary="Gmail" />
+                            </ListItemButton>
+                        </List>
+                    </Collapse>
 
                     {/* Quản lý dữ liệu */}
                     <ListItemButton onClick={toggleData}>

@@ -58,6 +58,7 @@ const FormTextField: React.FC<FormTextFieldProps> = ({
                     helperText={fieldState.error?.message}
                     placeholder={placeholder}
                     disabled={disabled}
+                    InputLabelProps={{ shrink: true }}
                 >
                     {options?.map((option) => (
                         <MenuItem key={option.value} value={option.value}>

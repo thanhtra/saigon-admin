@@ -1,12 +1,6 @@
 import {
     Box,
     Card,
-    Dialog,
-    DialogActions,
-    DialogContent,
-    type DialogProps,
-    DialogTitle,
-    Grid,
     Link,
     styled,
     Switch,

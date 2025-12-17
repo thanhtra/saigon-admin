@@ -1,4 +1,4 @@
-import { del } from '@/utils/apiClient';
+import { del } from '@/utils/request';
 import { useCallback } from 'react';
 
 const useDeletePinterest = () => {

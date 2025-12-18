@@ -4,7 +4,7 @@ import { Box } from '@mui/material';
 import Navbar from '@/components/Navbar';
 import Sidebar from '@/components/Sidebar';
 import { useAuth } from '@/context/AuthContext';
-import { useRouter } from 'next/router';
+import { useEffect } from 'react';
 
 export default function DashboardLayout({
   children,
@@ -22,7 +22,6 @@ export default function DashboardLayout({
   if (!user) {
     return null; // redirect đã xử lý trong AuthProvider
   }
-
 
 
   return (

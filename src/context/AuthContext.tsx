@@ -3,7 +3,7 @@
 import { createContext, useContext, useEffect, useRef, useState } from 'react';
 import { get, post } from '@/utils/request';
 import { useRouter } from 'next/navigation';
-import { UserRole } from '@/types/user';
+import { UserRole } from '@/common/enum';
 
 export type AuthContextType = {
     user: any;
@@ -61,11 +61,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             const res = await post('/auth/login', { phone, password });
             if (!res.success) return false;
 
-            // const isValid = await fetchMe();
+            const isValid = await fetchMe();
 
-            // if (!isValid) {
-            //     return false;
-            // }
+            if (!isValid) {
+                return false;
+            }
 
             return true;
         } catch {

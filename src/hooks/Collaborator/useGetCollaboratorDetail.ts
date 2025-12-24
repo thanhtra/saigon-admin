@@ -1,18 +1,22 @@
 import { get } from '@/utils/request';
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 
 const useGetCollaboratorDetail = () => {
-    const getCollaboratorDetail = useCallback(async (id: string) => {
+    const [loading, setLoading] = useState(false);
+
+    const getCollaboratorDetail = useCallback(async (id: string): Promise<any> => {
+        setLoading(true);
         try {
-            const data = await get(`/collaborator/${id}`);
-            return data;
+            return await get(`/collaborators/${id}`);
         } catch (error) {
-            console.error('Error fetching:', error);
+            console.log('Error getCollaboratorDetail: ', error);
             throw error;
+        } finally {
+            setLoading(false);
         }
     }, []);
 
-    return { getCollaboratorDetail };
+    return { getCollaboratorDetail, loading };
 };
 
 export default useGetCollaboratorDetail;

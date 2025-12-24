@@ -1,19 +1,23 @@
-import { put } from "@/utils/apiClient";
-import { Collaborator } from "@/utils/type";
-import { useCallback } from "react";
+import { CollaboratorInput } from '@/common/type';
+import { put } from '@/utils/request';
+import { useCallback, useState } from 'react';
 
 const useUpdateCollaborator = () => {
-    const updateCollaborator = useCallback(async (id: string, body: Collaborator) => {
+    const [loading, setLoading] = useState(false);
+
+    const updateCollaborator = useCallback(async (id: string, body: CollaboratorInput): Promise<any> => {
+        setLoading(true);
         try {
-            const updated = await put(`/collaborator/${id}`, body);
-            return updated;
+            return await put(`/collaborators/${id}`, body);
         } catch (error) {
-            console.error(error);
+            console.log('Error updateCollaborator: ', error);
             throw error;
+        } finally {
+            setLoading(false);
         }
     }, []);
 
-    return { updateCollaborator };
+    return { updateCollaborator, loading };
 };
 
 export default useUpdateCollaborator;

@@ -1,14 +1,17 @@
 'use client';
 
 import ConfirmDialog from '@/components/ConfirmDialog';
-import useDeleteUser from '@/hooks/User/useDeleteUser';
+import useDeleteTenant from '@/hooks/Tenant/useDeleteTenant';
+import useGetTenants from '@/hooks/Tenant/useGetTenants';
+
 import { CardItem, HeaderRow, TitleMain } from '@/styles/common';
 import DeleteIcon from '@mui/icons-material/Delete';
-import EditIcon from '@mui/icons-material/Edit';
+import VisibilityIcon from '@mui/icons-material/Visibility';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import CancelIcon from '@mui/icons-material/Cancel';
+
 import {
     Box,
-    Button,
     CircularProgress,
     IconButton,
     Link,
@@ -22,68 +25,68 @@ import {
     TextField,
     Tooltip,
 } from '@mui/material';
-import { useRouter } from 'next/navigation';
+
 import { useCallback, useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { toast } from 'react-toastify';
-import { User } from '@/common/type';
-import { UserRoleOptions } from '@/common/const';
-import { UserRole } from '@/common/enum';
-import useGetUsers from '@/hooks/User/useGetUsers';
+import { Tenant } from '@/common/type';
 
-export default function UsersPage() {
+export default function TenantsPage() {
     const router = useRouter();
-    const { getUsers } = useGetUsers();
-    const { deleteUser, loading: deleting } = useDeleteUser();
+    const { getTenants } = useGetTenants();
+    const { deleteTenant, loading: deleting } = useDeleteTenant();
 
-    const [users, setUsers] = useState<User[]>([]);
+    const [tenants, setTenants] = useState<Tenant[]>([]);
     const [search, setSearch] = useState('');
     const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
     const [loading, setLoading] = useState(false);
 
     const [openConfirm, setOpenConfirm] = useState(false);
-    const [userToDelete, setUserToDelete] = useState<User | null>(null);
+    const [tenantToDelete, setTenantToDelete] = useState<Tenant | null>(null);
 
-    // ---------------- FETCH USERS ----------------
-    const fetchUsers = useCallback(async () => {
+    /* ================= FETCH ================= */
+
+    const fetchTenants = useCallback(async () => {
         setLoading(true);
         try {
-            const res = await getUsers({
+            const res = await getTenants({
                 keySearch: search,
                 page,
                 size: 10,
             });
 
             if (res?.success) {
-                setUsers(res.result.data);
+                setTenants(res.result.data);
                 setTotalPages(res.result.meta.pageCount);
             } else {
-                setUsers([]);
+                setTenants([]);
                 setTotalPages(1);
             }
         } catch {
-            toast.error('Không thể tải danh sách người dùng');
-            setUsers([]);
+            toast.error('Không thể tải danh sách khách hàng');
+            setTenants([]);
         } finally {
             setLoading(false);
         }
-    }, [getUsers, search, page]);
+    }, [getTenants, search, page]);
 
     useEffect(() => {
-        fetchUsers();
-    }, [fetchUsers]);
+        fetchTenants();
+    }, [fetchTenants]);
 
-    // ---------------- DELETE ----------------
+    /* ================= DELETE ================= */
+
     const handleDelete = async () => {
-        if (!userToDelete?.id) return;
+        if (!tenantToDelete?.id) return;
 
         try {
-            const res = await deleteUser(userToDelete.id);
+            const res = await deleteTenant(tenantToDelete.id);
             if (res?.success) {
-                toast.success('Xoá thành công');
+                toast.success('Xoá khách hàng thành công');
                 setOpenConfirm(false);
-                setUserToDelete(null);
-                fetchUsers();
+                setTenantToDelete(null);
+                fetchTenants();
             } else {
                 toast.error(res?.message || 'Xoá thất bại');
             }
@@ -92,32 +95,27 @@ export default function UsersPage() {
         }
     };
 
+    /* ================= RENDER ================= */
+
     return (
         <>
-            <TitleMain>Danh sách tài khoản</TitleMain>
+            <TitleMain>Quản lý khách hàng</TitleMain>
 
             <CardItem>
-                <HeaderRow>
-                    <Button
-                        variant="contained"
-                        onClick={() => router.push('/user/create')}
-                    >
-                        + Thêm mới
-                    </Button>
-                </HeaderRow>
+                <HeaderRow />
 
                 {/* SEARCH */}
                 <Box mb={2}>
                     <TextField
                         fullWidth
                         size="small"
-                        label="Tìm kiếm"
+                        label="Tìm theo tên / SĐT"
                         value={search}
                         onChange={(e) => {
-                            setPage(0);
+                            setPage(1);
                             setSearch(e.target.value);
                         }}
-                        sx={{ maxWidth: 500 }}
+                        sx={{ maxWidth: 400 }}
                     />
                 </Box>
 
@@ -127,10 +125,10 @@ export default function UsersPage() {
                         <TableHead sx={{ backgroundColor: '#f5f5f5' }}>
                             <TableRow>
                                 <TableCell><strong>Tên</strong></TableCell>
-                                <TableCell><strong>Số điện thoại</strong></TableCell>
-                                <TableCell><strong>Phân quyền</strong></TableCell>
+                                <TableCell><strong>SĐT</strong></TableCell>
                                 <TableCell><strong>Facebook</strong></TableCell>
-                                <TableCell><strong>Mô tả</strong></TableCell>
+                                <TableCell><strong>Số hợp đồng</strong></TableCell>
+                                <TableCell><strong>Ghi chú</strong></TableCell>
                                 <TableCell align="center"><strong>Trạng thái</strong></TableCell>
                                 <TableCell align="center"><strong>Hành động</strong></TableCell>
                             </TableRow>
@@ -139,51 +137,60 @@ export default function UsersPage() {
                         <TableBody>
                             {loading ? (
                                 <TableRow>
-                                    <TableCell colSpan={4} align="center" sx={{ py: 5 }}>
+                                    <TableCell colSpan={7} align="center" sx={{ py: 5 }}>
                                         <CircularProgress size={24} />
                                     </TableCell>
                                 </TableRow>
-                            ) : users.length ? (
-                                users.map((user) => (
-                                    <TableRow key={user.id} hover>
-                                        <TableCell>{user.name}</TableCell>
-                                        <TableCell>{user.phone}</TableCell>
-                                        <TableCell>{UserRoleOptions[user.role as UserRole]}</TableCell>
+                            ) : tenants.length ? (
+                                tenants.map((tenant) => (
+                                    <TableRow key={tenant.id} hover>
+                                        <TableCell>{tenant.user?.name}</TableCell>
+                                        <TableCell>{tenant.user?.phone}</TableCell>
+
                                         <TableCell>
-                                            {user?.link_facebook ? (
+                                            {tenant.user?.link_facebook ? (
                                                 <Link
-                                                    href={user.link_facebook}
+                                                    href={tenant.user?.link_facebook}
                                                     target="_blank"
-                                                    rel="noopener noreferrer"
                                                     underline="hover"
                                                 >
                                                     Facebook
                                                 </Link>
-                                            ) : (
-                                                '-'
-                                            )}
+                                            ) : '-'}
                                         </TableCell>
-                                        <TableCell>{user.note}</TableCell>
+
+                                        <TableCell>
+                                            {tenant.contracts?.length || 0}
+                                        </TableCell>
+
+                                        <TableCell>{tenant.note || '-'}</TableCell>
+
                                         <TableCell align="center">
-                                            <Tooltip title={user.active ? 'Đang hoạt động' : 'Không hoạt động'}>
-                                                {user.active ? <CheckCircleIcon color="success" fontSize="small" /> : <CancelIcon color="error" fontSize="small" />}
+                                            <Tooltip title={tenant.user?.active ? 'Đang hoạt động' : 'Không hoạt động'}>
+                                                {tenant.user?.active ? (
+                                                    <CheckCircleIcon color="success" fontSize="small" />
+                                                ) : (
+                                                    <CancelIcon color="error" fontSize="small" />
+                                                )}
                                             </Tooltip>
                                         </TableCell>
+
                                         <TableCell align="center">
                                             <IconButton
                                                 size="small"
                                                 onClick={() =>
-                                                    router.push(`/user/${user.id}/edit`)
+                                                    router.push(`/tenant/${tenant.id}`)
                                                 }
                                             >
-                                                <EditIcon fontSize="small" />
+                                                <VisibilityIcon fontSize="small" />
                                             </IconButton>
+
                                             <IconButton
                                                 size="small"
                                                 color="error"
                                                 disabled={deleting}
                                                 onClick={() => {
-                                                    setUserToDelete(user);
+                                                    setTenantToDelete(tenant);
                                                     setOpenConfirm(true);
                                                 }}
                                             >
@@ -194,7 +201,7 @@ export default function UsersPage() {
                                 ))
                             ) : (
                                 <TableRow>
-                                    <TableCell colSpan={4} align="center">
+                                    <TableCell colSpan={7} align="center">
                                         Không có dữ liệu
                                     </TableCell>
                                 </TableRow>
@@ -220,8 +227,8 @@ export default function UsersPage() {
                     onClose={() => setOpenConfirm(false)}
                     onConfirm={handleDelete}
                     loading={deleting}
-                    title="Xác nhận xoá"
-                    description="Bạn có chắc chắn muốn xoá? Hành động này không thể hoàn tác."
+                    title="Xác nhận xoá khách hàng"
+                    description="Bạn có chắc chắn muốn xoá khách hàng này?"
                 />
             </CardItem>
         </>

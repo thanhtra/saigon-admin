@@ -1,13 +1,8 @@
-import { UserRole } from "@/common/enum";
-import { User } from "@/common/type";
+import { CollaboratorInput } from "@/common/type";
 
-
-export const USER_DEFAULT_VALUES: User = {
-    name: '',
-    phone: '',
-    password: '',
-    email: '',
-    role: UserRole.Tenant,
+export const COLLABORATOR_DEFAULT_VALUES: CollaboratorInput = {
+    user_id: '',
+    field_cooperation: undefined as any,
     note: '',
     active: true,
 };

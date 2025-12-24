@@ -2,98 +2,123 @@
 
 import { Box, Button } from '@mui/material';
 import { Control } from 'react-hook-form';
-import FormTextField from '@/components/FormTextField';
+import { toast } from 'react-toastify';
+import { useCallback, useEffect } from 'react';
+
 import FormSwitch from '@/components/FormSwitch';
-import FormAutocomplete from '@/components/FormAutocomplete';
-import { formGridStyles } from '@/styles/formGrid';
-import {
-    CollaboratorTypeLabels,
-    FieldCooperationLabels,
-} from '@/common/const';
+import FormTextField from '@/components/FormTextField';
+import FormAutocompleteSimple from '@/components/FormAutocompleteSimple';
+
+import { FieldCooperationLabels } from '@/common/const';
 import { CollaboratorInput } from '@/common/type';
-import useAvailableCollaboratorUsers from '@/hooks/Collaborator/useAvailableCollaborator';
-import { useEffect } from 'react';
+
+import useGetAvailableCollaborators from '@/hooks/User/useGetAvailableCollaborators';
+import { formGridStyles } from '@/styles/formGrid';
+
+type UserOption = {
+    label: string;
+    value: string;
+};
 
 type Props = {
     control: Control<CollaboratorInput>;
     loading?: boolean;
     onSubmit: () => void;
+    isEdit?: boolean;
+    userOption?: UserOption | null;
 };
 
 const CollaboratorForm: React.FC<Props> = ({
     control,
-    loading,
+    loading = false,
     onSubmit,
+    isEdit = false,
+    userOption,
 }) => {
+    const { getAvailableCollaborators } = useGetAvailableCollaborators();
 
-    const { fetchUsers, options: userOptions, loading: xxx } =
-        useAvailableCollaboratorUsers();
+    const fetchUserOptions = useCallback(
+        async (keyword?: string) => {
+            if (isEdit) return [];
 
+            try {
+                const res = await getAvailableCollaborators({
+                    keyword,
+                    limit: 200,
+                });
+
+                if (!res?.success) return [];
+
+                return res.result.map((u: any) => ({
+                    label: `${u.name} - ${u.phone}`,
+                    value: u.id,
+                }));
+            } catch {
+                toast.error('Không thể tải danh sách người dùng');
+                return [];
+            }
+        },
+        [getAvailableCollaborators, isEdit],
+    );
+
+    const fieldOptions = [
+        { label: '-- Chọn lĩnh vực --', value: '' },
+        ...Object.entries(FieldCooperationLabels).map(
+            ([value, label]) => ({ value, label }),
+        ),
+    ];
+
+    // 🔥 LOG OPTIONS
     useEffect(() => {
-        fetchUsers();
-    }, [fetchUsers]);
-
+        console.log('FIELD OPTIONS:', fieldOptions);
+    }, []);
 
     return (
-        <Box
-            component="form"
-            onSubmit={onSubmit}
-            noValidate
-            sx={formGridStyles.form}
-        >
-            <FormAutocomplete
+        <Box component="form" onSubmit={onSubmit} noValidate sx={formGridStyles.form}>
+            {/* USER */}
+            <FormAutocompleteSimple
                 name="user_id"
                 control={control}
                 label="Người dùng"
-                options={userOptions}
+                fetchOptions={fetchUserOptions}
                 required
-                disabled={loading}
+                disabled={isEdit}
+                defaultOptions={userOption ? [userOption] : []}
             />
 
-            <FormTextField
-                name="type"
-                control={control}
-                label="Loại cộng tác"
-                required
-                options={[
-                    { label: '-- Chọn loại --', value: '' },
-                    ...Object.entries(CollaboratorTypeLabels).map(([value, label]) => ({
-                        label,
-                        value,
-                    })),
-                ]}
-            />
-
+            {/* FIELD */}
             <FormTextField
                 name="field_cooperation"
                 control={control}
                 label="Lĩnh vực hợp tác"
                 required
-                options={[
-                    { label: '-- Chọn lĩnh vực --', value: '' },
-                    ...Object.entries(FieldCooperationLabels).map(([value, label]) => ({
-                        label,
-                        value,
-                    })),
-                ]}
+                options={fieldOptions}
             />
 
-            <Box sx={formGridStyles.alignRight}>
+            <FormTextField
+                name="note"
+                control={control}
+                label="Mô tả"
+                multiline
+                rows={2}
+            />
+
+            <Box sx={formGridStyles.actionRow}>
                 <FormSwitch
                     name="active"
                     control={control}
                     label="Kích hoạt"
                 />
-            </Box>
 
-            <Button
-                type="submit"
-                variant="contained"
-                disabled={loading}
-                sx={formGridStyles.submitButton}
-            >
-                {loading ? 'Đang tạo...' : 'Tạo cộng tác viên'}
-            </Button>
+                <Button
+                    type="submit"
+                    variant="contained"
+                    disabled={loading}
+                    sx={formGridStyles.submitButton}
+                >
+                    {loading ? 'Đang lưu...' : 'Lưu'}
+                </Button>
+            </Box>
         </Box>
     );
 };

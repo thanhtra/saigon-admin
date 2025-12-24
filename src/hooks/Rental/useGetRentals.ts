@@ -1,34 +1,32 @@
 import { get } from '@/utils/request';
 import { useCallback, useState } from 'react';
 
-export type GetRentalsParams = {
+export type Params = {
     page?: number;
     size?: number;
     keySearch?: string;
     isPagin?: boolean;
     profession?: string;
+    active?: boolean;
 };
 
 const useGetRentals = () => {
     const [loading, setLoading] = useState(false);
 
-    const getRentals = useCallback(async (params?: GetRentalsParams) => {
+    const getRentals = useCallback(async (params?: Params) => {
         setLoading(true);
         try {
-            const res = await get('/rentals', params);
-            return res;
+            return await get('/rentals', params);
         } catch (error) {
-            console.error('Get rentals error:', error);
+            console.error('Error getRentals:', error);
             throw error;
         } finally {
             setLoading(false);
         }
     }, []);
 
-    return {
-        getRentals,
-        loading,
-    };
+    return { getRentals, loading };
 };
 
 export default useGetRentals;
+

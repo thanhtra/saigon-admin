@@ -1,40 +1,42 @@
 'use client';
 
 import { useCallback } from 'react';
-import { useForm, SubmitHandler } from 'react-hook-form';
+import { SubmitHandler, useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
 
+import { CollaboratorInput } from '@/common/type';
 import BackToList from '@/components/BackToList';
-import { CardItem, HeaderRow, TitleMain } from '@/styles/common';
 import useCreateCollaborator from '@/hooks/Collaborator/useCreateCollaborator';
+import { CardItem, HeaderRow, TitleMain } from '@/styles/common';
 import CollaboratorForm from '../CollaboratorForm';
-import { Collaborator, CollaboratorInput } from '@/common/type';
+import { COLLABORATOR_DEFAULT_VALUES } from '../const';
 
 
-const DEFAULT_VALUES: CollaboratorInput = {
-    user_id: '',
-    type: undefined as any,
-    field_cooperation: undefined as any,
-    active: true,
-};
+
 
 export default function CreateCollaborator() {
     const { createCollaborator, loading } = useCreateCollaborator();
 
     const { control, handleSubmit, reset } =
         useForm<CollaboratorInput>({
-            defaultValues: DEFAULT_VALUES,
+            defaultValues: COLLABORATOR_DEFAULT_VALUES,
         });
 
     const onSubmit: SubmitHandler<CollaboratorInput> =
         useCallback(
             async (data) => {
                 try {
-                    const res = await createCollaborator(data);
+                    const payload: CollaboratorInput = {
+                        user_id: data.user_id,
+                        field_cooperation: data.field_cooperation,
+                        note: data.note,
+                        active: data.active
+                    }
+                    const res = await createCollaborator(payload);
 
                     if (res?.success) {
                         toast.success('Tạo cộng tác viên thành công');
-                        reset(DEFAULT_VALUES);
+                        reset(COLLABORATOR_DEFAULT_VALUES);
                         return;
                     }
 
@@ -48,11 +50,11 @@ export default function CreateCollaborator() {
 
     return (
         <>
-            <TitleMain>Thêm mới chủ nhà / môi giới</TitleMain>
+            <TitleMain>Thêm mới chủ nhà - môi giới</TitleMain>
 
             <CardItem>
                 <HeaderRow>
-                    <BackToList href="/collaborators" />
+                    <BackToList href="/collaborator" />
                 </HeaderRow>
 
                 <CollaboratorForm

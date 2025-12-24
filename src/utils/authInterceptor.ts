@@ -2,7 +2,7 @@
 import { AxiosError, AxiosInstance } from 'axios';
 
 let isRefreshing = false;
-let queue: (() => void)[] = [];
+let queue: Array<() => void> = [];
 
 const processQueue = () => {
     queue.forEach(cb => cb());
@@ -16,13 +16,11 @@ export function setupAuthInterceptor(apiClient: AxiosInstance) {
             const originalRequest: any = error.config;
             const url = originalRequest?.url || '';
 
-            // ❌ không xử lý me
-            if (url.includes('/auth/me')) {
-                return Promise.reject(error);
-            }
-
-            // ❌ không xử lý refresh
-            if (url.includes('/auth/refresh-token')) {
+            // ❌ bỏ qua các api không cần refresh
+            if (
+                url.includes('/auth/me') ||
+                url.includes('/auth/refresh-token')
+            ) {
                 return Promise.reject(error);
             }
 
@@ -42,7 +40,6 @@ export function setupAuthInterceptor(apiClient: AxiosInstance) {
                     processQueue();
                     return apiClient(originalRequest);
                 } catch (e) {
-                    // 🔥 refresh fail → logout
                     if (typeof window !== 'undefined') {
                         window.location.href = '/login';
                     }

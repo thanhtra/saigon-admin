@@ -84,40 +84,49 @@ const Sidebar: React.FC = () => {
                     <ListItemButton
                         sx={{ pl: 4 }}
                         component={Link}
+                        href="/tenant"
+                        selected={isActive('/tenant')}
+                    >
+                        <ListItemText primary="Khách hàng" />
+                    </ListItemButton>
+
+                    <ListItemButton
+                        sx={{ pl: 4 }}
+                        component={Link}
                         href="/rental"
                         selected={isActive('/rental')}
                     >
-                        <ListItemText primary="Cho thuê" />
+                        <ListItemText primary="Nhà cho thuê" />
                     </ListItemButton>
                     <ListItemButton
                         sx={{ pl: 4 }}
                         component={Link}
-                        href="/marketing/room"
-                        selected={isActive('/marketing/room')}
+                        href="/room"
+                        selected={isActive('/room')}
                     >
                         <ListItemText primary="Phòng trọ" />
                     </ListItemButton>
                     <ListItemButton
                         sx={{ pl: 4 }}
                         component={Link}
-                        href="/marketing/booking"
-                        selected={isActive('/marketing/booking')}
+                        href="/booking"
+                        selected={isActive('/booking')}
                     >
                         <ListItemText primary="Lịch xem phòng" />
                     </ListItemButton>
                     <ListItemButton
                         sx={{ pl: 4 }}
                         component={Link}
-                        href="/marketing/contract"
-                        selected={isActive('/marketing/contract')}
+                        href="/contract"
+                        selected={isActive('/contract')}
                     >
                         <ListItemText primary="Hợp đồng" />
                     </ListItemButton>
                     <ListItemButton
                         sx={{ pl: 4 }}
                         component={Link}
-                        href="/marketing/commission"
-                        selected={isActive('/marketing/commission')}
+                        href="/commission"
+                        selected={isActive('/commission')}
                     >
                         <ListItemText primary="Hoa hồng" />
                     </ListItemButton>

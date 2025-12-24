@@ -1,4 +1,3 @@
-import { FieldCooperation } from '@/common/enum';
 import { get } from '@/utils/request';
 import { useCallback, useState } from 'react';
 
@@ -7,26 +6,26 @@ export type Params = {
     size?: number;
     keySearch?: string;
     isPagin?: boolean;
-    field_cooperation?: FieldCooperation;
+    profession?: string;
 };
 
-const useGetCollaborators = () => {
+const useGetTenants = () => {
     const [loading, setLoading] = useState(false);
 
-    const getCollaborators = useCallback(async (params?: Params) => {
+    const getTenants = useCallback(async (params?: Params) => {
         setLoading(true);
         try {
-            return await get('/collaborators', params);
+            return await get('/tenants', params);
         } catch (error) {
-            console.error('Error getCollaborators:', error);
+            console.error('Error getTenants:', error);
             throw error;
         } finally {
             setLoading(false);
         }
     }, []);
 
-    return { getCollaborators, loading };
+    return { getTenants, loading };
 };
 
-export default useGetCollaborators;
+export default useGetTenants;
 

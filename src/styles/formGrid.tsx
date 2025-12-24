@@ -14,6 +14,13 @@ export const formGridStyles = {
         justifyContent: 'flex-end',
         alignItems: 'center',
     },
+    actionRow: {
+        gridColumn: 'span 2',
+        display: 'flex',
+        justifyContent: 'flex-end', // cả cụm nằm bên phải
+        alignItems: 'center',
+        gap: '30px',                // khoảng cách giữa switch và nút
+    },
     submitButton: {
         gridColumn: 'span 2',
         justifySelf: 'end',

@@ -45,7 +45,7 @@ const Navbar: React.FC = () => {
                     }}
                 >
                     <Typography fontSize={16} fontWeight={600}>
-                        XXX
+                        YYY
                     </Typography>
 
                     {/* PROFILE */}

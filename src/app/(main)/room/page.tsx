@@ -1,17 +1,12 @@
 'use client';
 
 import ConfirmDialog from '@/components/ConfirmDialog';
-import useDeleteUser from '@/hooks/User/useDeleteUser';
 import { CardItem, HeaderRow, TitleMain } from '@/styles/common';
-import DeleteIcon from '@mui/icons-material/Delete';
-import EditIcon from '@mui/icons-material/Edit';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import {
     Box,
     Button,
     CircularProgress,
     IconButton,
-    Link,
     Pagination,
     Paper,
     Table,
@@ -22,102 +17,103 @@ import {
     TextField,
     Tooltip,
 } from '@mui/material';
-import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
 import { toast } from 'react-toastify';
-import { User } from '@/common/type';
-import { UserRoleOptions } from '@/common/const';
-import { UserRole } from '@/common/enum';
-import useGetUsers from '@/hooks/User/useGetUsers';
 
-export default function UsersPage() {
+import { RoomStatusLabels } from '@/common/const';
+import { RoomStatus } from '@/common/enum';
+import useDeleteRoom from '@/hooks/Room/useDeleteRoom';
+import useGetRooms from '@/hooks/Room/useGetRentals';
+
+export default function RoomPage() {
     const router = useRouter();
-    const { getUsers } = useGetUsers();
-    const { deleteUser, loading: deleting } = useDeleteUser();
+    const { getRooms } = useGetRooms();
+    const { deleteRoom } = useDeleteRoom();
 
-    const [users, setUsers] = useState<User[]>([]);
-    const [search, setSearch] = useState('');
+    const [rooms, setRooms] = useState<any[]>([]);
+    const [keySearch, setKeySearch] = useState('');
     const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
     const [loading, setLoading] = useState(false);
 
     const [openConfirm, setOpenConfirm] = useState(false);
-    const [userToDelete, setUserToDelete] = useState<User | null>(null);
+    const [roomToDelete, setRoomToDelete] = useState<any | null>(null);
 
-    // ---------------- FETCH USERS ----------------
-    const fetchUsers = useCallback(async () => {
+    /* ================= FETCH ================= */
+    const fetchData = useCallback(async () => {
         setLoading(true);
         try {
-            const res = await getUsers({
-                keySearch: search,
+            const res = await getRooms({
+                keySearch,
                 page,
                 size: 10,
             });
 
             if (res?.success) {
-                setUsers(res.result.data);
+                setRooms(res.result.data);
                 setTotalPages(res.result.meta.pageCount);
             } else {
-                setUsers([]);
+                setRooms([]);
                 setTotalPages(1);
             }
         } catch {
-            toast.error('Không thể tải danh sách người dùng');
-            setUsers([]);
+            toast.error('Không thể tải danh sách phòng');
         } finally {
             setLoading(false);
         }
-    }, [getUsers, search, page]);
+    }, [getRooms, keySearch, page]);
 
     useEffect(() => {
-        fetchUsers();
-    }, [fetchUsers]);
+        fetchData();
+    }, [fetchData]);
 
-    // ---------------- DELETE ----------------
+    /* ================= DELETE ================= */
     const handleDelete = async () => {
-        if (!userToDelete?.id) return;
+        if (!roomToDelete?.id) return;
 
         try {
-            const res = await deleteUser(userToDelete.id);
+            const res = await deleteRoom(roomToDelete.id);
             if (res?.success) {
-                toast.success('Xoá thành công');
+                toast.success('Xoá phòng thành công');
                 setOpenConfirm(false);
-                setUserToDelete(null);
-                fetchUsers();
+                setRoomToDelete(null);
+                fetchData();
             } else {
                 toast.error(res?.message || 'Xoá thất bại');
             }
         } catch {
-            toast.error('Có lỗi xảy ra khi xoá');
+            toast.error('Có lỗi khi xoá phòng');
         }
     };
 
     return (
         <>
-            <TitleMain>Danh sách tài khoản</TitleMain>
+            <TitleMain>Danh sách phòng</TitleMain>
 
             <CardItem>
                 <HeaderRow>
                     <Button
                         variant="contained"
-                        onClick={() => router.push('/user/create')}
+                        onClick={() => router.push('/room/create')}
                     >
-                        + Thêm mới
+                        + Thêm phòng
                     </Button>
                 </HeaderRow>
 
                 {/* SEARCH */}
                 <Box mb={2}>
                     <TextField
-                        fullWidth
                         size="small"
-                        label="Tìm kiếm"
-                        value={search}
+                        label="Tìm theo mã phòng / tên nhà"
+                        value={keySearch}
                         onChange={(e) => {
-                            setPage(0);
-                            setSearch(e.target.value);
+                            setPage(1);
+                            setKeySearch(e.target.value);
                         }}
-                        sx={{ maxWidth: 500 }}
+                        sx={{ minWidth: 400 }}
                     />
                 </Box>
 
@@ -126,11 +122,10 @@ export default function UsersPage() {
                     <Table size="small">
                         <TableHead sx={{ backgroundColor: '#f5f5f5' }}>
                             <TableRow>
-                                <TableCell><strong>Tên</strong></TableCell>
-                                <TableCell><strong>Số điện thoại</strong></TableCell>
-                                <TableCell><strong>Phân quyền</strong></TableCell>
-                                <TableCell><strong>Facebook</strong></TableCell>
-                                <TableCell><strong>Mô tả</strong></TableCell>
+                                <TableCell><strong>Mã phòng</strong></TableCell>
+                                <TableCell><strong>Nhà</strong></TableCell>
+                                <TableCell><strong>Giá</strong></TableCell>
+                                <TableCell><strong>Diện tích</strong></TableCell>
                                 <TableCell align="center"><strong>Trạng thái</strong></TableCell>
                                 <TableCell align="center"><strong>Hành động</strong></TableCell>
                             </TableRow>
@@ -139,41 +134,35 @@ export default function UsersPage() {
                         <TableBody>
                             {loading ? (
                                 <TableRow>
-                                    <TableCell colSpan={4} align="center" sx={{ py: 5 }}>
+                                    <TableCell colSpan={6} align="center" sx={{ py: 5 }}>
                                         <CircularProgress size={24} />
                                     </TableCell>
                                 </TableRow>
-                            ) : users.length ? (
-                                users.map((user) => (
-                                    <TableRow key={user.id} hover>
-                                        <TableCell>{user.name}</TableCell>
-                                        <TableCell>{user.phone}</TableCell>
-                                        <TableCell>{UserRoleOptions[user.role as UserRole]}</TableCell>
+                            ) : rooms.length ? (
+                                rooms.map((r) => (
+                                    <TableRow key={r.id} hover>
+                                        <TableCell>{r.room_code}</TableCell>
+                                        <TableCell>{r.rental?.title || '-'}</TableCell>
                                         <TableCell>
-                                            {user?.link_facebook ? (
-                                                <Link
-                                                    href={user.link_facebook}
-                                                    target="_blank"
-                                                    rel="noopener noreferrer"
-                                                    underline="hover"
-                                                >
-                                                    Facebook
-                                                </Link>
-                                            ) : (
-                                                '-'
-                                            )}
+                                            {r.price
+                                                ? `${r.price.toLocaleString()} đ`
+                                                : '-'}
                                         </TableCell>
-                                        <TableCell>{user.note}</TableCell>
+                                        <TableCell>
+                                            {r.area ? `${r.area} m²` : '-'}
+                                        </TableCell>
                                         <TableCell align="center">
-                                            <Tooltip title={user.active ? 'Đang hoạt động' : 'Không hoạt động'}>
-                                                {user.active ? <CheckCircleIcon color="success" fontSize="small" /> : <CancelIcon color="error" fontSize="small" />}
+                                            <Tooltip title={RoomStatusLabels[r.status as RoomStatus]}>
+                                                <span>
+                                                    {RoomStatusLabels[r.status as RoomStatus]}
+                                                </span>
                                             </Tooltip>
                                         </TableCell>
                                         <TableCell align="center">
                                             <IconButton
                                                 size="small"
                                                 onClick={() =>
-                                                    router.push(`/user/${user.id}/edit`)
+                                                    router.push(`/room/${r.id}/edit`)
                                                 }
                                             >
                                                 <EditIcon fontSize="small" />
@@ -181,9 +170,8 @@ export default function UsersPage() {
                                             <IconButton
                                                 size="small"
                                                 color="error"
-                                                disabled={deleting}
                                                 onClick={() => {
-                                                    setUserToDelete(user);
+                                                    setRoomToDelete(r);
                                                     setOpenConfirm(true);
                                                 }}
                                             >
@@ -194,7 +182,7 @@ export default function UsersPage() {
                                 ))
                             ) : (
                                 <TableRow>
-                                    <TableCell colSpan={4} align="center">
+                                    <TableCell colSpan={6} align="center">
                                         Không có dữ liệu
                                     </TableCell>
                                 </TableRow>
@@ -214,14 +202,13 @@ export default function UsersPage() {
                     </Box>
                 )}
 
-                {/* CONFIRM */}
+                {/* CONFIRM DELETE */}
                 <ConfirmDialog
                     open={openConfirm}
                     onClose={() => setOpenConfirm(false)}
                     onConfirm={handleDelete}
-                    loading={deleting}
-                    title="Xác nhận xoá"
-                    description="Bạn có chắc chắn muốn xoá? Hành động này không thể hoàn tác."
+                    title="Xác nhận xoá phòng"
+                    description={`Bạn có chắc muốn xoá phòng "${roomToDelete?.room_code}" không?`}
                 />
             </CardItem>
         </>

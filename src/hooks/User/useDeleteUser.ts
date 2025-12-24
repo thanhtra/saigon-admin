@@ -4,23 +4,19 @@ import { useCallback, useState } from 'react';
 const useDeleteUser = () => {
     const [loading, setLoading] = useState(false);
 
-    const deleteUser = useCallback(async (id: string) => {
+    const deleteUser = useCallback(async (id: string): Promise<any> => {
         setLoading(true);
         try {
-            const res = await del(`/users/${id}`);
-            return res;
+            return await del(`/users/${id}`);
         } catch (error) {
-            console.error('Delete user error:', error);
+            console.error('Error deleteUser:', error);
             throw error;
         } finally {
             setLoading(false);
         }
     }, []);
 
-    return {
-        deleteUser,
-        loading,
-    };
+    return { deleteUser, loading };
 };
 
 export default useDeleteUser;

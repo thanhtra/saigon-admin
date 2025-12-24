@@ -1,32 +1,24 @@
-import { User } from '@/types/user';
+import { User } from '@/common/type';
 import { post } from '@/utils/request';
 import { useCallback, useState } from 'react';
 
-interface CreateUserResponse {
-	success: boolean;
-	message?: string;
-	data?: User;
-}
 
 const useCreateUser = () => {
 	const [loading, setLoading] = useState(false);
 
-	const createUser = useCallback(
-		async (body: User): Promise<CreateUserResponse> => {
-			setLoading(true);
-			try {
-				return await post('/users', body);
-			} finally {
-				setLoading(false);
-			}
-		},
-		[],
-	);
+	const createUser = useCallback(async (body: User): Promise<any> => {
+		setLoading(true);
+		try {
+			return await post('/users', body);
+		} catch (error) {
+			console.log('Error createUser: ', error);
+			throw error;
+		} finally {
+			setLoading(false);
+		}
+	}, []);
 
-	return {
-		createUser,
-		loading,
-	};
+	return { createUser, loading };
 };
 
 export default useCreateUser;

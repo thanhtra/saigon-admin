@@ -19,27 +19,33 @@ import {
     TextField,
     Tooltip,
 } from '@mui/material';
-
+import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import CancelIcon from '@mui/icons-material/Cancel';
 
 import { CardItem, HeaderRow, TitleMain } from '@/styles/common';
-import useGetCollaborators from '@/hooks/Collaborator/useGetCollaborators';
 import { Collaborator } from '@/common/type';
 import {
     CollaboratorTypeLabels,
     FieldCooperationLabels,
 } from '@/common/const';
+import useGetCollaborators from '@/hooks/Collaborator/useGetCollaborators';
+import useDeleteCollaborator from '@/hooks/Collaborator/useDeleteCollaborator';
+import ConfirmDialog from '@/components/ConfirmDialog';
 
 export default function CollaboratorsPage() {
     const router = useRouter();
     const { getCollaborators } = useGetCollaborators();
+    const { deleteCollaborator, loading: deleting } = useDeleteCollaborator();
+
+    const [openConfirm, setOpenConfirm] = useState(false);
+    const [collaboratorToDelete, setCollaboratorToDelete] = useState<Collaborator | null>(null);
 
     const [data, setData] = useState<Collaborator[]>([]);
     const [search, setSearch] = useState('');
-    const [page, setPage] = useState(0);
+    const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
     const [loading, setLoading] = useState(false);
 
@@ -71,10 +77,29 @@ export default function CollaboratorsPage() {
         fetchData();
     }, [fetchData]);
 
+    const handleDelete = async () => {
+        if (!collaboratorToDelete?.id) return;
+
+        try {
+            const res = await deleteCollaborator(collaboratorToDelete.id);
+            if (res?.success) {
+                toast.success('Xoá thành công');
+                setOpenConfirm(false);
+                setCollaboratorToDelete(null);
+                fetchData(); // load lại danh sách
+            } else {
+                toast.error(res?.message || 'Xoá thất bại');
+            }
+        } catch {
+            toast.error('Có lỗi xảy ra khi xoá');
+        }
+    };
+
+
     // ================= RENDER =================
     return (
         <>
-            <TitleMain>Chủ nhà / Môi giới</TitleMain>
+            <TitleMain>Danh sách Chủ nhà - Môi giới</TitleMain>
 
             <CardItem>
                 <HeaderRow>
@@ -96,7 +121,7 @@ export default function CollaboratorsPage() {
                             setPage(0);
                             setSearch(e.target.value);
                         }}
-                        sx={{ maxWidth: 400 }}
+                        sx={{ width: 500 }}
                     />
                 </Box>
 
@@ -109,7 +134,6 @@ export default function CollaboratorsPage() {
                                 <TableCell><strong>SĐT</strong></TableCell>
                                 <TableCell><strong>Loại</strong></TableCell>
                                 <TableCell><strong>Lĩnh vực</strong></TableCell>
-                                <TableCell align="center"><strong>Tin đăng</strong></TableCell>
                                 <TableCell align="center"><strong>Trạng thái</strong></TableCell>
                                 <TableCell align="center"><strong>Hành động</strong></TableCell>
                             </TableRow>
@@ -134,9 +158,6 @@ export default function CollaboratorsPage() {
                                             {FieldCooperationLabels[item.field_cooperation]}
                                         </TableCell>
                                         <TableCell align="center">
-                                            {item.total_rentals ?? 0}
-                                        </TableCell>
-                                        <TableCell align="center">
                                             <Tooltip
                                                 title={item.active ? 'Đang hoạt động' : 'Đã khoá'}
                                             >
@@ -151,7 +172,7 @@ export default function CollaboratorsPage() {
                                             <IconButton
                                                 size="small"
                                                 onClick={() =>
-                                                    router.push(`/collaborators/${item.id}`)
+                                                    router.push(`/collaborator/${item.id}`)
                                                 }
                                             >
                                                 <VisibilityIcon fontSize="small" />
@@ -159,11 +180,24 @@ export default function CollaboratorsPage() {
                                             <IconButton
                                                 size="small"
                                                 onClick={() =>
-                                                    router.push(`/collaborators/${item.id}/edit`)
+                                                    router.push(`/collaborator/${item.id}/edit`)
                                                 }
                                             >
                                                 <EditIcon fontSize="small" />
                                             </IconButton>
+
+                                            <IconButton
+                                                size="small"
+                                                color="error"
+                                                disabled={deleting}
+                                                onClick={() => {
+                                                    setCollaboratorToDelete(item);
+                                                    setOpenConfirm(true);
+                                                }}
+                                            >
+                                                <DeleteIcon fontSize="small" />
+                                            </IconButton>
+
                                         </TableCell>
                                     </TableRow>
                                 ))
@@ -188,6 +222,16 @@ export default function CollaboratorsPage() {
                         />
                     </Box>
                 )}
+
+                <ConfirmDialog
+                    open={openConfirm}
+                    onClose={() => setOpenConfirm(false)}
+                    onConfirm={handleDelete}
+                    loading={deleting}
+                    title="Xác nhận xoá"
+                    description="Bạn có chắc chắn muốn xoá chủ nhà / môi giới này? Hành động này không thể hoàn tác."
+                />
+
             </CardItem>
         </>
     );

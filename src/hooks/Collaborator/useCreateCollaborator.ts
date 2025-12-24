@@ -1,19 +1,17 @@
+import { CollaboratorInput } from '@/common/type';
+import { post } from '@/utils/request';
+import { useCallback, useState } from 'react';
 
-import { CollaboratorInput } from "@/common/type";
-import { post } from "@/utils/request";
-import { useCallback, useState } from "react";
 
 const useCreateCollaborator = () => {
 	const [loading, setLoading] = useState(false);
 
-	const createCollaborator = useCallback(async (body: CollaboratorInput) => {
+	const createCollaborator = useCallback(async (body: CollaboratorInput): Promise<any> => {
 		setLoading(true);
-
 		try {
-			const res = await post("/collaborator", body);
-			return res;
+			return await post('/collaborators', body);
 		} catch (error) {
-			console.error(error);
+			console.log('Error createCollaborator: ', error);
 			throw error;
 		} finally {
 			setLoading(false);

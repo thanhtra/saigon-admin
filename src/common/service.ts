@@ -87,7 +87,7 @@ export const buildAddressDetail = ({
 
 export const mapCollaboratorOptions = (data: any[] = []) => {
     return data.map(c => ({
-        label: c.name,
+        label: c.user.name,
         value: c.id,
     }));
 };

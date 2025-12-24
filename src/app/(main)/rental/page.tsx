@@ -1,7 +1,6 @@
 'use client';
 
 import ConfirmDialog from '@/components/ConfirmDialog';
-import useDeleteRental from '@/hooks/Rental/useDeleteRental';
 import { CardItem, HeaderRow, TitleMain } from '@/styles/common';
 import {
     Box,
@@ -25,9 +24,10 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import CancelIcon from '@mui/icons-material/Cancel';
 import { toast } from 'react-toastify';
-import useGetRentals from '@/hooks/Rental/useGetRental';
 import { RentalTypeLabels } from '@/common/const';
 import { RentalType } from '@/common/enum';
+import useGetRentals from '@/hooks/Rental/useGetRentals';
+import useDeleteRental from '@/hooks/Rental/useDeleteRental';
 
 
 export default function RentalPage() {
@@ -94,7 +94,7 @@ export default function RentalPage() {
 
     return (
         <>
-            <TitleMain>Danh sách cho thuê</TitleMain>
+            <TitleMain>Danh sách nhà cho thuê</TitleMain>
 
             <CardItem>
                 <HeaderRow>

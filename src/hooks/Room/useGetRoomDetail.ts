@@ -1,22 +1,22 @@
 import { get } from '@/utils/request';
 import { useCallback, useState } from 'react';
 
-const useGetUserDetail = () => {
+const useGetRoomDetail = () => {
     const [loading, setLoading] = useState(false);
 
-    const getUserDetail = useCallback(async (id: string): Promise<any> => {
+    const getRoomDetail = useCallback(async (id: string): Promise<any> => {
         setLoading(true);
         try {
-            return await get(`/users/${id}`);
+            return await get(`/rooms/${id}`);
         } catch (error) {
-            console.log('Error getUserDetail: ', error);
+            console.log('Error getRoomDetail: ', error);
             throw error;
         } finally {
             setLoading(false);
         }
     }, []);
 
-    return { getUserDetail, loading };
+    return { getRoomDetail, loading };
 };
 
-export default useGetUserDetail;
+export default useGetRoomDetail;

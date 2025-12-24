@@ -1,5 +1,4 @@
-import { CommissionStatus, Profession, RentalAmenity, RentalType, UserRole } from "./enum";
-import { CollaboratorType, FieldCooperation } from './enum';
+import { CollaboratorType, CommissionStatus, FieldCooperation, RentalAmenity, RentalType, UserRole } from "./enum";
 
 // ---------------------    COMMON    --------------------- //
 export type Option = {
@@ -46,9 +45,28 @@ export type LoginResponse = {
 };
 
 
+// ---------------------    USER    --------------------- //
+
+export type User = {
+    id?: string;
+    name: string;
+    phone: string;
+    password?: string;
+    cccd?: string;
+    email?: string;
+    link_facebook?: string;
+    zalo?: string;
+    role?: UserRole;
+    note?: string;
+    address?: string;
+    active?: boolean;
+}
+
+
+
 // ---------------------    RENTAL    --------------------- //
 
-export type RentalInput = {
+export type Rental = {
     collaborator_id: string;
     title: string;
     rental_type: RentalType;
@@ -66,6 +84,58 @@ export type RentalInput = {
     amenities?: RentalAmenity[];
 };
 
+export type RentalInput = {
+    title: string;
+    rental_type: RentalType;
+    province: string;
+    district: string;
+    ward: string;
+    street?: string;
+    house_number?: string;
+
+    address_detail: string;
+    address_detail_display: string;
+
+    commission_value: string; // 🔥 STRING (match entity)
+
+    collaborator_id: string;
+
+    price?: number;
+
+    amenities?: RentalAmenity[];
+
+    active: boolean;
+    description?: string;
+
+    rental_images?: UploadPreview[];   // 👉 chỉ dùng ở UI
+    upload_ids?: string[];      // 👉 chỉ gửi backend
+
+    cover_index?: number;
+}
+
+
+// ---------------------    ROOM    --------------------- //
+export type RoomInput = {
+    rental_id: string;
+    collaborator_id: string;
+    room_code: string;
+    floor?: number;
+    room_number?: string;
+    price: number;
+    area?: number;
+    max_people?: number;
+    status: string;
+    room_images?: UploadPreview[];
+    amenities?: RentalAmenity[];
+}
+
+
+export interface UploadPreview {
+    file: File;
+    preview: string;
+    isCover: boolean;
+}
+
 
 
 // ---------------------    COLLABORATOR    --------------------- //
@@ -78,36 +148,46 @@ export type Collaborator = {
     active?: boolean;
 };
 
+
 export type CollaboratorInput = {
-    id?: string;
     user_id: string;
-    type: CollaboratorType;
     field_cooperation: FieldCooperation;
+    note?: string;
     active?: boolean;
+};
+
+
+// ---------------------    TENANT    --------------------- //
+export type Tenant = {
+    id: string;
+    user_id: string;
+    note?: string;
+    created_at: string;
+
+    user: {
+        id: string;
+        name: string;
+        phone: string;
+        email?: string;
+        link_facebook?: string;
+        active: boolean;
+    };
+
+    contracts?: any[];
+};
+
+export type TenantInput = {
+    user_id: string;
+    note?: string;
+    active: boolean;
 };
 
 
 
 
 
-export interface User {
-    id?: string;
-    name: string;
-    phone: string;
-    password?: string;
-    cccd?: string;
-    email?: string;
-    link_facebook?: string;
-    zalo?: string;
-    role?: UserRole;
-    note?: string;
-    address?: string;
-    active?: boolean;
-}
 
-
-
-export interface Commission {
+export type Commission = {
     id: string;
     amount: number;
     status: CommissionStatus;
@@ -253,7 +333,7 @@ export type AccountFacebook = {
     have_app: boolean;
 };
 
-export interface AccountLinkedin {
+export type AccountLinkedin = {
     id?: string;
     linkedin_id: string;
     name: string;

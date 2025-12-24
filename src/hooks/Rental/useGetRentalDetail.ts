@@ -1,13 +1,22 @@
-// hooks/Rental/useGetRentalDetail.ts
 import { get } from '@/utils/request';
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 
 const useGetRentalDetail = () => {
-    const getRentalDetail = useCallback(async (id: string) => {
-        return await get(`/rentals/${id}`);
+    const [loading, setLoading] = useState(false);
+
+    const getRentalDetail = useCallback(async (id: string): Promise<any> => {
+        setLoading(true);
+        try {
+            return await get(`/rentals/${id}`);
+        } catch (error) {
+            console.log('Error getRentalDetail: ', error);
+            throw error;
+        } finally {
+            setLoading(false);
+        }
     }, []);
 
-    return { getRentalDetail };
+    return { getRentalDetail, loading };
 };
 
 export default useGetRentalDetail;

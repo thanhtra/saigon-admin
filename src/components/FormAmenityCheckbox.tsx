@@ -4,7 +4,8 @@ import {
     Box,
     Checkbox,
     FormControlLabel,
-    FormGroup
+    FormGroup,
+    Typography
 } from '@mui/material';
 import { Controller } from 'react-hook-form';
 
@@ -22,6 +23,7 @@ export default function FormAmenityCheckbox({
             defaultValue={[]}
             render={({ field }) => (
                 <FormGroup>
+                    <Typography style={{ fontWeight: "bold" }}>Tiện ích</Typography>
                     <Box
                         sx={{
                             display: 'grid',

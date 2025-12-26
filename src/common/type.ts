@@ -106,11 +106,16 @@ export type RentalInput = {
 
     active: boolean;
     description?: string;
+    description_detail?: string;
 
-    rental_images?: UploadPreview[];   // 👉 chỉ dùng ở UI
+    images?: UploadPreview[];   // 👉 chỉ dùng ở UI
     upload_ids?: string[];      // 👉 chỉ gửi backend
 
     cover_index?: number;
+
+    floor?: number | undefined;
+    area?: number | undefined;
+    room_number?: string;
 }
 
 
@@ -118,15 +123,19 @@ export type RentalInput = {
 export type RoomInput = {
     rental_id: string;
     collaborator_id: string;
-    room_code: string;
+    title: string;
     floor?: number;
     room_number?: string;
     price: number;
     area?: number;
     max_people?: number;
     status: string;
-    room_images?: UploadPreview[];
-    amenities?: RentalAmenity[];
+    images?: UploadPreview[];
+    amenities: RentalAmenity[];
+    cover_index: number;
+    upload_ids: string[];
+    description: string;
+    active?: boolean;
 }
 
 

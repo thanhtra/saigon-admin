@@ -1,71 +1,67 @@
 'use client';
 
 import { Box, Button } from '@mui/material';
-import { useEffect, useMemo, useState } from 'react';
-import { Controller, SubmitHandler, useForm } from 'react-hook-form';
+import { useEffect, useState } from 'react';
+import { Controller, SubmitHandler, useForm, useWatch } from 'react-hook-form';
 import { toast } from 'react-toastify';
 
-import FormTextField from '@/components/FormTextField';
 import FormAutocomplete from '@/components/FormAutocomplete';
+import FormTextField from '@/components/FormTextField';
 
-import { CardItem, HeaderRow, TitleMain, BackLink } from '@/styles/common';
+import { BackLink, CardItem, HeaderRow, TitleMain } from '@/styles/common';
 import { formGridStyles } from '@/styles/formGrid';
 
-import { RoomInput, UploadPreview } from '@/common/type';
-import useGetRentals from '@/hooks/Rental/useGetRentals';
-import useGetCollaborators from '@/hooks/Collaborator/useGetCollaborators';
-import useCreateRoom from '@/hooks/Room/useCreateRoom';
 import { RoomStatusLabels } from '@/common/const';
+import { RoomInput, UploadPreview } from '@/common/type';
+import ControlledSwitch from '@/components/ControlledSwitch';
 import FormAmenityCheckbox from '@/components/FormAmenityCheckbox';
 import FormImageUpload from '@/components/FormImageUpload';
-import ControlledSwitch from '@/components/ControlledSwitch';
+import useGetCollaborators from '@/hooks/Collaborator/useGetCollaborators';
+import useGetRentalsByCollaborator from '@/hooks/Rental/useGetRentalsByCollaborator';
+import useCreateRoom from '@/hooks/Room/useCreateRoom';
+import useUploadImages from '@/hooks/Upload/uploadImages';
 
 export default function CreateRoom() {
     const { createRoom } = useCreateRoom();
-    const { getRentals } = useGetRentals();
+    const { getRentalsByCollaborator } = useGetRentalsByCollaborator();
     const { getCollaborators } = useGetCollaborators();
+    const { uploadImages } = useUploadImages();
 
     const [loading, setLoading] = useState(false);
     const [rentalOptions, setRentalOptions] = useState<any[]>([]);
     const [collaboratorOptions, setCollaboratorOptions] = useState<any[]>([]);
 
-    /* ================= FORM ================= */
+
     const { control, handleSubmit, reset } = useForm<RoomInput>({
         defaultValues: {
             rental_id: '',
             collaborator_id: '',
-            room_code: '',
             price: undefined,
             floor: undefined,
             room_number: '',
             area: undefined,
             max_people: undefined,
             status: 'available',
-            room_images: [],
-            amenities: []
+            images: [],
+            amenities: [],
+            title: '',
+            description: '',
+            active: true
         },
     });
 
-    /* ================= LOAD OPTIONS ================= */
+    const collaboratorId = useWatch({
+        control,
+        name: 'collaborator_id',
+    });
+
     useEffect(() => {
         (async () => {
-            const [rentalRes, collRes] = await Promise.all([
-                getRentals({ active: true }),
-                getCollaborators(),
-            ]);
+            const res = await getCollaborators();
 
-            if (rentalRes?.success) {
-                setRentalOptions(
-                    rentalRes.result.data.map((r: any) => ({
-                        label: r.title,
-                        value: r.id,
-                    })),
-                );
-            }
-
-            if (collRes?.success) {
+            if (res?.success) {
                 setCollaboratorOptions(
-                    collRes.result.data.map((c: any) => ({
+                    res.result.data.map((c: any) => ({
                         label: c.user.name,
                         value: c.id,
                     })),
@@ -74,13 +70,75 @@ export default function CreateRoom() {
         })();
     }, []);
 
-    /* ================= SUBMIT ================= */
+    useEffect(() => {
+        if (!collaboratorId) {
+            setRentalOptions([]);
+            return;
+        }
+
+        reset((prev) => ({
+            ...prev,
+            rental_id: '',
+        }));
+
+        (async () => {
+            const res = await getRentalsByCollaborator({
+                collaborator_id: collaboratorId,
+                active: true,
+            });
+
+            if (res?.success) {
+                setRentalOptions(
+                    res.result.map((r: any) => ({
+                        label: `${r.address_detail}`,
+                        value: r.id,
+                    })),
+                );
+            }
+        })();
+    }, [collaboratorId]);
+
+
     const onSubmit: SubmitHandler<RoomInput> = async (data) => {
         setLoading(true);
         try {
+            if (!data.images?.length) {
+                toast.error("Cần ít nhất 1 tấm hình!");
+                return;
+            }
+
+            const uploadRes = await uploadImages(
+                data.images.map(i => i.file),
+            );
+
+            if (!uploadRes.success || !uploadRes.result?.length) {
+                toast.error('Upload hình thất bại');
+                return;
+            }
+
+            const uploadIds = uploadRes.result.map((u: any) => u.id);
+            const coverIndex =
+                data.images.findIndex(i => i.isCover) >= 0
+                    ? data.images.findIndex(i => i.isCover)
+                    : 0;
+
+            const { images, ...payload } = data;
+
             const res = await createRoom({
-                ...data,
-                price: Number(data.price),
+                rental_id: payload.rental_id,
+                collaborator_id: payload.collaborator_id,
+                title: payload.title,
+                floor: payload?.floor ? Number(payload.floor) : undefined,
+                room_number: payload.room_number,
+                price: Number(payload.price),
+                area: data?.area ? Number(payload.area) : undefined,
+                max_people: payload.max_people ? Number(payload.max_people) : undefined,
+                status: payload.status,
+                amenities: data.amenities,
+                cover_index: coverIndex,
+                upload_ids: uploadIds,
+                description: payload.description,
+                active: payload.active
             });
 
             if (res?.success) {
@@ -97,10 +155,10 @@ export default function CreateRoom() {
         }
     };
 
-    /* ================= RENDER ================= */
+
     return (
         <>
-            <TitleMain>Thêm phòng</TitleMain>
+            <TitleMain>Thêm phòng trọ</TitleMain>
 
             <CardItem>
                 <HeaderRow>
@@ -115,7 +173,7 @@ export default function CreateRoom() {
                     noValidate
                     sx={formGridStyles.form}
                 >
-                    {/* ===== CHỦ NHÀ ===== */}
+
                     <FormAutocomplete
                         name="collaborator_id"
                         control={control}
@@ -126,7 +184,7 @@ export default function CreateRoom() {
                         ]}
                         required
                     />
-                    {/* ===== NHÀ ===== */}
+
                     <FormAutocomplete
                         name="rental_id"
                         control={control}
@@ -135,10 +193,17 @@ export default function CreateRoom() {
                             { label: '-- Chọn nhà --', value: '' },
                             ...rentalOptions,
                         ]}
+                        disabled={!collaboratorId}
                         required
                     />
 
-
+                    <FormTextField
+                        name="title"
+                        control={control}
+                        label="Tiêu đề"
+                        required
+                        sx={formGridStyles.fullWidth}
+                    />
 
                     <FormTextField
                         name="floor"
@@ -152,8 +217,6 @@ export default function CreateRoom() {
                         control={control}
                         label="Phòng số"
                     />
-
-
 
                     <FormTextField
                         name="price"
@@ -190,6 +253,16 @@ export default function CreateRoom() {
                         required
                     />
 
+                    <FormTextField
+                        name="description"
+                        control={control}
+                        label="Mô tả chi tiết"
+                        multiline
+                        rows={5}
+                        sx={formGridStyles.fullWidth}
+                    />
+
+
                     <Box
                         sx={{
                             gridColumn: 'span 2',
@@ -205,7 +278,7 @@ export default function CreateRoom() {
                         />
 
                         <Controller
-                            name="room_images"
+                            name="images"
                             control={control}
                             defaultValue={[] as UploadPreview[]}
                             render={({ field }) => (

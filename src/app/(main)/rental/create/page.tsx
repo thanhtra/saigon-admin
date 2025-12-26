@@ -47,7 +47,6 @@ export default function CreateRental() {
         { label: string; value: string }[]
     >([]);
 
-    /* ================= FORM ================= */
     const {
         control,
         handleSubmit,
@@ -67,12 +66,16 @@ export default function CreateRental() {
             active: true,
             description: '',
             commission_value: '',
-            rental_images: [],
-            price: undefined
+            images: [],
+            price: undefined,
+            description_detail: '',
+            floor: undefined,
+            area: undefined,
+            room_number: ''
         },
     });
 
-    /* ================= WATCH ================= */
+
     const provinceId = useWatch({ control, name: 'province' });
     const districtId = useWatch({ control, name: 'district' });
     const wardId = useWatch({ control, name: 'ward' });
@@ -80,7 +83,7 @@ export default function CreateRental() {
     const houseNumber = useWatch({ control, name: 'house_number' });
     const rentalType = useWatch({ control, name: 'rental_type' });
 
-    /* ================= RESET CASCADE ================= */
+
     useEffect(() => {
         if (provinceId !== HCM_PROVINCE_ID) {
             setValue('district', '');
@@ -92,7 +95,7 @@ export default function CreateRental() {
         setValue('ward', '');
     }, [districtId, setValue]);
 
-    /* ================= AUTO BUILD ADDRESS ================= */
+
     useEffect(() => {
         const address = buildAddressDetail({
             provinceId,
@@ -107,8 +110,6 @@ export default function CreateRental() {
     }, [provinceId, districtId, wardId, street, houseNumber, setValue]);
 
 
-
-    /* ================= OPTIONS (CACHE) ================= */
     const provinceOptions = useMemo(() => getProvinceOptions(), []);
     const districtOptions = useMemo(
         () => getDistrictOptions(provinceId),
@@ -137,32 +138,36 @@ export default function CreateRental() {
             return;
         }
 
-        if (!data.rental_images?.length) {
-            toast.error('Vui lòng upload ít nhất 1 hình');
-            return;
-        }
-
         setLoading(true);
         try {
-            const uploadRes = await uploadImages(
-                data.rental_images.map(i => i.file),
-            );
+            let uploadIds = [];
+            let coverIndex = undefined;
 
-            if (!uploadRes.success || !uploadRes.result?.length) {
-                toast.error('Upload hình thất bại');
-                return;
+            if (rentalType !== RentalType.BoardingHouse) {
+                if (!data.images?.length) {
+                    toast.error('Vui lòng upload ít nhất 1 hình');
+                    return;
+                }
+
+                const uploadRes = await uploadImages(
+                    data.images.map(i => i.file),
+                );
+
+                if (!uploadRes.success || !uploadRes.result?.length) {
+                    toast.error('Upload hình thất bại');
+                    return;
+                }
+
+                uploadIds = uploadRes.result.map((u: any) => u.id);
+                coverIndex =
+                    data.images.findIndex(i => i.isCover) >= 0
+                        ? data.images.findIndex(i => i.isCover)
+                        : 0;
             }
-
-            const uploadIds = uploadRes.result.map((u: any) => u.id);
-            const coverIndex =
-                data.rental_images.findIndex(i => i.isCover) >= 0
-                    ? data.rental_images.findIndex(i => i.isCover)
-                    : 0;
 
             const res = await createRental({
                 ...data,
                 price: Number(data.price),
-                rental_images: undefined,
                 upload_ids: uploadIds,
                 cover_index: coverIndex,
             });
@@ -182,7 +187,6 @@ export default function CreateRental() {
     };
 
 
-    /* ================= RENDER ================= */
     return (
         <>
             <TitleMain>Thêm mới thông tin nhà</TitleMain>
@@ -200,16 +204,7 @@ export default function CreateRental() {
                     noValidate
                     sx={formGridStyles.form}
                 >
-                    {/* ===== THÔNG TIN CƠ BẢN ===== */}
-                    <FormTextField
-                        name="title"
-                        control={control}
-                        label="Tiêu đề"
-                        required
-                        sx={formGridStyles.fullWidth}
-                    />
 
-                    {/* ===== ĐỊA CHỈ ===== */}
                     <FormAutocomplete
                         name="province"
                         control={control}
@@ -251,6 +246,24 @@ export default function CreateRental() {
                     />
 
                     <FormTextField
+                        name="address_detail"
+                        control={control}
+                        label="Địa chỉ"
+                        multiline
+                        rows={1}
+                        required
+                        disabled
+                    />
+
+                    <FormTextField
+                        name="commission_value"
+                        control={control}
+                        label="Giá trị hoa hồng"
+                        multiline
+                        required
+                    />
+
+                    <FormTextField
                         name="address_detail_display"
                         control={control}
                         label="Địa chỉ hiển thị"
@@ -259,22 +272,13 @@ export default function CreateRental() {
                         required
                     />
 
-
                     <FormTextField
                         name="description"
                         control={control}
-                        label="Mô tả căn nhà"
+                        label="Mô tả tổng quan căn nhà"
                         multiline
-                        rows={3}
-                    />
-
-                    <FormTextField
-                        name="commission_value"
-                        control={control}
-                        label="Giá trị hoa hồng"
-                        multiline
-                        rows={3}
-                        required
+                        rows={5}
+                        sx={formGridStyles.fullWidth}
                     />
 
                     <FormTextField
@@ -304,41 +308,93 @@ export default function CreateRental() {
                     />
 
 
-                    {isUnitRental(rentalType) && (<FormTextField
-                        name="price"
-                        control={control}
-                        label="Giá thuê"
-                        type="number"
-                        required
-                    />)}
+                    {
+                        isUnitRental(rentalType) &&
+                        <>
+                            <FormTextField
+                                name="title"
+                                control={control}
+                                label="Tiêu đề"
+                                required
+                                sx={formGridStyles.fullWidth}
+                            />
 
-                    <Box
-                        sx={{
-                            gridColumn: 'span 2',
-                            display: 'grid',
-                            gridTemplateColumns: '1fr 1fr',
-                            gap: 2,
-                            alignItems: 'flex-start',
-                        }}
-                    >
-                        <FormAmenityCheckbox
-                            name="amenities"
-                            control={control}
-                        />
+                            <FormTextField
+                                name="price"
+                                control={control}
+                                label="Giá thuê"
+                                type="number"
+                                required
+                            />
 
-                        <Controller
-                            name="rental_images"
-                            control={control}
-                            defaultValue={[] as UploadPreview[]}
-                            render={({ field }) => (
-                                <FormImageUpload
-                                    value={field.value}
-                                    onChange={field.onChange}
-                                    label="Upload hình nhà"
+                            <FormTextField
+                                name="area"
+                                control={control}
+                                label="Diện tích"
+                                type="number"
+                            />
+
+                            {
+                                rentalType === RentalType.Apartment &&
+                                <>
+                                    <FormTextField
+                                        name="floor"
+                                        control={control}
+                                        label="Tầng"
+                                        type="number"
+                                        required
+                                    />
+
+                                    <FormTextField
+                                        name="room_number"
+                                        control={control}
+                                        label="Nhà số mấy trong toà nhà (chung cư)"
+                                    />
+                                </>
+                            }
+
+
+
+                            <Box
+                                sx={{
+                                    gridColumn: 'span 2',
+                                    display: 'grid',
+                                    gridTemplateColumns: '1fr 1fr',
+                                    gap: 2,
+                                    alignItems: 'flex-start',
+                                }}
+                            >
+
+                                <FormAmenityCheckbox
+                                    name="amenities"
+                                    control={control}
                                 />
-                            )}
-                        />
-                    </Box>
+                                <Controller
+                                    name="images"
+                                    control={control}
+                                    defaultValue={[] as UploadPreview[]}
+                                    render={({ field }) => (
+                                        <FormImageUpload
+                                            value={field.value}
+                                            onChange={field.onChange}
+                                            label="Upload hình"
+                                        />
+                                    )}
+                                />
+                            </Box>
+
+
+                            <FormTextField
+                                name="description_detail"
+                                control={control}
+                                label="Mô tả chi tiết căn nhà cho thuê"
+                                multiline
+                                rows={6}
+                                sx={formGridStyles.fullWidth}
+                            />
+                        </>
+                    }
+
 
 
                     <Box sx={formGridStyles.actionRow}>

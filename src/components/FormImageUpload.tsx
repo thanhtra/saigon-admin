@@ -25,6 +25,11 @@ export default function FormImageUpload({
 }) {
     const [images, setImages] = useState<UploadPreview[]>(value || []);
 
+    // ✅ SYNC với react-hook-form
+    useEffect(() => {
+        setImages(value || []);
+    }, [value]);
+
     useEffect(() => {
         onChange(images);
     }, [images, onChange]);

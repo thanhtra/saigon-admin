@@ -27,6 +27,7 @@ import { RoomStatusLabels } from '@/common/const';
 import { RoomStatus } from '@/common/enum';
 import useDeleteRoom from '@/hooks/Room/useDeleteRoom';
 import useGetRooms from '@/hooks/Room/useGetRentals';
+import { formatArea, formatVnd, truncate } from '@/common/service';
 
 export default function RoomPage() {
     const router = useRouter();
@@ -47,7 +48,7 @@ export default function RoomPage() {
         setLoading(true);
         try {
             const res = await getRooms({
-                keySearch,
+                key_search: keySearch,
                 page,
                 size: 10,
             });
@@ -103,7 +104,6 @@ export default function RoomPage() {
                     </Button>
                 </HeaderRow>
 
-                {/* SEARCH */}
                 <Box mb={2}>
                     <TextField
                         size="small"
@@ -117,7 +117,6 @@ export default function RoomPage() {
                     />
                 </Box>
 
-                {/* TABLE */}
                 <Paper sx={{ overflowX: 'auto' }}>
                     <Table size="small">
                         <TableHead sx={{ backgroundColor: '#f5f5f5' }}>
@@ -142,14 +141,12 @@ export default function RoomPage() {
                                 rooms.map((r) => (
                                     <TableRow key={r.id} hover>
                                         <TableCell>{r.room_code}</TableCell>
-                                        <TableCell>{r.rental?.title || '-'}</TableCell>
+                                        <TableCell>{truncate(r.title, 40)}</TableCell>
                                         <TableCell>
-                                            {r.price
-                                                ? `${r.price.toLocaleString()} đ`
-                                                : '-'}
+                                            {formatVnd(r.price)}
                                         </TableCell>
                                         <TableCell>
-                                            {r.area ? `${r.area} m²` : '-'}
+                                            {formatArea(r.area)}
                                         </TableCell>
                                         <TableCell align="center">
                                             <Tooltip title={RoomStatusLabels[r.status as RoomStatus]}>

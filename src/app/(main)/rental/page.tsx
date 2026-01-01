@@ -1,7 +1,17 @@
 'use client';
 
+import { RentalTypeLabels } from '@/common/const';
+import { RentalType } from '@/common/enum';
+import { formatDateTime, formatVnd, truncate } from '@/common/service';
 import ConfirmDialog from '@/components/ConfirmDialog';
+import { TruncateWithTooltip } from '@/components/TruncateWithTooltip';
+import useDeleteRental from '@/hooks/Rental/useDeleteRental';
+import useGetRentals from '@/hooks/Rental/useGetRentals';
 import { CardItem, HeaderRow, TitleMain } from '@/styles/common';
+import CancelIcon from '@mui/icons-material/Cancel';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import DeleteIcon from '@mui/icons-material/Delete';
+import EditIcon from '@mui/icons-material/Edit';
 import {
     Box,
     Button,
@@ -17,17 +27,9 @@ import {
     TextField,
     Tooltip,
 } from '@mui/material';
-import { useCallback, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import EditIcon from '@mui/icons-material/Edit';
-import DeleteIcon from '@mui/icons-material/Delete';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import CancelIcon from '@mui/icons-material/Cancel';
+import { useCallback, useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
-import { RentalTypeLabels } from '@/common/const';
-import { RentalType } from '@/common/enum';
-import useGetRentals from '@/hooks/Rental/useGetRentals';
-import useDeleteRental from '@/hooks/Rental/useDeleteRental';
 
 
 export default function RentalPage() {
@@ -44,12 +46,12 @@ export default function RentalPage() {
     const [openConfirm, setOpenConfirm] = useState(false);
     const [rentalToDelete, setRentalToDelete] = useState<any | null>(null);
 
-    // ---------------- FETCH DATA ----------------
+
     const fetchData = useCallback(async () => {
         setLoading(true);
         try {
             const res = await getRentals({
-                keySearch,
+                key_search: keySearch,
                 page,
                 size: 10,
             });
@@ -73,7 +75,7 @@ export default function RentalPage() {
         fetchData();
     }, [fetchData]);
 
-    // ---------------- DELETE ----------------
+
     const handleDelete = async () => {
         if (!rentalToDelete?.id) return;
 
@@ -106,7 +108,6 @@ export default function RentalPage() {
                     </Button>
                 </HeaderRow>
 
-                {/* SEARCH */}
                 <Box mb={2} display="flex" gap={2}>
                     <TextField
                         size="small"
@@ -120,15 +121,17 @@ export default function RentalPage() {
                     />
                 </Box>
 
-                {/* TABLE */}
                 <Paper sx={{ overflowX: 'auto' }}>
                     <Table size="small">
                         <TableHead sx={{ backgroundColor: '#f5f5f5' }}>
                             <TableRow>
-                                <TableCell><strong>Tiêu đề</strong></TableCell>
+                                <TableCell><strong>Chủ nhà</strong></TableCell>
+                                <TableCell><strong>Người đăng</strong></TableCell>
+                                <TableCell><strong>Hoa hồng</strong></TableCell>
                                 <TableCell><strong>Loại hình</strong></TableCell>
                                 <TableCell><strong>Địa chỉ</strong></TableCell>
                                 <TableCell><strong>Giá</strong></TableCell>
+                                <TableCell><strong>Ngày tạo</strong></TableCell>
                                 <TableCell align="center"><strong>Trạng thái</strong></TableCell>
                                 <TableCell align="center"><strong>Hành động</strong></TableCell>
                             </TableRow>
@@ -144,18 +147,19 @@ export default function RentalPage() {
                             ) : rentals.length ? (
                                 rentals.map((r) => (
                                     <TableRow key={r.id} hover>
-                                        <TableCell>{r.title}</TableCell>
+                                        <TableCell>{r.collaborator?.user?.name} - {r.collaborator?.user?.phone}</TableCell>
+                                        <TableCell>{r.created_by_user?.name} - {r.created_by_user?.phone}</TableCell>
+                                        <TableCell>
+                                            {r.commission_value}
+                                        </TableCell>
                                         <TableCell>
                                             {RentalTypeLabels[r.rental_type as RentalType]}
                                         </TableCell>
                                         <TableCell>
-                                            {r.address_detail}
+                                            <TruncateWithTooltip text={r.address_detail} />
                                         </TableCell>
-                                        <TableCell>
-                                            {r.price
-                                                ? `${r.price.toLocaleString()} đ`
-                                                : '-'}
-                                        </TableCell>
+                                        <TableCell> {formatVnd(r.price)}</TableCell>
+                                        <TableCell> {formatDateTime(r.createdAt)}</TableCell>
                                         <TableCell align="center">
                                             <Tooltip
                                                 title={r.active ? 'Đang hoạt động' : 'Tạm ẩn'}
@@ -206,7 +210,6 @@ export default function RentalPage() {
                     </Table>
                 </Paper>
 
-                {/* PAGINATION */}
                 {!loading && totalPages > 1 && (
                     <Box display="flex" justifyContent="center" mt={2}>
                         <Pagination
@@ -217,7 +220,6 @@ export default function RentalPage() {
                     </Box>
                 )}
 
-                {/* CONFIRM DELETE */}
                 <ConfirmDialog
                     open={openConfirm}
                     onClose={() => setOpenConfirm(false)}

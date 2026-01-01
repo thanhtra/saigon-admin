@@ -54,7 +54,7 @@ export default function CollaboratorsPage() {
         setLoading(true);
         try {
             const res = await getCollaborators({
-                keySearch: search,
+                key_search: search,
                 page,
                 size: 10,
             });

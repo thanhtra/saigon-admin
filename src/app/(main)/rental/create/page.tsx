@@ -1,24 +1,22 @@
 'use client';
 
-import FormTextField from '@/components/FormTextField';
 import ControlledSwitch from '@/components/ControlledSwitch';
 import FormAutocomplete from '@/components/FormAutocomplete';
+import FormTextField from '@/components/FormTextField';
 
 import { BackLink, CardItem, HeaderRow, TitleMain } from '@/styles/common';
 import { Box, Button } from '@mui/material';
+import { useEffect, useMemo, useState } from 'react';
 import { SubmitHandler, useForm, useWatch } from 'react-hook-form';
 import { toast } from 'react-toastify';
-import { useEffect, useMemo, useState } from 'react';
 
-import { RentalInput, UploadPreview } from '@/common/type';
-import { RentalType } from '@/common/enum';
 import {
     GO_VAP_DISTRICT_ID,
     HCM_PROVINCE_ID,
     isUnitRental,
     RentalTypeLabels,
 } from '@/common/const';
-import { formGridStyles } from '@/styles/formGrid';
+import { RentalType } from '@/common/enum';
 import {
     buildAddressDetail,
     getDistrictOptions,
@@ -26,13 +24,17 @@ import {
     getWardOptions,
     mapCollaboratorOptions,
 } from '@/common/service';
+import { RentalInput, UploadPreview } from '@/common/type';
+import { formGridStyles } from '@/styles/formGrid';
 
 import FormAmenityCheckbox from '@/components/FormAmenityCheckbox';
-import useUploadImages from '@/hooks/Upload/uploadImages';
-import useCreateRental from '@/hooks/Rental/useCreateRental';
-import useGetCollaborators from '@/hooks/Collaborator/useGetCollaborators';
-import { Controller } from 'react-hook-form';
 import FormImageUpload from '@/components/FormImageUpload';
+import useGetCollaborators from '@/hooks/Collaborator/useGetCollaborators';
+import useCreateRental from '@/hooks/Rental/useCreateRental';
+import useUploadImages from '@/hooks/Upload/uploadImages';
+import { Controller } from 'react-hook-form';
+
+import useUpdateRoom from '@/hooks/Room/useUpdateRoom';
 
 
 
@@ -40,7 +42,7 @@ export default function CreateRental() {
     const { createRental } = useCreateRental();
     const { getCollaborators } = useGetCollaborators();
     const { uploadImages } = useUploadImages();
-
+    const { updateRoom } = useUpdateRoom();
 
     const [loading, setLoading] = useState(false);
     const [collaboratorOptions, setCollaboratorOptions] = useState<
@@ -140,44 +142,77 @@ export default function CreateRental() {
 
         setLoading(true);
         try {
-            let uploadIds = [];
-            let coverIndex = undefined;
+            /* ========== 1. CREATE RENTAL (NO IMAGE) ========== */
 
-            if (rentalType !== RentalType.BoardingHouse) {
-                if (!data.images?.length) {
-                    toast.error('Vui lòng upload ít nhất 1 hình');
-                    return;
-                }
+            const { images, ...payload } = data;
 
+            const createRes = await createRental({
+                ...payload,
+                price: payload.price ? Number(payload.price) : undefined,
+            });
+
+            if (!createRes?.success) {
+                toast.error(createRes?.message || 'Tạo tin thất bại');
+                return;
+            }
+
+            console.log('dsfsadf', createRes);
+            const roomId = createRes.result?.room?.id;
+
+            /* ========== 2. UPLOAD IMAGES ========== */
+
+            if (
+                rentalType !== RentalType.BoardingHouse &&
+                images?.length &&
+                roomId
+            ) {
                 const uploadRes = await uploadImages(
-                    data.images.map(i => i.file),
+                    images.map(i => i.file),
+                    {
+                        domain: 'rooms',
+                        room_id: roomId,
+                    },
                 );
+
+                // export enum UploadDomain {
+                //     Rooms = 'rooms',
+                //     RealEstates = 'real-estates',
+                //     Contracts = 'contracts',
+                // }
+
+                // await uploadImages(files, {
+                //     domain: 'real-estates',
+                //     file_type: 'image',
+                //     real_estate_id: realEstateId,
+                // });
+
+                // await uploadImages(files, {
+                //     domain: 'contracts',
+                //     file_type: 'image',
+                //     contract_id: contractId,
+                // });
 
                 if (!uploadRes.success || !uploadRes.result?.length) {
                     toast.error('Upload hình thất bại');
                     return;
                 }
 
-                uploadIds = uploadRes.result.map((u: any) => u.id);
-                coverIndex =
-                    data.images.findIndex(i => i.isCover) >= 0
-                        ? data.images.findIndex(i => i.isCover)
+                const uploadIds = uploadRes.result.map((u: any) => u.id);
+                const coverIndex =
+                    images.findIndex(i => i.isCover) >= 0
+                        ? images.findIndex(i => i.isCover)
                         : 0;
+
+                /* ========== 3. UPDATE ROOM IMAGE ========== */
+
+                await updateRoom(roomId, {
+                    upload_ids: uploadIds,
+                    cover_index: coverIndex,
+                });
             }
 
-            const res = await createRental({
-                ...data,
-                price: Number(data.price),
-                upload_ids: uploadIds,
-                cover_index: coverIndex,
-            });
-
-            if (res?.success) {
-                toast.success('Tạo tin cho thuê thành công!');
-                reset();
-            } else {
-                toast.error(res?.message || 'Tạo thất bại');
-            }
+            toast.success('Tạo tin cho thuê thành công!');
+            reset();
         } catch (e) {
             console.error(e);
             toast.error('Có lỗi xảy ra');
@@ -185,6 +220,7 @@ export default function CreateRental() {
             setLoading(false);
         }
     };
+
 
 
     return (

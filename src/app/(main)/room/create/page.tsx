@@ -20,12 +20,14 @@ import useGetCollaborators from '@/hooks/Collaborator/useGetCollaborators';
 import useGetRentalsByCollaborator from '@/hooks/Rental/useGetRentalsByCollaborator';
 import useCreateRoom from '@/hooks/Room/useCreateRoom';
 import useUploadImages from '@/hooks/Upload/uploadImages';
+import useUpdateRoom from '@/hooks/Room/useUpdateRoom';
 
 export default function CreateRoom() {
     const { createRoom } = useCreateRoom();
     const { getRentalsByCollaborator } = useGetRentalsByCollaborator();
     const { getCollaborators } = useGetCollaborators();
     const { uploadImages } = useUploadImages();
+    const { updateRoom } = useUpdateRoom();
 
     const [loading, setLoading] = useState(false);
     const [rentalOptions, setRentalOptions] = useState<any[]>([]);
@@ -101,30 +103,17 @@ export default function CreateRoom() {
 
     const onSubmit: SubmitHandler<RoomInput> = async (data) => {
         setLoading(true);
+
         try {
             if (!data.images?.length) {
-                toast.error("Cần ít nhất 1 tấm hình!");
+                toast.error('Cần ít nhất 1 tấm hình!');
                 return;
             }
 
-            const uploadRes = await uploadImages(
-                data.images.map(i => i.file),
-            );
-
-            if (!uploadRes.success || !uploadRes.result?.length) {
-                toast.error('Upload hình thất bại');
-                return;
-            }
-
-            const uploadIds = uploadRes.result.map((u: any) => u.id);
-            const coverIndex =
-                data.images.findIndex(i => i.isCover) >= 0
-                    ? data.images.findIndex(i => i.isCover)
-                    : 0;
+            /* ================= 1. CREATE ROOM (NO IMAGES) ================= */
 
             const { images, ...payload } = data;
-
-            const res = await createRoom({
+            const createRes = await createRoom({
                 rental_id: payload.rental_id,
                 collaborator_id: payload.collaborator_id,
                 title: payload.title,
@@ -135,20 +124,55 @@ export default function CreateRoom() {
                 max_people: payload.max_people ? Number(payload.max_people) : undefined,
                 status: payload.status,
                 amenities: data.amenities,
-                cover_index: coverIndex,
-                upload_ids: uploadIds,
                 description: payload.description,
                 active: payload.active
             });
 
-            if (res?.success) {
-                toast.success('Tạo phòng thành công!');
-                reset();
-            } else {
-                toast.error(res?.message || 'Tạo thất bại');
+            if (!createRes?.success || !createRes.result?.id) {
+                toast.error(createRes?.message || 'Tạo phòng thất bại');
+                return;
             }
-        } catch (err) {
-            console.error(err);
+
+            const roomId = createRes.result.id;
+
+            /* ================= 2. UPLOAD IMAGES ================= */
+
+            const uploadRes = await uploadImages(
+                data.images.map(i => i.file),
+                {
+                    domain: 'rooms',
+                    room_id: roomId,
+                },
+            );
+
+            if (!uploadRes.success || !uploadRes.result.length) {
+                toast.error('Upload hình thất bại');
+                return;
+            }
+
+            const uploadIds = uploadRes.result.map(u => u.id);
+
+            const coverIndex =
+                data.images.findIndex(i => i.isCover) >= 0
+                    ? data.images.findIndex(i => i.isCover)
+                    : 0;
+
+            /* ================= 3. UPDATE ROOM ================= */
+
+            const updateRes = await updateRoom(roomId, {
+                upload_ids: uploadIds,
+                cover_index: coverIndex,
+            });
+
+            if (!updateRes?.success) {
+                toast.error('Cập nhật hình thất bại');
+                return;
+            }
+
+            toast.success('🎉 Tạo phòng thành công!');
+            reset();
+        } catch (error) {
+            console.error(error);
             toast.error('Có lỗi xảy ra');
         } finally {
             setLoading(false);

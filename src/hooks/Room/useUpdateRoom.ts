@@ -5,7 +5,7 @@ import { useCallback, useState } from 'react';
 const useUpdateRoom = () => {
     const [loading, setLoading] = useState(false);
 
-    const updateRoom = useCallback(async (id: string, body: RoomInput): Promise<any> => {
+    const updateRoom = useCallback(async (id: string, body: Partial<RoomInput>): Promise<any> => {
         setLoading(true);
         try {
             return await put(`/rooms/${id}`, body);

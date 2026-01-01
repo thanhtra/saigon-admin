@@ -4,8 +4,8 @@ import { useCallback, useState } from 'react';
 export type Params = {
     page?: number;
     size?: number;
-    keySearch?: string;
-    isPagin?: boolean;
+    key_search?: string;
+    is_pagin?: boolean;
     profession?: string;
 };
 

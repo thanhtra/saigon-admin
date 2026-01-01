@@ -51,7 +51,7 @@ export default function TenantsPage() {
         setLoading(true);
         try {
             const res = await getTenants({
-                keySearch: search,
+                key_search: search,
                 page,
                 size: 10,
             });

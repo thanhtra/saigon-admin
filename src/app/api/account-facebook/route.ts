@@ -20,13 +20,11 @@ export async function POST(req: NextRequest) {
     }
 }
 
-// GET /api/facebook?topic_id=...&facebook_id=...&keySearch=...&page=1&size=10
-
 export async function GET(req: NextRequest) {
     try {
         const { searchParams } = new URL(req.url);
         const params = {
-            keySearch: searchParams.get('keySearch') || '',
+            key_search: searchParams.get('key_search') || '',
             page: Number(searchParams.get('page') || '1'),
             size: Number(searchParams.get('size') || '10'),
         };

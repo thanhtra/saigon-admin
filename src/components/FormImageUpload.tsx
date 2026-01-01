@@ -4,35 +4,23 @@ import {
     Box,
     Button,
     IconButton,
-    Radio,
     Tooltip,
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import StarIcon from '@mui/icons-material/Star';
 import StarBorderIcon from '@mui/icons-material/StarBorder';
-import { useEffect, useState } from 'react';
 import { UploadPreview } from '@/common/type';
 
-
 export default function FormImageUpload({
-    value,
+    value = [],
     onChange,
-    label
+    label,
 }: {
     value?: UploadPreview[];
     onChange: (files: UploadPreview[]) => void;
     label?: string;
 }) {
-    const [images, setImages] = useState<UploadPreview[]>(value || []);
-
-    // ✅ SYNC với react-hook-form
-    useEffect(() => {
-        setImages(value || []);
-    }, [value]);
-
-    useEffect(() => {
-        onChange(images);
-    }, [images, onChange]);
+    const images = value;
 
     const handleAddFiles = (files: FileList) => {
         const newFiles: UploadPreview[] = Array.from(files).map((file, index) => ({
@@ -41,28 +29,25 @@ export default function FormImageUpload({
             isCover: images.length === 0 && index === 0,
         }));
 
-        setImages(prev => [...prev, ...newFiles]);
+        onChange([...images, ...newFiles]);
     };
 
     const handleRemove = (idx: number) => {
-        setImages(prev => {
-            const removed = prev[idx];
-            URL.revokeObjectURL(removed.preview);
+        const removed = images[idx];
+        URL.revokeObjectURL(removed.preview);
 
-            const next = prev.filter((_, i) => i !== idx);
+        const next = images.filter((_, i) => i !== idx);
 
-            // đảm bảo luôn có cover
-            if (!next.some(i => i.isCover) && next.length) {
-                next[0].isCover = true;
-            }
+        if (!next.some(i => i.isCover) && next.length) {
+            next[0] = { ...next[0], isCover: true };
+        }
 
-            return [...next];
-        });
+        onChange(next);
     };
 
     const setCover = (idx: number) => {
-        setImages(prev =>
-            prev.map((img, i) => ({
+        onChange(
+            images.map((img, i) => ({
                 ...img,
                 isCover: i === idx,
             })),
@@ -72,7 +57,7 @@ export default function FormImageUpload({
     return (
         <Box>
             <Button variant="outlined" component="label">
-                {label || "Upload hình"}
+                {label || 'Upload hình'}
                 <input
                     hidden
                     type="file"
@@ -114,7 +99,6 @@ export default function FormImageUpload({
                             }}
                         />
 
-                        {/* ACTIONS */}
                         <Box
                             sx={{
                                 position: 'absolute',
@@ -135,7 +119,6 @@ export default function FormImageUpload({
                             </Tooltip>
                         </Box>
 
-                        {/* COVER */}
                         <Box
                             sx={{
                                 position: 'absolute',
@@ -153,7 +136,9 @@ export default function FormImageUpload({
                             }}
                             onClick={() => setCover(idx)}
                         >
-                            {img.isCover ? <StarIcon fontSize="small" /> : <StarBorderIcon fontSize="small" />}
+                            {img.isCover
+                                ? <StarIcon fontSize="small" />
+                                : <StarBorderIcon fontSize="small" />}
                             Ảnh chính
                         </Box>
                     </Box>

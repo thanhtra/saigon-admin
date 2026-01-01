@@ -132,8 +132,8 @@ export type RoomInput = {
     status: string;
     images?: UploadPreview[];
     amenities: RentalAmenity[];
-    cover_index: number;
-    upload_ids: string[];
+    cover_index?: number;
+    upload_ids?: string[];
     description: string;
     active?: boolean;
 }

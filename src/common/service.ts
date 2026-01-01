@@ -91,3 +91,57 @@ export const mapCollaboratorOptions = (data: any[] = []) => {
         value: c.id,
     }));
 };
+
+export const truncate = (text?: string, limit = 40) =>
+    !text ? '-' : text.length > limit ? `${text.slice(0, limit)}...` : text;
+
+
+export const formatVnd = (
+    value?: number | null,
+    options?: {
+        suffix?: string;
+        emptyText?: string;
+    },
+) => {
+    if (value === null || value === undefined) {
+        return options?.emptyText ?? '-';
+    }
+
+    return `${value.toLocaleString('vi-VN')}${options?.suffix ?? ' đ'}`;
+};
+
+
+export const formatArea = (
+    value?: number | null,
+    options?: {
+        unit?: string;
+        emptyText?: string;
+    },
+) => {
+    if (value === null || value === undefined) {
+        return options?.emptyText ?? '-';
+    }
+
+    return `${value} ${options?.unit ?? 'm²'}`;
+};
+
+
+export const formatDateTime = (
+    value?: string | Date,
+    locale: string = 'vi-VN',
+) => {
+    if (!value) return '-';
+
+    const date = value instanceof Date ? value : new Date(value);
+
+    if (isNaN(date.getTime())) return '-';
+
+    return new Intl.DateTimeFormat(locale, {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+    }).format(date);
+};
+

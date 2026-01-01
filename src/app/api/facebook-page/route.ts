@@ -36,7 +36,7 @@ export async function GET(req: NextRequest) {
         const params = {
             topic_id: searchParams.get('topic_id') || '',
             facebook_id: searchParams.get('facebook_id') || '',
-            keySearch: searchParams.get('keySearch') || '',
+            key_search: searchParams.get('key_search') || '',
             page: Number(searchParams.get('page') || '1'),
             size: Number(searchParams.get('size') || '10'),
         };

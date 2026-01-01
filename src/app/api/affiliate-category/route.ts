@@ -27,7 +27,7 @@ export async function GET(req: NextRequest) {
 
     const params = {
         type: searchParams.get('type') || '',
-        keySearch: searchParams.get('keySearch') || '',
+        key_search: searchParams.get('key_search') || '',
         page: Number(searchParams.get('page')) || 0,
         size: Number(searchParams.get('size')) || 10,
     };

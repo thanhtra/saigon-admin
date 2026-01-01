@@ -49,7 +49,7 @@ export default function UsersPage() {
         setLoading(true);
         try {
             const res = await getUsers({
-                keySearch: search,
+                key_search: search,
                 page,
                 size: 10,
             });

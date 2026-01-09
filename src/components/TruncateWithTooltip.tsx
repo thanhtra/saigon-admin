@@ -2,26 +2,26 @@ import { truncate } from '@/common/service';
 import { Tooltip } from '@mui/material';
 
 type TruncateWithTooltipProps = {
-    text?: string;
+    text?: string | null | undefined;
     limit?: number;
 };
 
 export function TruncateWithTooltip({
     text,
-    limit = 40,
+    limit = 100,
 }: TruncateWithTooltipProps) {
-    const isTruncated = !!text && text.length > limit;
+    const displayText = text || '';
+
+    const isTruncated = displayText.length > limit;
 
     return (
         <Tooltip
-            title={isTruncated ? text : ''}
+            title={isTruncated ? displayText : ''}
             placement="top"
             arrow
             disableHoverListener={!isTruncated}
         >
-            <span>
-                {truncate(text, limit)}
-            </span>
+            <span>{truncate(displayText, limit)}</span>
         </Tooltip>
     );
 }

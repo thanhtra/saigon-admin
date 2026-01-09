@@ -4,13 +4,14 @@ import ControlledSwitch from '@/components/ControlledSwitch';
 import FormAutocomplete from '@/components/FormAutocomplete';
 import FormTextField from '@/components/FormTextField';
 
-import { BackLink, CardItem, HeaderRow, TitleMain } from '@/styles/common';
+import { BackLink, CardItem, HeaderRowOneItem, TitleMain } from '@/styles/common';
 import { Box, Button } from '@mui/material';
 import { useEffect, useMemo, useState } from 'react';
 import { SubmitHandler, useForm, useWatch } from 'react-hook-form';
 import { toast } from 'react-toastify';
 
 import {
+    ErrorMessage,
     GO_VAP_DISTRICT_ID,
     HCM_PROVINCE_ID,
     isUnitRental,
@@ -142,8 +143,6 @@ export default function CreateRental() {
 
         setLoading(true);
         try {
-            /* ========== 1. CREATE RENTAL (NO IMAGE) ========== */
-
             const { images, ...payload } = data;
 
             const createRes = await createRental({
@@ -152,14 +151,11 @@ export default function CreateRental() {
             });
 
             if (!createRes?.success) {
-                toast.error(createRes?.message || 'Tạo tin thất bại');
+                toast.error('Tạo tin thất bại');
                 return;
             }
 
-            console.log('dsfsadf', createRes);
             const roomId = createRes.result?.room?.id;
-
-            /* ========== 2. UPLOAD IMAGES ========== */
 
             if (
                 rentalType !== RentalType.BoardingHouse &&
@@ -203,8 +199,6 @@ export default function CreateRental() {
                         ? images.findIndex(i => i.isCover)
                         : 0;
 
-                /* ========== 3. UPDATE ROOM IMAGE ========== */
-
                 await updateRoom(roomId, {
                     upload_ids: uploadIds,
                     cover_index: coverIndex,
@@ -212,15 +206,14 @@ export default function CreateRental() {
             }
 
             toast.success('Tạo tin cho thuê thành công!');
-            reset();
+            reset({});
         } catch (e) {
             console.error(e);
-            toast.error('Có lỗi xảy ra');
+            toast.error(ErrorMessage.SYSTEM);
         } finally {
             setLoading(false);
         }
     };
-
 
 
     return (
@@ -228,11 +221,11 @@ export default function CreateRental() {
             <TitleMain>Thêm mới thông tin nhà</TitleMain>
 
             <CardItem>
-                <HeaderRow>
+                <HeaderRowOneItem>
                     <BackLink href="/rental">
                         <span className="mr-1">←</span> Trở về danh sách
                     </BackLink>
-                </HeaderRow>
+                </HeaderRowOneItem>
 
                 <Box
                     component="form"

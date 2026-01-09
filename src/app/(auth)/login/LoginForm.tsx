@@ -3,11 +3,11 @@
 import FormTextField from '@/components/FormTextField';
 import { Box, Button, Paper, Typography } from '@mui/material';
 import { useForm } from 'react-hook-form';
-import { LoginPayload } from '@/types/auth';
 import { useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
 import { toast } from 'react-toastify';
+import { LoginPayload } from '@/common/type';
 
 const LoginForm = () => {
     const router = useRouter();
@@ -31,7 +31,7 @@ const LoginForm = () => {
                 toast.error('Đăng nhập thất bại');
             }
         } catch (error) {
-            toast.error('Đăng nhập thất bại');
+            toast.error(ErrorMessage.SYSTEM);
         } finally {
             setLoading(false);
         }

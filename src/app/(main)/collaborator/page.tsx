@@ -29,6 +29,7 @@ import { CardItem, HeaderRow, TitleMain } from '@/styles/common';
 import { Collaborator } from '@/common/type';
 import {
     CollaboratorTypeLabels,
+    ErrorMessage,
     FieldCooperationLabels,
 } from '@/common/const';
 import useGetCollaborators from '@/hooks/Collaborator/useGetCollaborators';
@@ -49,7 +50,6 @@ export default function CollaboratorsPage() {
     const [totalPages, setTotalPages] = useState(1);
     const [loading, setLoading] = useState(false);
 
-    // ================= FETCH =================
     const fetchData = useCallback(async () => {
         setLoading(true);
         try {
@@ -67,7 +67,7 @@ export default function CollaboratorsPage() {
                 setTotalPages(1);
             }
         } catch {
-            toast.error('Không thể tải danh sách chủ nhà / môi giới');
+            toast.error(ErrorMessage.SYSTEM);
         } finally {
             setLoading(false);
         }
@@ -86,23 +86,32 @@ export default function CollaboratorsPage() {
                 toast.success('Xoá thành công');
                 setOpenConfirm(false);
                 setCollaboratorToDelete(null);
-                fetchData(); // load lại danh sách
+                fetchData();
             } else {
-                toast.error(res?.message || 'Xoá thất bại');
+                toast.error('Xoá thất bại');
             }
         } catch {
-            toast.error('Có lỗi xảy ra khi xoá');
+            toast.error(ErrorMessage.SYSTEM);
         }
     };
 
 
-    // ================= RENDER =================
     return (
         <>
             <TitleMain>Danh sách Chủ nhà - Môi giới</TitleMain>
 
             <CardItem>
                 <HeaderRow>
+                    <TextField
+                        size="small"
+                        label="Tìm kiếm"
+                        value={search}
+                        onChange={(e) => {
+                            setPage(1);
+                            setSearch(e.target.value);
+                        }}
+                        sx={{ width: 300 }}
+                    />
                     <Button
                         variant="contained"
                         onClick={() => router.push('/collaborator/create')}
@@ -111,21 +120,6 @@ export default function CollaboratorsPage() {
                     </Button>
                 </HeaderRow>
 
-                {/* SEARCH */}
-                <Box mb={2}>
-                    <TextField
-                        size="small"
-                        label="Tìm kiếm theo tên / SĐT"
-                        value={search}
-                        onChange={(e) => {
-                            setPage(0);
-                            setSearch(e.target.value);
-                        }}
-                        sx={{ width: 500 }}
-                    />
-                </Box>
-
-                {/* TABLE */}
                 <Paper sx={{ overflowX: 'auto' }}>
                     <Table size="small">
                         <TableHead sx={{ backgroundColor: '#f5f5f5' }}>
@@ -212,7 +206,6 @@ export default function CollaboratorsPage() {
                     </Table>
                 </Paper>
 
-                {/* PAGINATION */}
                 {!loading && totalPages > 1 && (
                     <Box display="flex" justifyContent="center" mt={2}>
                         <Pagination

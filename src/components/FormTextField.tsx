@@ -18,6 +18,8 @@ type FormTextFieldProps<T extends FieldValues> = {
     options?: SelectOption[];
 
     multiline?: boolean;
+    minRows?: number;
+    maxRows?: number;
     rows?: number;
     placeholder?: string;
 
@@ -45,6 +47,8 @@ function FormTextField<T extends FieldValues>({
     type = 'text',
     sx,
     helperText,
+    minRows,
+    maxRows
 }: FormTextFieldProps<T>) {
     const mergedRules = {
         ...rules,
@@ -59,25 +63,18 @@ function FormTextField<T extends FieldValues>({
             control={control}
             rules={mergedRules}
             render={({ field, fieldState }) => {
-                /* 🔥 DEBUG LOG */
-                // console.log('--- FormTextField DEBUG ---');
-                // console.log('name:', name);
-                // console.log('field.value:', field.value);
-                // console.log(
-                //     'matched option:',
-                //     options?.find(o => o.value === field.value)
-                // );
-
                 return (
                     <TextField
                         {...field}
-                        value={field.value ?? ''} // ⬅️ BẮT BUỘC
+                        value={field.value ?? ''}
                         type={type}
                         select={Boolean(options)}
                         label={label}
                         fullWidth
                         multiline={multiline}
-                        rows={multiline ? rows : undefined}
+                        minRows={multiline ? minRows : undefined}
+                        maxRows={multiline ? maxRows : undefined}
+                        rows={multiline && rows ? rows : undefined}
                         margin="normal"
                         disabled={disabled}
                         placeholder={placeholder}

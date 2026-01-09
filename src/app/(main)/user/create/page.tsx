@@ -3,7 +3,7 @@
 import { User } from '@/common/type';
 import BackToList from '@/components/BackToList';
 import useCreateUser from '@/hooks/User/useCreateUser';
-import { CardItem, HeaderRow, TitleMain } from '@/styles/common';
+import { CardItem, HeaderRowOneItem, TitleMain } from '@/styles/common';
 import React, { useCallback } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
@@ -34,9 +34,9 @@ const CreateUser: React.FC = () => {
                     return;
                 }
 
-                toast.error(res?.message || 'Tạo mới thất bại');
+                toast.error('Tạo mới thất bại');
             } catch {
-                toast.error('Lỗi hệ thống, vui lòng thử lại');
+                toast.error('Lỗi hệ thống!');
             }
         },
         [createUser, reset],
@@ -47,9 +47,9 @@ const CreateUser: React.FC = () => {
             <TitleMain>Thêm mới người dùng</TitleMain>
 
             <CardItem>
-                <HeaderRow>
+                <HeaderRowOneItem>
                     <BackToList href="/user" />
-                </HeaderRow>
+                </HeaderRowOneItem>
 
                 <UserForm
                     control={control}

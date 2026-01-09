@@ -78,7 +78,7 @@ const Sidebar: React.FC = () => {
                         href="/collaborator"
                         selected={isActive('/collaborator')}
                     >
-                        <ListItemText primary="Chủ nhà - Môi giới" />
+                        <ListItemText primary="Cộng tác" />
                     </ListItemButton>
 
                     <ListItemButton

@@ -1,24 +1,20 @@
 'use client';
 
 import { Box, Button } from '@mui/material';
+import { useEffect, useMemo, useState } from 'react';
 import { Control } from 'react-hook-form';
 import { toast } from 'react-toastify';
-import { useCallback, useEffect } from 'react';
 
+import FormAutocompleteSimple from '@/components/FormAutocompleteSimple';
 import FormSwitch from '@/components/FormSwitch';
 import FormTextField from '@/components/FormTextField';
-import FormAutocompleteSimple from '@/components/FormAutocompleteSimple';
 
-import { FieldCooperationLabels } from '@/common/const';
+import { ErrorMessage, FieldCooperationLabels } from '@/common/const';
 import { CollaboratorInput } from '@/common/type';
-
 import useGetAvailableCollaborators from '@/hooks/User/useGetAvailableCollaborators';
 import { formGridStyles } from '@/styles/formGrid';
 
-type UserOption = {
-    label: string;
-    value: string;
-};
+type UserOption = { label: string; value: string };
 
 type Props = {
     control: Control<CollaboratorInput>;
@@ -36,57 +32,49 @@ const CollaboratorForm: React.FC<Props> = ({
     userOption,
 }) => {
     const { getAvailableCollaborators } = useGetAvailableCollaborators();
+    const [userOptions, setUserOptions] = useState<UserOption[]>([]);
 
-    const fetchUserOptions = useCallback(
-        async (keyword?: string) => {
-            if (isEdit) return [];
-
-            try {
-                const res = await getAvailableCollaborators({
-                    keyword,
-                    limit: 200,
-                });
-
-                if (!res?.success) return [];
-
-                return res.result.map((u: any) => ({
-                    label: `${u.name} - ${u.phone}`,
-                    value: u.id,
-                }));
-            } catch {
-                toast.error('Không thể tải danh sách người dùng');
-                return [];
-            }
-        },
-        [getAvailableCollaborators, isEdit],
-    );
-
-    const fieldOptions = [
-        { label: '-- Chọn lĩnh vực --', value: '' },
-        ...Object.entries(FieldCooperationLabels).map(
-            ([value, label]) => ({ value, label }),
-        ),
-    ];
-
-    // 🔥 LOG OPTIONS
     useEffect(() => {
-        console.log('FIELD OPTIONS:', fieldOptions);
-    }, []);
+        if (isEdit && userOption) {
+            setUserOptions([userOption]);
+            return;
+        }
+
+        getAvailableCollaborators({ limit: 200 })
+            .then((res) => {
+                if (res?.success) {
+                    setUserOptions(
+                        res.result.map((u: any) => ({
+                            label: `${u.name} - ${u.phone}`,
+                            value: u.id,
+                        }))
+                    );
+                }
+            })
+            .catch(() => {
+                toast.error(ErrorMessage.SYSTEM);
+            });
+    }, [getAvailableCollaborators, isEdit, userOption]);
+
+    const fieldOptions = useMemo(
+        () => [
+            { label: '-- Chọn lĩnh vực --', value: '' },
+            ...Object.entries(FieldCooperationLabels).map(([value, label]) => ({ value, label })),
+        ],
+        []
+    );
 
     return (
         <Box component="form" onSubmit={onSubmit} noValidate sx={formGridStyles.form}>
-            {/* USER */}
             <FormAutocompleteSimple
                 name="user_id"
                 control={control}
-                label="Người dùng"
-                fetchOptions={fetchUserOptions}
+                label="Tài khoản"
+                options={userOptions}
                 required
                 disabled={isEdit}
-                defaultOptions={userOption ? [userOption] : []}
             />
 
-            {/* FIELD */}
             <FormTextField
                 name="field_cooperation"
                 control={control}
@@ -100,22 +88,13 @@ const CollaboratorForm: React.FC<Props> = ({
                 control={control}
                 label="Mô tả"
                 multiline
-                rows={2}
+                minRows={1}
+                maxRows={10}
             />
 
             <Box sx={formGridStyles.actionRow}>
-                <FormSwitch
-                    name="active"
-                    control={control}
-                    label="Kích hoạt"
-                />
-
-                <Button
-                    type="submit"
-                    variant="contained"
-                    disabled={loading}
-                    sx={formGridStyles.submitButton}
-                >
+                <FormSwitch name="active" control={control} label="Kích hoạt" />
+                <Button type="submit" variant="contained" disabled={loading} sx={formGridStyles.submitButton}>
                     {loading ? 'Đang lưu...' : 'Lưu'}
                 </Button>
             </Box>

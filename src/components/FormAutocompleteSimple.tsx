@@ -1,95 +1,53 @@
 'use client';
 
 import { Controller } from 'react-hook-form';
-import {
-    Autocomplete,
-    CircularProgress,
-    TextField,
-} from '@mui/material';
-import { useEffect, useState } from 'react';
+import { Autocomplete, TextField } from '@mui/material';
+import { useState, useMemo } from 'react';
 
-type Option = {
-    label: string;
-    value: string;
-};
+type Option = { label: string; value: string };
 
 type Props = {
     name: string;
     control: any;
     label: string;
-    fetchOptions: () => Promise<Option[]>;
+    options: Option[]; // 🔹 truyền toàn bộ danh sách từ parent
     required?: boolean;
     disabled?: boolean;
-
-    /** ⭐ NEW – dùng cho edit */
-    defaultOptions?: Option[];
 };
 
 export default function FormAutocompleteSimple({
     name,
     control,
     label,
-    fetchOptions,
-    required,
-    disabled,
-    defaultOptions = [],
+    options,
+    required = false,
+    disabled = false,
 }: Props) {
-    const [options, setOptions] = useState<Option[]>(defaultOptions);
-    const [loading, setLoading] = useState(false);
+    const [inputValue, setInputValue] = useState('');
 
-    /* 🔥 LOAD OPTION */
-    useEffect(() => {
-        let mounted = true;
-
-        // 👉 Nếu có defaultOptions (edit) thì dùng luôn
-        if (defaultOptions.length) {
-            setOptions(defaultOptions);
-            return;
-        }
-
-        setLoading(true);
-        fetchOptions()
-            .then((data) => {
-                if (mounted) setOptions(data || []);
-            })
-            .finally(() => {
-                if (mounted) setLoading(false);
-            });
-
-        return () => {
-            mounted = false;
-        };
-    }, [fetchOptions, defaultOptions]);
+    const filteredOptions = useMemo(() => {
+        return options.filter((o) =>
+            o.label.toLowerCase().includes(inputValue.toLowerCase())
+        );
+    }, [options, inputValue]);
 
     return (
         <Controller
             name={name}
             control={control}
-            rules={
-                required
-                    ? { required: 'Trường bắt buộc' }
-                    : undefined
-            }
+            rules={required ? { required: 'Trường bắt buộc' } : undefined}
             render={({ field, fieldState }) => {
-                const selected =
-                    options.find(
-                        (o) => o.value === field.value,
-                    ) || null;
+                const selected = options.find((o) => o.value === field.value) || null;
 
                 return (
                     <Autocomplete
-                        options={options}
-                        loading={loading}
+                        options={filteredOptions}
                         value={selected}
-                        onChange={(_, newValue) =>
-                            field.onChange(
-                                newValue?.value || '',
-                            )
-                        }
+                        onChange={(_, newValue) => field.onChange(newValue?.value || '')}
+                        inputValue={inputValue}
+                        onInputChange={(_, value) => setInputValue(value)}
                         getOptionLabel={(o) => o.label}
-                        isOptionEqualToValue={(o, v) =>
-                            o.value === v.value
-                        }
+                        isOptionEqualToValue={(o, v) => o.value === v.value}
                         disabled={disabled}
                         renderInput={(params) => (
                             <TextField
@@ -98,25 +56,7 @@ export default function FormAutocompleteSimple({
                                 label={label}
                                 required={required}
                                 error={!!fieldState.error}
-                                helperText={
-                                    fieldState.error?.message
-                                }
-                                InputProps={{
-                                    ...params.InputProps,
-                                    endAdornment: (
-                                        <>
-                                            {loading && (
-                                                <CircularProgress
-                                                    size={18}
-                                                />
-                                            )}
-                                            {
-                                                params.InputProps
-                                                    .endAdornment
-                                            }
-                                        </>
-                                    ),
-                                }}
+                                helperText={fieldState.error?.message}
                             />
                         )}
                     />

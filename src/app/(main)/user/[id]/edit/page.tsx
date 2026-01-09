@@ -1,16 +1,17 @@
 'use client';
 
+import { ErrorMessage } from '@/common/const';
+import { User } from '@/common/type';
 import BackToList from '@/components/BackToList';
-import { CardItem, HeaderRow, TitleMain } from '@/styles/common';
+import useGetUserDetail from '@/hooks/User/useGetUserDetail';
+import useUpdateUser from '@/hooks/User/useUpdateUser';
+import { CardItem, HeaderRowOneItem, TitleMain } from '@/styles/common';
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
-import useGetUserDetail from '@/hooks/User/useGetUserDetail';
-import useUpdateUser from '@/hooks/User/useUpdateUser';
 import { USER_DEFAULT_VALUES } from '../../const';
 import UserForm from '../../UserForm';
-import { User } from '@/common/type';
 
 export default function EditUser() {
     const { id } = useParams<{ id: string }>();
@@ -28,7 +29,7 @@ export default function EditUser() {
         defaultValues: USER_DEFAULT_VALUES,
     });
 
-    // ---------------- FETCH DETAIL ----------------
+
     useEffect(() => {
         if (!id) return;
 
@@ -40,19 +41,19 @@ export default function EditUser() {
                     reset({
                         ...USER_DEFAULT_VALUES,
                         ...res.result,
-                        password: '', // ⚠️ không fill password
+                        password: '',
                     });
                 } else {
                     toast.error('Không tìm thấy người dùng');
                     router.replace('/user');
                 }
             } catch {
-                toast.error('Không thể tải dữ liệu');
+                toast.error(ErrorMessage.SYSTEM);
             }
         })();
     }, [id, getUserDetail, reset, router]);
 
-    // ---------------- SUBMIT ----------------
+
     const onSubmit = async (data: User) => {
         try {
             const res = await updateUser(id, data);
@@ -63,9 +64,9 @@ export default function EditUser() {
                 return;
             }
 
-            toast.error(res?.message || 'Cập nhật thất bại');
+            toast.error('Cập nhật thất bại');
         } catch {
-            toast.error('Lỗi hệ thống');
+            toast.error(ErrorMessage.SYSTEM);
         }
     };
 
@@ -74,9 +75,9 @@ export default function EditUser() {
             <TitleMain>Cập nhật người dùng</TitleMain>
 
             <CardItem>
-                <HeaderRow>
+                <HeaderRowOneItem>
                     <BackToList href="/user" />
-                </HeaderRow>
+                </HeaderRowOneItem>
 
                 <UserForm
                     control={control}

@@ -1,6 +1,6 @@
 'use client';
 
-import { UserRoleOptions } from '@/common/const';
+import { UserRoleOptionsWithoutAdmin } from '@/common/const';
 import { User } from '@/common/type';
 import FormSwitch from '@/components/FormSwitch';
 import FormTextField from '@/components/FormTextField';
@@ -50,7 +50,6 @@ const UserForm: React.FC<UserFormProps> = ({
                 label="Email"
             />
 
-            {/* 🔒 Password chỉ hiện khi Create */}
             {!isEdit && (
                 <FormTextField
                     name="password"
@@ -66,7 +65,7 @@ const UserForm: React.FC<UserFormProps> = ({
                 label="Phân quyền"
                 options={[
                     { label: '-- Chọn quyền --', value: '' },
-                    ...Object.entries(UserRoleOptions).map(([value, label]) => ({
+                    ...Object.entries(UserRoleOptionsWithoutAdmin).map(([value, label]) => ({
                         label: label,
                         value: value,
                     }))
@@ -78,31 +77,32 @@ const UserForm: React.FC<UserFormProps> = ({
                 control={control}
                 label="Mô tả"
                 multiline
-                rows={2}
+                minRows={1}
+                maxRows={10}
             />
 
-            <Box sx={formGridStyles.alignRight}>
+            <Box sx={formGridStyles.actionRow}>
                 <FormSwitch
                     name="active"
                     control={control}
                     label="Kích hoạt"
                 />
-            </Box>
 
-            <Button
-                type="submit"
-                variant="contained"
-                disabled={loading}
-                sx={formGridStyles.submitButton}
-            >
-                {loading
-                    ? isEdit
-                        ? 'Đang cập nhật...'
-                        : 'Đang tạo...'
-                    : isEdit
-                        ? 'Cập nhật'
-                        : 'Tạo mới'}
-            </Button>
+                <Button
+                    type="submit"
+                    variant="contained"
+                    disabled={loading}
+                    sx={formGridStyles.submitButton}
+                >
+                    {loading
+                        ? isEdit
+                            ? 'Đang cập nhật...'
+                            : 'Đang tạo...'
+                        : isEdit
+                            ? 'Cập nhật'
+                            : 'Tạo mới'}
+                </Button>
+            </Box>
         </Box>
     );
 };

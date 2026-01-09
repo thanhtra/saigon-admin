@@ -1,8 +1,8 @@
 'use client';
 
-import { RentalTypeLabels } from '@/common/const';
+import { ErrorMessage, RentalTypeLabels } from '@/common/const';
 import { RentalType } from '@/common/enum';
-import { formatDateTime, formatVnd, truncate } from '@/common/service';
+import { formatDateTime, formatVnd } from '@/common/service';
 import ConfirmDialog from '@/components/ConfirmDialog';
 import { TruncateWithTooltip } from '@/components/TruncateWithTooltip';
 import useDeleteRental from '@/hooks/Rental/useDeleteRental';
@@ -64,7 +64,7 @@ export default function RentalPage() {
                 setTotalPages(1);
             }
         } catch {
-            toast.error('Không thể tải danh sách rental');
+            toast.error(ErrorMessage.SYSTEM);
             setRentals([]);
         } finally {
             setLoading(false);
@@ -87,10 +87,10 @@ export default function RentalPage() {
                 setRentalToDelete(null);
                 fetchData();
             } else {
-                toast.error(res?.message || 'Xoá thất bại');
+                toast.error('Xoá thất bại');
             }
         } catch {
-            toast.error('Có lỗi xảy ra khi xoá');
+            toast.error(ErrorMessage.SYSTEM);
         }
     };
 
@@ -100,15 +100,6 @@ export default function RentalPage() {
 
             <CardItem>
                 <HeaderRow>
-                    <Button
-                        variant="contained"
-                        onClick={() => router.push('/rental/create')}
-                    >
-                        + Thêm mới
-                    </Button>
-                </HeaderRow>
-
-                <Box mb={2} display="flex" gap={2}>
                     <TextField
                         size="small"
                         label="Tìm kiếm"
@@ -117,9 +108,15 @@ export default function RentalPage() {
                             setPage(1);
                             setKeySearch(e.target.value);
                         }}
-                        sx={{ minWidth: 400 }}
+                        sx={{ minWidth: 300 }}
                     />
-                </Box>
+                    <Button
+                        variant="contained"
+                        onClick={() => router.push('/rental/create')}
+                    >
+                        + Thêm mới
+                    </Button>
+                </HeaderRow>
 
                 <Paper sx={{ overflowX: 'auto' }}>
                     <Table size="small">
@@ -148,7 +145,7 @@ export default function RentalPage() {
                                 rentals.map((r) => (
                                     <TableRow key={r.id} hover>
                                         <TableCell>{r.collaborator?.user?.name} - {r.collaborator?.user?.phone}</TableCell>
-                                        <TableCell>{r.created_by_user?.name} - {r.created_by_user?.phone}</TableCell>
+                                        <TableCell>{r.createdBy?.name} - {r.createdBy?.phone}</TableCell>
                                         <TableCell>
                                             {r.commission_value}
                                         </TableCell>

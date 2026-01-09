@@ -74,10 +74,10 @@ export default function EditThread() {
             if (res?.success) {
                 toast.success('Cập nhật tài khoản Thread thành công!');
             } else {
-                toast.error(res?.message || 'Cập nhật thất bại!');
+                toast.error('Cập nhật thất bại!');
             }
         } catch (err) {
-            toast.error('Có lỗi xảy ra khi cập nhật tài khoản Thread.');
+            toast.error(ErrorMessage.SYSTEM);
         } finally {
             setLoading(false);
         }

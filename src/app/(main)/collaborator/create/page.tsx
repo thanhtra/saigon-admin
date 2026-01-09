@@ -4,13 +4,13 @@ import { useCallback } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
 
+import { ErrorMessage } from '@/common/const';
 import { CollaboratorInput } from '@/common/type';
 import BackToList from '@/components/BackToList';
 import useCreateCollaborator from '@/hooks/Collaborator/useCreateCollaborator';
-import { CardItem, HeaderRow, TitleMain } from '@/styles/common';
+import { CardItem, HeaderRowOneItem, TitleMain } from '@/styles/common';
 import CollaboratorForm from '../CollaboratorForm';
 import { COLLABORATOR_DEFAULT_VALUES } from '../const';
-
 
 
 
@@ -40,9 +40,9 @@ export default function CreateCollaborator() {
                         return;
                     }
 
-                    toast.error(res?.message || 'Tạo thất bại');
+                    toast.error('Tạo thất bại');
                 } catch {
-                    toast.error('Lỗi hệ thống');
+                    toast.error(ErrorMessage.SYSTEM);
                 }
             },
             [createCollaborator, reset],
@@ -53,9 +53,9 @@ export default function CreateCollaborator() {
             <TitleMain>Thêm mới chủ nhà - môi giới</TitleMain>
 
             <CardItem>
-                <HeaderRow>
+                <HeaderRowOneItem>
                     <BackToList href="/collaborator" />
-                </HeaderRow>
+                </HeaderRowOneItem>
 
                 <CollaboratorForm
                     control={control}

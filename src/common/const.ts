@@ -8,11 +8,14 @@ export const GO_VAP_DISTRICT_ID = '764';
 
 
 export const FieldCooperationLabels: Record<FieldCooperation, string> = {
-    [FieldCooperation.Rental]: 'Cho thuê (phòng trọ, nhà thuê, CHDV)',
-    [FieldCooperation.Land]: 'Bất động sản (mua bán)',
+    [FieldCooperation.Rental]: 'Nhà ở cho thuê',
+    [FieldCooperation.Land]: 'Bất động sản',
 };
 
 
+export const ErrorMessage = {
+    SYSTEM: "Lỗi hệ thống"
+}
 
 
 // ---------------------    AUTH    --------------------- //
@@ -24,6 +27,10 @@ export const UserRoleOptions: Record<UserRole, string> = {
     [UserRole.Broker]: 'Môi giới',
     [UserRole.Tenant]: 'Khách hàng',
 };
+
+export const UserRoleOptionsWithoutAdmin = Object.fromEntries(
+    Object.entries(UserRoleOptions).filter(([key]) => key !== UserRole.Admin)
+) as Record<Exclude<UserRole, UserRole.Admin>, string>;
 
 
 

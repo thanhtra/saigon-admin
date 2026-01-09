@@ -1,17 +1,27 @@
 'use client';
 
+import { ErrorMessage, UserRoleOptions } from '@/common/const';
+import { UserRole } from '@/common/enum';
+import { User } from '@/common/type';
 import ConfirmDialog from '@/components/ConfirmDialog';
+import ResetPasswordDialog, { UserResetInfo } from '@/components/ResetPasswordDialog';
+import { TruncateWithTooltip } from '@/components/TruncateWithTooltip';
 import useDeleteUser from '@/hooks/User/useDeleteUser';
+import useGetUsers from '@/hooks/User/useGetUsers';
+import useResetPassword from '@/hooks/User/useResetPassword';
 import { CardItem, HeaderRow, TitleMain } from '@/styles/common';
+import CancelIcon from '@mui/icons-material/Cancel';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import FacebookIcon from '@mui/icons-material/Facebook';
+import LockResetIcon from '@mui/icons-material/LockReset';
+import SmsIcon from '@mui/icons-material/Sms';
 import {
     Box,
     Button,
     CircularProgress,
     IconButton,
-    Link,
     Pagination,
     Paper,
     Table,
@@ -20,15 +30,11 @@ import {
     TableHead,
     TableRow,
     TextField,
-    Tooltip,
+    Tooltip
 } from '@mui/material';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
-import { User } from '@/common/type';
-import { UserRoleOptions } from '@/common/const';
-import { UserRole } from '@/common/enum';
-import useGetUsers from '@/hooks/User/useGetUsers';
 
 export default function UsersPage() {
     const router = useRouter();
@@ -44,7 +50,11 @@ export default function UsersPage() {
     const [openConfirm, setOpenConfirm] = useState(false);
     const [userToDelete, setUserToDelete] = useState<User | null>(null);
 
-    // ---------------- FETCH USERS ----------------
+    const [openReset, setOpenReset] = useState(false);
+    const [selectedUser, setSelectedUser] = useState<UserResetInfo | null>(null);
+
+    const { resetPassword } = useResetPassword();
+
     const fetchUsers = useCallback(async () => {
         setLoading(true);
         try {
@@ -62,7 +72,7 @@ export default function UsersPage() {
                 setTotalPages(1);
             }
         } catch {
-            toast.error('Không thể tải danh sách người dùng');
+            toast.error(ErrorMessage.SYSTEM);
             setUsers([]);
         } finally {
             setLoading(false);
@@ -73,7 +83,6 @@ export default function UsersPage() {
         fetchUsers();
     }, [fetchUsers]);
 
-    // ---------------- DELETE ----------------
     const handleDelete = async () => {
         if (!userToDelete?.id) return;
 
@@ -85,10 +94,31 @@ export default function UsersPage() {
                 setUserToDelete(null);
                 fetchUsers();
             } else {
-                toast.error(res?.message || 'Xoá thất bại');
+                toast.error('Xoá thất bại');
             }
         } catch {
-            toast.error('Có lỗi xảy ra khi xoá');
+            toast.error(ErrorMessage.SYSTEM);
+        }
+    };
+
+    const handleOpenReset = (user: any) => {
+        setSelectedUser(user);
+        setOpenReset(true);
+    };
+
+    const resetPasswordApi = async (userId: string) => {
+        try {
+            const res = await resetPassword(userId);
+
+            if (res.success) {
+                toast.success('Reset mật khẩu thành công');
+                return res.result.password;
+            } else {
+                toast.error('Reset mật khẩu thất bại');
+                return "";
+            }
+        } catch (error) {
+            toast.error(ErrorMessage.SYSTEM);
         }
     };
 
@@ -98,6 +128,17 @@ export default function UsersPage() {
 
             <CardItem>
                 <HeaderRow>
+                    <TextField
+                        fullWidth
+                        size="small"
+                        label="Tìm kiếm"
+                        value={search}
+                        onChange={(e) => {
+                            setPage(1);
+                            setSearch(e.target.value);
+                        }}
+                        sx={{ width: 300, float: 'left' }}
+                    />
                     <Button
                         variant="contained"
                         onClick={() => router.push('/user/create')}
@@ -106,22 +147,6 @@ export default function UsersPage() {
                     </Button>
                 </HeaderRow>
 
-                {/* SEARCH */}
-                <Box mb={2}>
-                    <TextField
-                        fullWidth
-                        size="small"
-                        label="Tìm kiếm"
-                        value={search}
-                        onChange={(e) => {
-                            setPage(0);
-                            setSearch(e.target.value);
-                        }}
-                        sx={{ maxWidth: 500 }}
-                    />
-                </Box>
-
-                {/* TABLE */}
                 <Paper sx={{ overflowX: 'auto' }}>
                     <Table size="small">
                         <TableHead sx={{ backgroundColor: '#f5f5f5' }}>
@@ -129,7 +154,7 @@ export default function UsersPage() {
                                 <TableCell><strong>Tên</strong></TableCell>
                                 <TableCell><strong>Số điện thoại</strong></TableCell>
                                 <TableCell><strong>Phân quyền</strong></TableCell>
-                                <TableCell><strong>Facebook</strong></TableCell>
+                                <TableCell><strong>Liên hệ</strong></TableCell>
                                 <TableCell><strong>Mô tả</strong></TableCell>
                                 <TableCell align="center"><strong>Trạng thái</strong></TableCell>
                                 <TableCell align="center"><strong>Hành động</strong></TableCell>
@@ -147,23 +172,58 @@ export default function UsersPage() {
                                 users.map((user) => (
                                     <TableRow key={user.id} hover>
                                         <TableCell>{user.name}</TableCell>
-                                        <TableCell>{user.phone}</TableCell>
+                                        <TableCell width={180}>
+                                            {user.phone}
+                                            <Tooltip title="Reset mật khẩu">
+                                                <IconButton
+                                                    sx={{ float: 'right', height: '20px' }}
+                                                    color="warning"
+                                                    onClick={() => handleOpenReset({
+                                                        id: user.id,
+                                                        phone: user.phone,
+                                                        name: user.name,
+                                                        role: user.role,
+                                                    })}
+                                                >
+                                                    <LockResetIcon />
+                                                </IconButton>
+                                            </Tooltip>
+                                        </TableCell>
                                         <TableCell>{UserRoleOptions[user.role as UserRole]}</TableCell>
                                         <TableCell>
-                                            {user?.link_facebook ? (
-                                                <Link
-                                                    href={user.link_facebook}
-                                                    target="_blank"
-                                                    rel="noopener noreferrer"
-                                                    underline="hover"
-                                                >
-                                                    Facebook
-                                                </Link>
-                                            ) : (
-                                                '-'
-                                            )}
+                                            <Box display="flex" gap={1}>
+                                                {user?.link_facebook && (
+                                                    <Tooltip title="Facebook" placement="top">
+                                                        <IconButton
+                                                            size="small"
+                                                            color="primary"
+                                                            component="a"
+                                                            href={user.link_facebook}
+                                                            target="_blank"
+                                                            rel="noopener noreferrer"
+                                                        >
+                                                            <FacebookIcon fontSize="small" />
+                                                        </IconButton>
+                                                    </Tooltip>
+                                                )}
+
+                                                {user?.phone && (
+                                                    <Tooltip title="Zalo" placement="top">
+                                                        <IconButton
+                                                            size="small"
+                                                            color="success"
+                                                            component="a"
+                                                            href={`https://zalo.me/${user.phone}`}
+                                                            target="_blank"
+                                                            rel="noopener noreferrer"
+                                                        >
+                                                            <SmsIcon fontSize="small" />
+                                                        </IconButton>
+                                                    </Tooltip>
+                                                )}
+                                            </Box>
                                         </TableCell>
-                                        <TableCell>{user.note}</TableCell>
+                                        <TableCell>{TruncateWithTooltip({ text: user.note })}</TableCell>
                                         <TableCell align="center">
                                             <Tooltip title={user.active ? 'Đang hoạt động' : 'Không hoạt động'}>
                                                 {user.active ? <CheckCircleIcon color="success" fontSize="small" /> : <CancelIcon color="error" fontSize="small" />}
@@ -203,7 +263,6 @@ export default function UsersPage() {
                     </Table>
                 </Paper>
 
-                {/* PAGINATION */}
                 {!loading && totalPages > 1 && (
                     <Box display="flex" justifyContent="center" mt={2}>
                         <Pagination
@@ -214,7 +273,6 @@ export default function UsersPage() {
                     </Box>
                 )}
 
-                {/* CONFIRM */}
                 <ConfirmDialog
                     open={openConfirm}
                     onClose={() => setOpenConfirm(false)}
@@ -222,6 +280,13 @@ export default function UsersPage() {
                     loading={deleting}
                     title="Xác nhận xoá"
                     description="Bạn có chắc chắn muốn xoá? Hành động này không thể hoàn tác."
+                />
+
+                <ResetPasswordDialog
+                    open={openReset}
+                    onClose={() => setOpenReset(false)}
+                    user={selectedUser}
+                    onReset={resetPasswordApi}
                 />
             </CardItem>
         </>

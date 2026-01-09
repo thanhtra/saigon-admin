@@ -33,9 +33,18 @@ export const Note = styled(Typography)(() => ({
 
 export const HeaderRow = styled('div')({
     display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'flex',
+    marginBottom: '16px',
+    width: '100%'
+});
+
+export const HeaderRowOneItem = styled('div')({
+    display: 'flex',
     justifyContent: 'end',
     alignItems: 'flex',
     marginBottom: '16px',
+    width: '100%'
 });
 
 export const BackLink = styled(Link)({

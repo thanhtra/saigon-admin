@@ -8,10 +8,10 @@ import { toast } from 'react-toastify';
 import FormAutocomplete from '@/components/FormAutocomplete';
 import FormTextField from '@/components/FormTextField';
 
-import { BackLink, CardItem, HeaderRow, TitleMain } from '@/styles/common';
+import { BackLink, CardItem, HeaderRowOneItem, TitleMain } from '@/styles/common';
 import { formGridStyles } from '@/styles/formGrid';
 
-import { RoomStatusLabels } from '@/common/const';
+import { ErrorMessage, RoomStatusLabels } from '@/common/const';
 import { RoomInput, UploadPreview } from '@/common/type';
 import ControlledSwitch from '@/components/ControlledSwitch';
 import FormAmenityCheckbox from '@/components/FormAmenityCheckbox';
@@ -19,8 +19,8 @@ import FormImageUpload from '@/components/FormImageUpload';
 import useGetCollaborators from '@/hooks/Collaborator/useGetCollaborators';
 import useGetRentalsByCollaborator from '@/hooks/Rental/useGetRentalsByCollaborator';
 import useCreateRoom from '@/hooks/Room/useCreateRoom';
-import useUploadImages from '@/hooks/Upload/uploadImages';
 import useUpdateRoom from '@/hooks/Room/useUpdateRoom';
+import useUploadImages from '@/hooks/Upload/uploadImages';
 
 export default function CreateRoom() {
     const { createRoom } = useCreateRoom();
@@ -110,8 +110,6 @@ export default function CreateRoom() {
                 return;
             }
 
-            /* ================= 1. CREATE ROOM (NO IMAGES) ================= */
-
             const { images, ...payload } = data;
             const createRes = await createRoom({
                 rental_id: payload.rental_id,
@@ -129,13 +127,11 @@ export default function CreateRoom() {
             });
 
             if (!createRes?.success || !createRes.result?.id) {
-                toast.error(createRes?.message || 'Tạo phòng thất bại');
+                toast.error('Tạo phòng thất bại');
                 return;
             }
 
             const roomId = createRes.result.id;
-
-            /* ================= 2. UPLOAD IMAGES ================= */
 
             const uploadRes = await uploadImages(
                 data.images.map(i => i.file),
@@ -157,8 +153,6 @@ export default function CreateRoom() {
                     ? data.images.findIndex(i => i.isCover)
                     : 0;
 
-            /* ================= 3. UPDATE ROOM ================= */
-
             const updateRes = await updateRoom(roomId, {
                 upload_ids: uploadIds,
                 cover_index: coverIndex,
@@ -173,7 +167,7 @@ export default function CreateRoom() {
             reset();
         } catch (error) {
             console.error(error);
-            toast.error('Có lỗi xảy ra');
+            toast.error(ErrorMessage.SYSTEM);
         } finally {
             setLoading(false);
         }
@@ -182,14 +176,14 @@ export default function CreateRoom() {
 
     return (
         <>
-            <TitleMain>Thêm phòng trọ</TitleMain>
+            <TitleMain>Thêm mới phòng</TitleMain>
 
             <CardItem>
-                <HeaderRow>
+                <HeaderRowOneItem>
                     <BackLink href="/room">
-                        ← Trở về danh sách phòng
+                        ← Trở về danh sách
                     </BackLink>
-                </HeaderRow>
+                </HeaderRowOneItem>
 
                 <Box
                     component="form"

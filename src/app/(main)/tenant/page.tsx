@@ -5,10 +5,10 @@ import useDeleteTenant from '@/hooks/Tenant/useDeleteTenant';
 import useGetTenants from '@/hooks/Tenant/useGetTenants';
 
 import { CardItem, HeaderRow, TitleMain } from '@/styles/common';
+import CancelIcon from '@mui/icons-material/Cancel';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import DeleteIcon from '@mui/icons-material/Delete';
 import VisibilityIcon from '@mui/icons-material/Visibility';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import CancelIcon from '@mui/icons-material/Cancel';
 
 import {
     Box,
@@ -26,10 +26,11 @@ import {
     Tooltip,
 } from '@mui/material';
 
-import { useCallback, useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { toast } from 'react-toastify';
+import { ErrorMessage } from '@/common/const';
 import { Tenant } from '@/common/type';
+import { useRouter } from 'next/navigation';
+import { useCallback, useEffect, useState } from 'react';
+import { toast } from 'react-toastify';
 
 export default function TenantsPage() {
     const router = useRouter();
@@ -44,8 +45,6 @@ export default function TenantsPage() {
 
     const [openConfirm, setOpenConfirm] = useState(false);
     const [tenantToDelete, setTenantToDelete] = useState<Tenant | null>(null);
-
-    /* ================= FETCH ================= */
 
     const fetchTenants = useCallback(async () => {
         setLoading(true);
@@ -64,7 +63,7 @@ export default function TenantsPage() {
                 setTotalPages(1);
             }
         } catch {
-            toast.error('Không thể tải danh sách khách hàng');
+            toast.error(ErrorMessage.SYSTEM);
             setTenants([]);
         } finally {
             setLoading(false);
@@ -74,8 +73,6 @@ export default function TenantsPage() {
     useEffect(() => {
         fetchTenants();
     }, [fetchTenants]);
-
-    /* ================= DELETE ================= */
 
     const handleDelete = async () => {
         if (!tenantToDelete?.id) return;
@@ -88,38 +85,32 @@ export default function TenantsPage() {
                 setTenantToDelete(null);
                 fetchTenants();
             } else {
-                toast.error(res?.message || 'Xoá thất bại');
+                toast.error('Xoá thất bại');
             }
         } catch {
-            toast.error('Có lỗi xảy ra khi xoá');
+            toast.error(ErrorMessage.SYSTEM);
         }
     };
-
-    /* ================= RENDER ================= */
 
     return (
         <>
             <TitleMain>Quản lý khách hàng</TitleMain>
 
             <CardItem>
-                <HeaderRow />
-
-                {/* SEARCH */}
-                <Box mb={2}>
+                <HeaderRow>
                     <TextField
                         fullWidth
                         size="small"
-                        label="Tìm theo tên / SĐT"
+                        label="Tìm kiếm"
                         value={search}
                         onChange={(e) => {
                             setPage(1);
                             setSearch(e.target.value);
                         }}
-                        sx={{ maxWidth: 400 }}
+                        sx={{ maxWidth: 300 }}
                     />
-                </Box>
+                </HeaderRow>
 
-                {/* TABLE */}
                 <Paper sx={{ overflowX: 'auto' }}>
                     <Table size="small">
                         <TableHead sx={{ backgroundColor: '#f5f5f5' }}>
@@ -210,7 +201,6 @@ export default function TenantsPage() {
                     </Table>
                 </Paper>
 
-                {/* PAGINATION */}
                 {!loading && totalPages > 1 && (
                     <Box display="flex" justifyContent="center" mt={2}>
                         <Pagination
@@ -221,7 +211,6 @@ export default function TenantsPage() {
                     </Box>
                 )}
 
-                {/* CONFIRM */}
                 <ConfirmDialog
                     open={openConfirm}
                     onClose={() => setOpenConfirm(false)}

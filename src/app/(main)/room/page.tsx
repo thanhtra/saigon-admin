@@ -23,7 +23,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { toast } from 'react-toastify';
 
-import { RoomStatusLabels } from '@/common/const';
+import { ErrorMessage, RoomStatusLabels } from '@/common/const';
 import { RoomStatus } from '@/common/enum';
 import useDeleteRoom from '@/hooks/Room/useDeleteRoom';
 import useGetRooms from '@/hooks/Room/useGetRentals';
@@ -43,7 +43,6 @@ export default function RoomPage() {
     const [openConfirm, setOpenConfirm] = useState(false);
     const [roomToDelete, setRoomToDelete] = useState<any | null>(null);
 
-    /* ================= FETCH ================= */
     const fetchData = useCallback(async () => {
         setLoading(true);
         try {
@@ -61,7 +60,7 @@ export default function RoomPage() {
                 setTotalPages(1);
             }
         } catch {
-            toast.error('Không thể tải danh sách phòng');
+            toast.error(ErrorMessage.SYSTEM);
         } finally {
             setLoading(false);
         }
@@ -71,7 +70,6 @@ export default function RoomPage() {
         fetchData();
     }, [fetchData]);
 
-    /* ================= DELETE ================= */
     const handleDelete = async () => {
         if (!roomToDelete?.id) return;
 
@@ -83,10 +81,10 @@ export default function RoomPage() {
                 setRoomToDelete(null);
                 fetchData();
             } else {
-                toast.error(res?.message || 'Xoá thất bại');
+                toast.error('Xoá thất bại');
             }
         } catch {
-            toast.error('Có lỗi khi xoá phòng');
+            toast.error(ErrorMessage.SYSTEM);
         }
     };
 
@@ -96,6 +94,16 @@ export default function RoomPage() {
 
             <CardItem>
                 <HeaderRow>
+                    <TextField
+                        size="small"
+                        label="Tìm kiếm"
+                        value={keySearch}
+                        onChange={(e) => {
+                            setPage(1);
+                            setKeySearch(e.target.value);
+                        }}
+                        sx={{ minWidth: 300 }}
+                    />
                     <Button
                         variant="contained"
                         onClick={() => router.push('/room/create')}
@@ -103,19 +111,6 @@ export default function RoomPage() {
                         + Thêm phòng
                     </Button>
                 </HeaderRow>
-
-                <Box mb={2}>
-                    <TextField
-                        size="small"
-                        label="Tìm theo mã phòng / tên nhà"
-                        value={keySearch}
-                        onChange={(e) => {
-                            setPage(1);
-                            setKeySearch(e.target.value);
-                        }}
-                        sx={{ minWidth: 400 }}
-                    />
-                </Box>
 
                 <Paper sx={{ overflowX: 'auto' }}>
                     <Table size="small">
@@ -188,7 +183,6 @@ export default function RoomPage() {
                     </Table>
                 </Paper>
 
-                {/* PAGINATION */}
                 {!loading && totalPages > 1 && (
                     <Box display="flex" justifyContent="center" mt={2}>
                         <Pagination
@@ -199,7 +193,6 @@ export default function RoomPage() {
                     </Box>
                 )}
 
-                {/* CONFIRM DELETE */}
                 <ConfirmDialog
                     open={openConfirm}
                     onClose={() => setOpenConfirm(false)}

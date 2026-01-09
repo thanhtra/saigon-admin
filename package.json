@@ -28,11 +28,13 @@
     "@eslint/eslintrc": "^3",
     "@tailwindcss/postcss": "^4",
     "@types/form-data": "^2.5.2",
+    "@types/lodash": "^4.17.21",
     "@types/node": "^20.17.30",
     "@types/react": "^19.1.0",
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "15.2.4",
+    "lodash": "^4.17.21",
     "tailwindcss": "^4",
     "typescript": "^5"
   }

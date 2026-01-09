@@ -1,7 +1,7 @@
 'use client';
 
 import BackToList from '@/components/BackToList';
-import { CardItem, HeaderRow, TitleMain } from '@/styles/common';
+import { CardItem, HeaderRowOneItem, TitleMain } from '@/styles/common';
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -11,8 +11,9 @@ import { CollaboratorInput } from '@/common/type';
 import useGetCollaboratorDetail from '@/hooks/Collaborator/useGetCollaboratorDetail';
 import useUpdateCollaborator from '@/hooks/Collaborator/useUpdateCollaborator';
 
-import { COLLABORATOR_DEFAULT_VALUES } from '../../const';
+import { ErrorMessage } from '@/common/const';
 import CollaboratorForm from '../../CollaboratorForm';
+import { COLLABORATOR_DEFAULT_VALUES } from '../../const';
 
 type UserOption = {
     label: string;
@@ -32,7 +33,6 @@ export default function EditCollaborator() {
         defaultValues: COLLABORATOR_DEFAULT_VALUES,
     });
 
-    // ---------------- FETCH DETAIL ----------------
     useEffect(() => {
         if (!id) return;
 
@@ -59,12 +59,11 @@ export default function EditCollaborator() {
                     router.replace('/collaborator');
                 }
             } catch {
-                toast.error('Không thể tải dữ liệu');
+                toast.error(ErrorMessage.SYSTEM);
             }
         })();
     }, [id, getCollaboratorDetail, reset, router]);
 
-    // ---------------- SUBMIT ----------------
     const onSubmit = async (data: CollaboratorInput) => {
         try {
             const res = await updateCollaborator(id, data);
@@ -75,9 +74,9 @@ export default function EditCollaborator() {
                 return;
             }
 
-            toast.error(res?.message || 'Cập nhật thất bại');
+            toast.error('Cập nhật thất bại');
         } catch {
-            toast.error('Lỗi hệ thống');
+            toast.error(ErrorMessage.SYSTEM);
         }
     };
 
@@ -86,9 +85,9 @@ export default function EditCollaborator() {
             <TitleMain>Cập nhật chủ nhà - môi giới</TitleMain>
 
             <CardItem>
-                <HeaderRow>
+                <HeaderRowOneItem>
                     <BackToList href="/collaborator" />
-                </HeaderRow>
+                </HeaderRowOneItem>
 
                 <CollaboratorForm
                     control={control}

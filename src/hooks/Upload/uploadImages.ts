@@ -1,28 +1,29 @@
-import { useState, useCallback } from 'react';
+import { UploadDomain } from '@/common/enum';
 import { post } from '@/utils/request';
+import { useCallback, useState } from 'react';
 
 /* ================= TYPES ================= */
 
 export type FileType = 'image' | 'video';
-export type UploadDomain = 'rooms' | 'real-estates' | 'contracts';
+export type Domain = UploadDomain.Rooms | UploadDomain.RealEstates | UploadDomain.Contracts;
 
 interface BaseUploadOptions {
     // file_type: FileType;
-    domain: UploadDomain;
+    domain: Domain;
 }
 
 export interface UploadRoomOptions extends BaseUploadOptions {
-    domain: 'rooms';
+    domain: UploadDomain.Rooms;
     room_id: string;
 }
 
 export interface UploadRealEstateOptions extends BaseUploadOptions {
-    domain: 'real-estates';
+    domain: UploadDomain.RealEstates;
     real_estate_id: string;
 }
 
 export interface UploadContractOptions extends BaseUploadOptions {
-    domain: 'contracts';
+    domain: UploadDomain.Contracts;
     contract_id: string;
 }
 

@@ -28,6 +28,7 @@ import { RoomStatus } from '@/common/enum';
 import useDeleteRoom from '@/hooks/Room/useDeleteRoom';
 import useGetRooms from '@/hooks/Room/useGetRentals';
 import { formatArea, formatVnd, truncate } from '@/common/service';
+import PaginationWrapper from '@/components/common/PaginationWrapper';
 
 export default function RoomPage() {
     const router = useRouter();
@@ -184,13 +185,13 @@ export default function RoomPage() {
                 </Paper>
 
                 {!loading && totalPages > 1 && (
-                    <Box display="flex" justifyContent="center" mt={2}>
+                    <PaginationWrapper>
                         <Pagination
                             count={totalPages}
                             page={page}
                             onChange={(_, value) => setPage(value)}
                         />
-                    </Box>
+                    </PaginationWrapper>
                 )}
 
                 <ConfirmDialog

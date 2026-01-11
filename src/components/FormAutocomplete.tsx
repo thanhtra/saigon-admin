@@ -1,11 +1,7 @@
-// components/FormAutocomplete.tsx
 import { Controller } from 'react-hook-form';
 import { Autocomplete, TextField } from '@mui/material';
+import { Option } from '@/common/type';
 
-type Option = {
-    label: string;
-    value: string;
-};
 
 type Props = {
     name: string;

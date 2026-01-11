@@ -5,31 +5,31 @@ import { SubmitHandler, useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
 
 import { ErrorMessage } from '@/common/const';
-import { CollaboratorInput } from '@/common/type';
+import { TenantInput } from '@/common/type';
 import BackToList from '@/components/BackToList';
-import useCreateCollaborator from '@/hooks/Collaborator/useCreateCollaborator';
 import { CardItem, HeaderRowOneItem, TitleMain } from '@/styles/common';
-import CollaboratorForm from '../CollaboratorForm';
-import { COLLABORATOR_DEFAULT_VALUES } from '../const';
-import useGetAvailableCollaborators from '@/hooks/User/useGetAvailableCollaborators';
+import useCreateTenant from '@/hooks/Tenant/useCreateTenant';
+
+import TenantForm from '../TenantForm';
+import { TENANT_DEFAULT_VALUES } from '../const';
+import useGetAvailableTenants from '@/hooks/User/useGetAvailableTenants';
 import { Option } from '@/common/type';
 
-export default function CreateCollaborator() {
-    const { createCollaborator, loading } = useCreateCollaborator();
-    const { getAvailableCollaborators } = useGetAvailableCollaborators();
+export default function CreateTenant() {
+    const { createTenant, loading } = useCreateTenant();
+    const { getAvailableTenants } = useGetAvailableTenants();
 
     const [userOptions, setUserOptions] = useState<Option[]>([]);
     const [loadingOptions, setLoadingOptions] = useState(true);
 
-    const { control, handleSubmit, reset } = useForm<CollaboratorInput>({
-        defaultValues: COLLABORATOR_DEFAULT_VALUES,
+    const { control, handleSubmit, reset } = useForm<TenantInput>({
+        defaultValues: TENANT_DEFAULT_VALUES,
     });
 
     useEffect(() => {
         (async () => {
             try {
-                const res = await getAvailableCollaborators({ limit: 200 });
-
+                const res = await getAvailableTenants({ limit: 200 });
                 if (res?.success) {
                     const options: Option[] = res.result.map((u: any) => ({
                         label: `${u.name} - ${u.phone}`,
@@ -43,44 +43,35 @@ export default function CreateCollaborator() {
                 setLoadingOptions(false);
             }
         })();
-    }, [getAvailableCollaborators]);
+    }, [getAvailableTenants]);
 
-    const onSubmit: SubmitHandler<CollaboratorInput> = useCallback(
+    const onSubmit: SubmitHandler<TenantInput> = useCallback(
         async (data) => {
             try {
-                const payload: CollaboratorInput = {
-                    user_id: data.user_id,
-                    field_cooperation: data.field_cooperation,
-                    note: data.note,
-                    active: data.active,
-                };
-
-                const res = await createCollaborator(payload);
-
+                const res = await createTenant(data);
                 if (res?.success) {
-                    toast.success('Tạo cộng tác viên thành công');
-                    reset(COLLABORATOR_DEFAULT_VALUES);
+                    toast.success('Tạo tenant thành công');
+                    reset(TENANT_DEFAULT_VALUES);
                     return;
                 }
-
-                toast.error('Tạo thất bại');
+                toast.error('Tạo tenant thất bại');
             } catch {
                 toast.error(ErrorMessage.SYSTEM);
             }
         },
-        [createCollaborator, reset]
+        [createTenant, reset]
     );
 
     return (
         <>
-            <TitleMain>Thêm mới chủ nhà - môi giới</TitleMain>
+            <TitleMain>Thêm mới khách hàng</TitleMain>
 
             <CardItem>
                 <HeaderRowOneItem>
-                    <BackToList href="/collaborator" />
+                    <BackToList href="/tenant" />
                 </HeaderRowOneItem>
 
-                <CollaboratorForm
+                <TenantForm
                     control={control}
                     loading={loading || loadingOptions}
                     onSubmit={handleSubmit(onSubmit)}

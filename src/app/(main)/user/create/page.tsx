@@ -1,5 +1,6 @@
 'use client';
 
+import { ErrorMessage } from '@/common/const';
 import { User } from '@/common/type';
 import BackToList from '@/components/BackToList';
 import useCreateUser from '@/hooks/User/useCreateUser';
@@ -26,17 +27,24 @@ const CreateUser: React.FC = () => {
     const onSubmit: SubmitHandler<User> = useCallback(
         async (data) => {
             try {
-                const res = await createUser(data);
+                const res = await createUser({
+                    name: data.name,
+                    phone: data.phone,
+                    password: data.password,
+                    role: data.role,
+                    active: data.active,
+                    ...(data.email && { email: data.email }),
+                    ...(data.note && { note: data.note }),
+                });
 
                 if (res?.success) {
-                    toast.success('Tạo mới thành công!');
+                    toast.success('Tạo mới thành công');
                     reset(USER_DEFAULT_VALUES);
-                    return;
+                } else {
+                    toast.error('Tạo mới thất bại');
                 }
-
-                toast.error('Tạo mới thất bại');
             } catch {
-                toast.error('Lỗi hệ thống!');
+                toast.error(ErrorMessage.SYSTEM);
             }
         },
         [createUser, reset],

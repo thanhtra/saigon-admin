@@ -1,4 +1,4 @@
-import { CollaboratorType, FieldCooperation, RentalAmenity, RentalType, RoomStatus, UserRole } from "./enum";
+import { CollaboratorType, FieldCooperation, RentalAmenity, RentalStatus, RentalType, RoomStatus, UserRole } from "./enum";
 import { StatusType } from "./type";
 
 
@@ -16,6 +16,8 @@ export const FieldCooperationLabels: Record<FieldCooperation, string> = {
 export const ErrorMessage = {
     SYSTEM: "Lỗi hệ thống"
 }
+
+export const LOGOUT_FLAG = 'force_logout';
 
 
 // ---------------------    AUTH    --------------------- //
@@ -43,6 +45,15 @@ export const RentalTypeLabels: Record<RentalType, string> = {
     [RentalType.BusinessPremises]: 'Mặt bằng kinh doanh',
 };
 
+
+export const RentalStatusLabels: Record<RentalStatus, string> = {
+    [RentalStatus.New]: 'Nhà mới tạo',
+    [RentalStatus.Confirmed]: 'Đã xác nhận',
+    [RentalStatus.Update]: 'Đã chỉnh sửa',
+    [RentalStatus.Cancelled]: 'Đã huỷ',
+};
+
+
 export const UNIT_RENTAL_TYPES = [
     RentalType.WholeHouse,
     RentalType.Apartment,
@@ -65,8 +76,8 @@ export const RoomStatusLabels: Record<RoomStatus, string> = {
     [RoomStatus.Rented]: 'Đã thuê',
     [RoomStatus.Deposited]: 'Đã cọc',
     [RoomStatus.Maintenance]: 'Bảo trì',
+    [RoomStatus.Disabled]: 'Vô hiệu hoá'
 };
-
 
 
 

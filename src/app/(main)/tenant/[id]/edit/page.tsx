@@ -7,26 +7,25 @@ import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
 
-import { CollaboratorInput } from '@/common/type';
-import useGetCollaboratorDetail from '@/hooks/Collaborator/useGetCollaboratorDetail';
-import useUpdateCollaborator from '@/hooks/Collaborator/useUpdateCollaborator';
-
-import CollaboratorForm from '../../CollaboratorForm';
-import { COLLABORATOR_DEFAULT_VALUES } from '../../const';
+import { TenantInput } from '@/common/type';
+import useGetTenantDetail from '@/hooks/Tenant/useGetTenantDetail';
+import useUpdateTenant from '@/hooks/Tenant/useUpdateTenant';
 import { ErrorMessage } from '@/common/const';
+import { TENANT_DEFAULT_VALUES } from '../../const';
+import TenantForm from '../../TenantForm';
 import { Option } from '@/common/type';
 
-export default function EditCollaborator() {
+export default function EditTenant() {
     const { id } = useParams<{ id: string }>();
     const router = useRouter();
 
-    const { getCollaboratorDetail } = useGetCollaboratorDetail();
-    const { updateCollaborator, loading } = useUpdateCollaborator();
+    const { getTenantDetail } = useGetTenantDetail();
+    const { updateTenant, loading } = useUpdateTenant();
 
     const [userOption, setUserOption] = useState<Option | null>(null);
 
-    const { control, handleSubmit, reset } = useForm<CollaboratorInput>({
-        defaultValues: COLLABORATOR_DEFAULT_VALUES,
+    const { control, handleSubmit, reset } = useForm<TenantInput>({
+        defaultValues: TENANT_DEFAULT_VALUES,
     });
 
     useEffect(() => {
@@ -34,7 +33,7 @@ export default function EditCollaborator() {
 
         (async () => {
             try {
-                const res = await getCollaboratorDetail(id);
+                const res = await getTenantDetail(id);
 
                 if (res?.success) {
                     const user = res.result.user;
@@ -46,26 +45,25 @@ export default function EditCollaborator() {
 
                     reset({
                         user_id: user.id,
-                        field_cooperation: res.result.field_cooperation,
                         note: res.result.note,
                         active: res.result.active,
                     });
                 } else {
-                    toast.error('Không tìm thấy cộng tác viên');
-                    router.replace('/collaborator');
+                    toast.error('Không tìm thấy tenant');
+                    router.replace('/tenant');
                 }
             } catch {
                 toast.error(ErrorMessage.SYSTEM);
             }
         })();
-    }, [id, getCollaboratorDetail, reset, router]);
+    }, [id, getTenantDetail, reset, router]);
 
-    const onSubmit = async (data: CollaboratorInput) => {
+    const onSubmit = async (data: TenantInput) => {
         try {
-            const res = await updateCollaborator(id, data);
+            const res = await updateTenant(id, data);
             if (res?.success) {
                 toast.success('Cập nhật thành công');
-                router.push('/collaborator');
+                router.push('/tenant');
                 return;
             }
             toast.error('Cập nhật thất bại');
@@ -76,14 +74,14 @@ export default function EditCollaborator() {
 
     return (
         <>
-            <TitleMain>Cập nhật chủ nhà - môi giới</TitleMain>
+            <TitleMain>Cập nhật tenant</TitleMain>
 
             <CardItem>
                 <HeaderRowOneItem>
-                    <BackToList href="/collaborator" />
+                    <BackToList href="/tenant" />
                 </HeaderRowOneItem>
 
-                <CollaboratorForm
+                <TenantForm
                     control={control}
                     loading={loading}
                     onSubmit={handleSubmit(onSubmit)}

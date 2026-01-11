@@ -27,6 +27,14 @@ export enum CustomerType {
 }
 
 
+// ---------------------    UPLOAD    --------------------- //
+export enum UploadDomain {
+    Rooms = 'rooms',
+    RealEstates = 'real_estates',
+    Contracts = 'contracts',
+}
+
+
 
 // ---------------------    RENTAL    --------------------- //
 
@@ -53,6 +61,7 @@ export enum RoomStatus {
     Rented = 'rented',             // Đã thuê
     Deposited = 'deposited',       // Đã cọc
     Maintenance = 'maintenance',   // Bảo trì
+    Disabled = 'disabled'          // Vô hiệu
 }
 
 

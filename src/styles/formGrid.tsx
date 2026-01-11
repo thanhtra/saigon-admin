@@ -1,4 +1,3 @@
-// src/styles/formGrid.ts
 export const formGridStyles = {
     form: {
         display: 'grid',
@@ -6,7 +5,7 @@ export const formGridStyles = {
         gap: 2, // khoảng cách giữa các cột và hàng
     },
     fullWidth: {
-        gridColumn: 'span 2', // chiếm toàn bộ 2 cột
+        gridColumn: 'span 2',
     },
     alignRight: {
         gridColumn: 'span 2',
@@ -16,10 +15,22 @@ export const formGridStyles = {
     },
     actionRow: {
         gridColumn: 'span 2',
-        display: 'flex',
-        justifyContent: 'flex-end', // cả cụm nằm bên phải
+        display: 'grid',
+        gridTemplateColumns: '1fr 1fr', // chia 2 nửa trái / phải
         alignItems: 'center',
-        gap: '30px',                // khoảng cách giữa switch và nút
+        mt: 2,
+    },
+    actionLeft: {
+        display: 'flex',
+        justifyContent: 'flex-start',
+        alignItems: 'center',
+    },
+
+    actionRight: {
+        display: 'flex',
+        justifyContent: 'flex-end',
+        alignItems: 'center',
+        gap: '30px',
     },
     submitButton: {
         gridColumn: 'span 2',

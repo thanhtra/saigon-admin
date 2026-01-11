@@ -1,4 +1,4 @@
-import { Tenant } from '@/common/type';
+import { TenantInput } from '@/common/type';
 import { post } from '@/utils/request';
 import { useCallback, useState } from 'react';
 
@@ -6,7 +6,7 @@ import { useCallback, useState } from 'react';
 const useCreateTenant = () => {
 	const [loading, setLoading] = useState(false);
 
-	const createTenant = useCallback(async (body: Tenant): Promise<any> => {
+	const createTenant = useCallback(async (body: TenantInput): Promise<any> => {
 		setLoading(true);
 		try {
 			return await post('/tenants', body);

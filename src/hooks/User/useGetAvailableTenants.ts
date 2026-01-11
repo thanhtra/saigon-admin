@@ -1,24 +1,24 @@
 import { get } from '@/utils/request';
 import { useCallback, useState } from 'react';
 
-export type GetAvailableCollaboratorsParams = {
+export type GetAvailableTenantsParams = {
     keyword?: string;
     limit?: number;
 };
 
 
-const useGetAvailableCollaborators = () => {
+const useGetAvailableTenants = () => {
     const [loading, setLoading] = useState(false);
 
-    const getAvailableCollaborators = useCallback(
+    const getAvailableTenants = useCallback(
         async (
-            params?: GetAvailableCollaboratorsParams,
+            params?: GetAvailableTenantsParams,
         ): Promise<any> => {
             setLoading(true);
             try {
-                return await get('/users/available-collaborator', params);
+                return await get('/users/available-tenant', params);
             } catch (error) {
-                console.error('Error getAvailableCollaborators:', error);
+                console.error('Error getAvailableTenants:', error);
                 throw error;
             } finally {
                 setLoading(false);
@@ -28,9 +28,9 @@ const useGetAvailableCollaborators = () => {
     );
 
     return {
-        getAvailableCollaborators,
+        getAvailableTenants,
         loading,
     };
 };
 
-export default useGetAvailableCollaborators;
+export default useGetAvailableTenants;

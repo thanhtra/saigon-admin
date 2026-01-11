@@ -8,10 +8,10 @@ import { CardItem, HeaderRow, TitleMain } from '@/styles/common';
 import CancelIcon from '@mui/icons-material/Cancel';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import DeleteIcon from '@mui/icons-material/Delete';
-import VisibilityIcon from '@mui/icons-material/Visibility';
+import EditIcon from '@mui/icons-material/Edit';
 
 import {
-    Box,
+    Button,
     CircularProgress,
     IconButton,
     Link,
@@ -23,11 +23,12 @@ import {
     TableHead,
     TableRow,
     TextField,
-    Tooltip,
+    Tooltip
 } from '@mui/material';
 
 import { ErrorMessage } from '@/common/const';
 import { Tenant } from '@/common/type';
+import PaginationWrapper from '@/components/common/PaginationWrapper';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
@@ -109,6 +110,13 @@ export default function TenantsPage() {
                         }}
                         sx={{ maxWidth: 300 }}
                     />
+
+                    <Button
+                        variant="contained"
+                        onClick={() => router.push('/tenant/create')}
+                    >
+                        + Thêm mới
+                    </Button>
                 </HeaderRow>
 
                 <Paper sx={{ overflowX: 'auto' }}>
@@ -151,14 +159,14 @@ export default function TenantsPage() {
                                         </TableCell>
 
                                         <TableCell>
-                                            {tenant.contracts?.length || 0}
+                                            {tenant.contracts?.length || '-'}
                                         </TableCell>
 
                                         <TableCell>{tenant.note || '-'}</TableCell>
 
                                         <TableCell align="center">
                                             <Tooltip title={tenant.user?.active ? 'Đang hoạt động' : 'Không hoạt động'}>
-                                                {tenant.user?.active ? (
+                                                {tenant?.active ? (
                                                     <CheckCircleIcon color="success" fontSize="small" />
                                                 ) : (
                                                     <CancelIcon color="error" fontSize="small" />
@@ -170,10 +178,10 @@ export default function TenantsPage() {
                                             <IconButton
                                                 size="small"
                                                 onClick={() =>
-                                                    router.push(`/tenant/${tenant.id}`)
+                                                    router.push(`/tenant/${tenant.id}/edit`)
                                                 }
                                             >
-                                                <VisibilityIcon fontSize="small" />
+                                                <EditIcon fontSize="small" />
                                             </IconButton>
 
                                             <IconButton
@@ -202,13 +210,13 @@ export default function TenantsPage() {
                 </Paper>
 
                 {!loading && totalPages > 1 && (
-                    <Box display="flex" justifyContent="center" mt={2}>
+                    <PaginationWrapper>
                         <Pagination
                             count={totalPages}
                             page={page}
                             onChange={(_, value) => setPage(value)}
                         />
-                    </Box>
+                    </PaginationWrapper>
                 )}
 
                 <ConfirmDialog
@@ -217,7 +225,7 @@ export default function TenantsPage() {
                     onConfirm={handleDelete}
                     loading={deleting}
                     title="Xác nhận xoá khách hàng"
-                    description="Bạn có chắc chắn muốn xoá khách hàng này?"
+                    description={`Bạn muốn xoá khách hàng ${tenantToDelete?.user?.name} - ${tenantToDelete?.user?.phone}?`}
                 />
             </CardItem>
         </>

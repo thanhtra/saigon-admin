@@ -16,16 +16,17 @@ import { RoomInput, UploadPreview } from '@/common/type';
 import ControlledSwitch from '@/components/ControlledSwitch';
 import FormAmenityCheckbox from '@/components/FormAmenityCheckbox';
 import FormImageUpload from '@/components/FormImageUpload';
-import useGetCollaborators from '@/hooks/Collaborator/useGetCollaborators';
+import useGetCollaboratorsAvailable from '@/hooks/Collaborator/useGetCollaboratorsAvailable';
 import useGetRentalsByCollaborator from '@/hooks/Rental/useGetRentalsByCollaborator';
 import useCreateRoom from '@/hooks/Room/useCreateRoom';
 import useUpdateRoom from '@/hooks/Room/useUpdateRoom';
 import useUploadImages from '@/hooks/Upload/uploadImages';
+import { CollaboratorType, FieldCooperation } from '@/common/enum';
 
 export default function CreateRoom() {
     const { createRoom } = useCreateRoom();
     const { getRentalsByCollaborator } = useGetRentalsByCollaborator();
-    const { getCollaborators } = useGetCollaborators();
+    const { getCollaboratorsAvailable } = useGetCollaboratorsAvailable();
     const { uploadImages } = useUploadImages();
     const { updateRoom } = useUpdateRoom();
 
@@ -59,12 +60,11 @@ export default function CreateRoom() {
 
     useEffect(() => {
         (async () => {
-            const res = await getCollaborators();
-
+            const res = await getCollaboratorsAvailable({ type: CollaboratorType.Owner, field_cooperation: FieldCooperation.Rental });
             if (res?.success) {
                 setCollaboratorOptions(
-                    res.result.data.map((c: any) => ({
-                        label: c.user.name,
+                    res.result.map((c: any) => ({
+                        label: `${c.name} - ${c.phone}`,
                         value: c.id,
                     })),
                 );
@@ -106,14 +106,13 @@ export default function CreateRoom() {
 
         try {
             if (!data.images?.length) {
-                toast.error('Cần ít nhất 1 tấm hình!');
+                toast.error('Cần ít nhất 1 tấm hình');
                 return;
             }
 
             const { images, ...payload } = data;
             const createRes = await createRoom({
                 rental_id: payload.rental_id,
-                collaborator_id: payload.collaborator_id,
                 title: payload.title,
                 floor: payload?.floor ? Number(payload.floor) : undefined,
                 room_number: payload.room_number,
@@ -163,8 +162,8 @@ export default function CreateRoom() {
                 return;
             }
 
-            toast.success('🎉 Tạo phòng thành công!');
-            reset();
+            toast.success('Tạo phòng thành công');
+            reset({});
         } catch (error) {
             console.error(error);
             toast.error(ErrorMessage.SYSTEM);

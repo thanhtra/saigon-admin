@@ -15,17 +15,17 @@ import {
     GO_VAP_DISTRICT_ID,
     HCM_PROVINCE_ID,
     isUnitRental,
+    RentalStatusLabels,
     RentalTypeLabels,
 } from '@/common/const';
-import { RentalType } from '@/common/enum';
+import { CollaboratorType, FieldCooperation, RentalStatus, RentalType, UploadDomain } from '@/common/enum';
 import {
     buildAddressDetail,
     getDistrictOptions,
     getProvinceOptions,
-    getWardOptions,
-    mapCollaboratorOptions,
+    getWardOptions
 } from '@/common/service';
-import { RentalInput, UploadPreview } from '@/common/type';
+import { Option, RentalInput, UploadPreview } from '@/common/type';
 import { formGridStyles } from '@/styles/formGrid';
 
 import FormAmenityCheckbox from '@/components/FormAmenityCheckbox';
@@ -35,6 +35,7 @@ import useCreateRental from '@/hooks/Rental/useCreateRental';
 import useUploadImages from '@/hooks/Upload/uploadImages';
 import { Controller } from 'react-hook-form';
 
+import useGetCollaboratorsAvailable from '@/hooks/Collaborator/useGetCollaboratorsAvailable';
 import useUpdateRoom from '@/hooks/Room/useUpdateRoom';
 
 
@@ -44,11 +45,10 @@ export default function CreateRental() {
     const { getCollaborators } = useGetCollaborators();
     const { uploadImages } = useUploadImages();
     const { updateRoom } = useUpdateRoom();
+    const { getCollaboratorsAvailable } = useGetCollaboratorsAvailable();
 
     const [loading, setLoading] = useState(false);
-    const [collaboratorOptions, setCollaboratorOptions] = useState<
-        { label: string; value: string }[]
-    >([]);
+    const [collaboratorOptions, setCollaboratorOptions] = useState<Option[]>([]);
 
     const {
         control,
@@ -74,7 +74,8 @@ export default function CreateRental() {
             description_detail: '',
             floor: undefined,
             area: undefined,
-            room_number: ''
+            room_number: '',
+            status: RentalStatus.New
         },
     });
 
@@ -123,16 +124,19 @@ export default function CreateRental() {
         [provinceId, districtId],
     );
 
-
     useEffect(() => {
         (async () => {
-            const res = await getCollaborators();
+            const res = await getCollaboratorsAvailable({ type: CollaboratorType.Owner, field_cooperation: FieldCooperation.Rental });
             if (res?.success) {
-                const coll = mapCollaboratorOptions(res.result.data);
-                setCollaboratorOptions(coll);
+                setCollaboratorOptions(
+                    res.result.map((c: any) => ({
+                        label: `${c.name} - ${c.phone}`,
+                        value: c.id,
+                    })),
+                );
             }
         })();
-    }, [getCollaborators]);
+    }, [getCollaboratorsAvailable]);
 
 
     const onSubmit: SubmitHandler<RentalInput> = async (data) => {
@@ -146,8 +150,24 @@ export default function CreateRental() {
             const { images, ...payload } = data;
 
             const createRes = await createRental({
-                ...payload,
+                title: data.title,
+                active: data.active,
+                address_detail: data.address_detail,
+                address_detail_display: data.address_detail_display,
+                collaborator_id: data.collaborator_id,
+                commission_value: data.commission_value,
+                description: data.description,
+                district: data.district,
+                house_number: data.house_number,
+                province: data.province,
+                rental_type: data.rental_type,
+                status: data.status,
+                street: data.street,
+                ward: data.ward,
                 price: payload.price ? Number(payload.price) : undefined,
+                amenities: data.amenities,
+                description_detail: data.description_detail,
+                area: data.area,
             });
 
             if (!createRes?.success) {
@@ -163,30 +183,12 @@ export default function CreateRental() {
                 roomId
             ) {
                 const uploadRes = await uploadImages(
-                    images.map(i => i.file),
+                    images.map(i => i.file!),
                     {
-                        domain: 'rooms',
+                        domain: UploadDomain.Rooms,
                         room_id: roomId,
                     },
                 );
-
-                // export enum UploadDomain {
-                //     Rooms = 'rooms',
-                //     RealEstates = 'real-estates',
-                //     Contracts = 'contracts',
-                // }
-
-                // await uploadImages(files, {
-                //     domain: 'real-estates',
-                //     file_type: 'image',
-                //     real_estate_id: realEstateId,
-                // });
-
-                // await uploadImages(files, {
-                //     domain: 'contracts',
-                //     file_type: 'image',
-                //     contract_id: contractId,
-                // });
 
                 if (!uploadRes.success || !uploadRes.result?.length) {
                     toast.error('Upload hình thất bại');
@@ -205,7 +207,7 @@ export default function CreateRental() {
                 });
             }
 
-            toast.success('Tạo tin cho thuê thành công!');
+            toast.success('Tạo tin cho thuê thành công');
             reset({});
         } catch (e) {
             console.error(e);
@@ -310,6 +312,17 @@ export default function CreateRental() {
                         sx={formGridStyles.fullWidth}
                     />
 
+                    <FormAutocomplete
+                        name="collaborator_id"
+                        control={control}
+                        label="Chủ nhà"
+                        options={[
+                            { label: '-- Chọn chủ nhà --', value: '' },
+                            ...collaboratorOptions,
+                        ]}
+                        required
+                    />
+
                     <FormTextField
                         name="rental_type"
                         control={control}
@@ -324,17 +337,6 @@ export default function CreateRental() {
                         required
                     />
 
-
-                    <FormTextField
-                        name="collaborator_id"
-                        control={control}
-                        label="Chủ nhà"
-                        options={[
-                            { label: '-- Chọn chủ nhà --', value: '' },
-                            ...collaboratorOptions,
-                        ]}
-                        required
-                    />
 
 
                     {
@@ -427,22 +429,39 @@ export default function CreateRental() {
 
 
                     <Box sx={formGridStyles.actionRow}>
-                        <ControlledSwitch
-                            name="active"
-                            control={control}
-                            label="Kích hoạt"
-                        />
+                        <Box sx={formGridStyles.actionLeft}>
+                            <FormTextField
+                                name="status"
+                                control={control}
+                                label="Tình trạng nhà"
+                                options={[
+                                    { label: '-- Chọn tình trạng --', value: '' },
+                                    ...Object.entries(RentalStatusLabels).map(([value, label]) => ({
+                                        label,
+                                        value,
+                                    })),
+                                ]}
+                                required
+                            />
+                        </Box>
 
-                        <Button
-                            type="submit"
-                            variant="contained"
-                            disabled={loading}
-                            sx={formGridStyles.submitButton}
-                        >
-                            {loading ? 'Đang lưu...' : 'Lưu'}
-                        </Button>
+                        <Box sx={formGridStyles.actionRight}>
+                            <ControlledSwitch
+                                name="active"
+                                control={control}
+                                label="Kích hoạt"
+                            />
+
+                            <Button
+                                type="submit"
+                                variant="contained"
+                                disabled={loading}
+                                sx={formGridStyles.submitButton}
+                            >
+                                {loading ? 'Đang lưu...' : 'Lưu'}
+                            </Button>
+                        </Box>
                     </Box>
-
                 </Box>
             </CardItem>
         </>

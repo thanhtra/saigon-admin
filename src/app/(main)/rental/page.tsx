@@ -2,7 +2,8 @@
 
 import { ErrorMessage, RentalTypeLabels } from '@/common/const';
 import { RentalType } from '@/common/enum';
-import { formatDateTime, formatVnd } from '@/common/service';
+import { formatDateTime } from '@/common/service';
+import PaginationWrapper from '@/components/common/PaginationWrapper';
 import ConfirmDialog from '@/components/ConfirmDialog';
 import { TruncateWithTooltip } from '@/components/TruncateWithTooltip';
 import useDeleteRental from '@/hooks/Rental/useDeleteRental';
@@ -13,7 +14,6 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import {
-    Box,
     Button,
     CircularProgress,
     IconButton,
@@ -25,11 +25,12 @@ import {
     TableHead,
     TableRow,
     TextField,
-    Tooltip,
+    Tooltip
 } from '@mui/material';
 import { useRouter } from 'next/navigation';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { toast } from 'react-toastify';
+import { formatPriceRange, resolveRentalPrice } from './service';
 
 
 export default function RentalPage() {
@@ -94,6 +95,16 @@ export default function RentalPage() {
         }
     };
 
+    const rentalsWithPrice = useMemo(
+        () =>
+            rentals.map(r => ({
+                ...r,
+                displayPrice: resolveRentalPrice(r),
+            })),
+        [rentals],
+    );
+
+
     return (
         <>
             <TitleMain>Danh sách nhà cho thuê</TitleMain>
@@ -141,8 +152,8 @@ export default function RentalPage() {
                                         <CircularProgress size={24} />
                                     </TableCell>
                                 </TableRow>
-                            ) : rentals.length ? (
-                                rentals.map((r) => (
+                            ) : rentalsWithPrice.length ? (
+                                rentalsWithPrice.map((r) => (
                                     <TableRow key={r.id} hover>
                                         <TableCell>{r.collaborator?.user?.name} - {r.collaborator?.user?.phone}</TableCell>
                                         <TableCell>{r.createdBy?.name} - {r.createdBy?.phone}</TableCell>
@@ -153,9 +164,11 @@ export default function RentalPage() {
                                             {RentalTypeLabels[r.rental_type as RentalType]}
                                         </TableCell>
                                         <TableCell>
-                                            <TruncateWithTooltip text={r.address_detail} />
+                                            <TruncateWithTooltip text={r.address_detail} limit={50} />
                                         </TableCell>
-                                        <TableCell> {formatVnd(r.price)}</TableCell>
+                                        <TableCell>
+                                            {formatPriceRange(resolveRentalPrice(r))}
+                                        </TableCell>
                                         <TableCell> {formatDateTime(r.createdAt)}</TableCell>
                                         <TableCell align="center">
                                             <Tooltip
@@ -174,7 +187,7 @@ export default function RentalPage() {
                                                 )}
                                             </Tooltip>
                                         </TableCell>
-                                        <TableCell align="center">
+                                        <TableCell align="center" sx={{ minWidth: 100 }}>
                                             <IconButton
                                                 size="small"
                                                 onClick={() =>
@@ -208,13 +221,13 @@ export default function RentalPage() {
                 </Paper>
 
                 {!loading && totalPages > 1 && (
-                    <Box display="flex" justifyContent="center" mt={2}>
+                    <PaginationWrapper>
                         <Pagination
                             count={totalPages}
                             page={page}
                             onChange={(_, value) => setPage(value)}
                         />
-                    </Box>
+                    </PaginationWrapper>
                 )}
 
                 <ConfirmDialog

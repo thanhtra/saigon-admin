@@ -3,6 +3,7 @@
 import { ErrorMessage, UserRoleOptions } from '@/common/const';
 import { UserRole } from '@/common/enum';
 import { User } from '@/common/type';
+import PaginationWrapper from '@/components/common/PaginationWrapper';
 import ConfirmDialog from '@/components/ConfirmDialog';
 import ResetPasswordDialog, { UserResetInfo } from '@/components/ResetPasswordDialog';
 import { TruncateWithTooltip } from '@/components/TruncateWithTooltip';
@@ -119,6 +120,7 @@ export default function UsersPage() {
             }
         } catch (error) {
             toast.error(ErrorMessage.SYSTEM);
+            return "";
         }
     };
 
@@ -137,7 +139,7 @@ export default function UsersPage() {
                             setPage(1);
                             setSearch(e.target.value);
                         }}
-                        sx={{ width: 300, float: 'left' }}
+                        sx={{ width: 300 }}
                     />
                     <Button
                         variant="contained"
@@ -213,7 +215,7 @@ export default function UsersPage() {
                                                             size="small"
                                                             color="success"
                                                             component="a"
-                                                            href={`https://zalo.me/${user.phone}`}
+                                                            href={`https://zalo.me/${user.zalo || user.phone}`}
                                                             target="_blank"
                                                             rel="noopener noreferrer"
                                                         >
@@ -230,25 +232,29 @@ export default function UsersPage() {
                                             </Tooltip>
                                         </TableCell>
                                         <TableCell align="center">
-                                            <IconButton
-                                                size="small"
-                                                onClick={() =>
-                                                    router.push(`/user/${user.id}/edit`)
-                                                }
-                                            >
-                                                <EditIcon fontSize="small" />
-                                            </IconButton>
-                                            <IconButton
-                                                size="small"
-                                                color="error"
-                                                disabled={deleting}
-                                                onClick={() => {
-                                                    setUserToDelete(user);
-                                                    setOpenConfirm(true);
-                                                }}
-                                            >
-                                                <DeleteIcon fontSize="small" />
-                                            </IconButton>
+                                            {user.role !== UserRole.Admin &&
+                                                <>
+                                                    <IconButton
+                                                        size="small"
+                                                        onClick={() =>
+                                                            router.push(`/user/${user.id}/edit`)
+                                                        }
+                                                    >
+                                                        <EditIcon fontSize="small" />
+                                                    </IconButton>
+                                                    <IconButton
+                                                        size="small"
+                                                        color="error"
+                                                        disabled={deleting}
+                                                        onClick={() => {
+                                                            setUserToDelete(user);
+                                                            setOpenConfirm(true);
+                                                        }}
+                                                    >
+                                                        <DeleteIcon fontSize="small" />
+                                                    </IconButton>
+                                                </>
+                                            }
                                         </TableCell>
                                     </TableRow>
                                 ))
@@ -264,13 +270,13 @@ export default function UsersPage() {
                 </Paper>
 
                 {!loading && totalPages > 1 && (
-                    <Box display="flex" justifyContent="center" mt={2}>
+                    <PaginationWrapper>
                         <Pagination
                             count={totalPages}
                             page={page}
                             onChange={(_, value) => setPage(value)}
                         />
-                    </Box>
+                    </PaginationWrapper>
                 )}
 
                 <ConfirmDialog
@@ -279,7 +285,7 @@ export default function UsersPage() {
                     onConfirm={handleDelete}
                     loading={deleting}
                     title="Xác nhận xoá"
-                    description="Bạn có chắc chắn muốn xoá? Hành động này không thể hoàn tác."
+                    description={`Bạn có chắc chắn muốn xoá ${userToDelete?.name} - ${userToDelete?.phone}? Hành động này không thể hoàn tác.`}
                 />
 
                 <ResetPasswordDialog

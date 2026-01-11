@@ -1,11 +1,11 @@
-import { Tenant } from '@/common/type';
+import { TenantInput } from '@/common/type';
 import { put } from '@/utils/request';
 import { useCallback, useState } from 'react';
 
 const useUpdateTenant = () => {
     const [loading, setLoading] = useState(false);
 
-    const updateTenant = useCallback(async (id: string, body: Tenant): Promise<any> => {
+    const updateTenant = useCallback(async (id: string, body: TenantInput): Promise<any> => {
         setLoading(true);
         try {
             return await put(`/tenants/${id}`, body);

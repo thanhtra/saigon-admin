@@ -89,9 +89,30 @@ export const CardItem = styled(Card)(({ theme }) => ({
     // },
 }));
 
-export const IOSSwitch = styled((props: SwitchProps) => (
-    <Switch focusVisibleClassName=".Mui-focusVisible" disableRipple {...props} />
-))(({ theme }) => ({
+export const IOSSwitch = styled((props: SwitchProps) => {
+    // <Switch focusVisibleClassName=".Mui-focusVisible" disableRipple {...props} />  // 1. Destructure to separate the potential conflicting props
+    const { checked, defaultChecked, ...otherProps } = props;
+
+    // 2. Create a clean props object
+    const switchProps: SwitchProps = { ...otherProps };
+
+    // 3. Add property conditionally: 
+    // If 'checked' is provided (even if false/null), treat as controlled.
+    // Otherwise, if 'defaultChecked' exists, treat as uncontrolled.
+    if (checked !== undefined) {
+        switchProps.checked = checked;
+    } else if (defaultChecked !== undefined) {
+        switchProps.defaultChecked = defaultChecked;
+    }
+
+    return (
+        <Switch
+            focusVisibleClassName=".Mui-focusVisible"
+            disableRipple
+            {...switchProps}
+        />
+    )
+})(({ theme }) => ({
     width: 42,
     height: 26,
     padding: 0,

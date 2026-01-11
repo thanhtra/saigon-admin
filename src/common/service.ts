@@ -73,8 +73,7 @@ export const buildAddressDetail = ({
     const district = province?.Districts.find(d => d.Id === districtId);
     const ward = district?.Wards.find(w => w.Id === wardId);
 
-    return [
-        houseNumber,
+    const adr = [
         street,
         ward?.Name,
         district?.Name,
@@ -82,12 +81,21 @@ export const buildAddressDetail = ({
     ]
         .filter(Boolean)
         .join(', ');
+
+    return `${houseNumber} ${adr}`;
 };
 
 
 export const mapCollaboratorOptions = (data: any[] = []) => {
     return data.map(c => ({
         label: c.user.name,
+        value: c.id,
+    }));
+};
+
+export const mapCollaboratorOptionsNamePhone = (data: any[] = []) => {
+    return data.map(c => ({
+        label: `${c.name} - ${c.phone}`,
         value: c.id,
     }));
 };
@@ -145,3 +153,10 @@ export const formatDateTime = (
     }).format(date);
 };
 
+export const resolveUploadUrl = (path?: string) => {
+    if (!path) return '';
+    if (path.startsWith('http')) return path;
+
+    const base = process.env.NEXT_PUBLIC_REACT_APP_API;
+    return `${base}/uploads${path}`;
+};

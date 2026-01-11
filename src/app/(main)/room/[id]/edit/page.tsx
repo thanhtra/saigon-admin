@@ -52,7 +52,7 @@ export default function EditThread() {
                 setThread(resDetail.result);
                 reset(resDetail.result);
             } else {
-                toast.error('Không tìm thấy dữ liệu tài khoản!');
+                toast.error('Không tìm thấy dữ liệu tài khoản');
                 router.push('/threa/thread-acocunt');
             }
         };
@@ -72,9 +72,9 @@ export default function EditThread() {
                 active: data.active,
             });
             if (res?.success) {
-                toast.success('Cập nhật tài khoản Thread thành công!');
+                toast.success('Cập nhật tài khoản Thread thành công');
             } else {
-                toast.error('Cập nhật thất bại!');
+                toast.error('Cập nhật thất bại');
             }
         } catch (err) {
             toast.error(ErrorMessage.SYSTEM);

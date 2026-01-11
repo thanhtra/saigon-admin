@@ -27,6 +27,7 @@ export default function FormImageUpload({
             file,
             preview: URL.createObjectURL(file),
             isCover: images.length === 0 && index === 0,
+            client_id: crypto.randomUUID()
         }));
 
         onChange([...images, ...newFiles]);
@@ -34,7 +35,9 @@ export default function FormImageUpload({
 
     const handleRemove = (idx: number) => {
         const removed = images[idx];
-        URL.revokeObjectURL(removed.preview);
+        if (removed.file && removed.preview.startsWith('blob:')) {
+            URL.revokeObjectURL(removed.preview);
+        }
 
         const next = images.filter((_, i) => i !== idx);
 

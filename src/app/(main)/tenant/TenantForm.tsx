@@ -3,19 +3,15 @@
 import { Box, Button } from '@mui/material';
 import { useMemo } from 'react';
 import { Control } from 'react-hook-form';
-
 import FormAutocompleteSimple from '@/components/FormAutocompleteSimple';
 import FormSwitch from '@/components/FormSwitch';
 import FormTextField from '@/components/FormTextField';
-
-import { FieldCooperationLabels } from '@/common/const';
-import { CollaboratorInput } from '@/common/type';
+import { TenantInput } from '@/common/type';
 import { formGridStyles } from '@/styles/formGrid';
 import { Option } from '@/common/type';
 
-
 type Props = {
-    control: Control<CollaboratorInput>;
+    control: Control<TenantInput>;
     loading?: boolean;
     onSubmit: () => void;
     isEdit?: boolean;
@@ -23,7 +19,7 @@ type Props = {
     userOptions?: Option[];
 };
 
-const CollaboratorForm: React.FC<Props> = ({
+const TenantForm: React.FC<Props> = ({
     control,
     loading = false,
     onSubmit,
@@ -31,13 +27,6 @@ const CollaboratorForm: React.FC<Props> = ({
     userOption,
     userOptions = [],
 }) => {
-    const fieldOptions = useMemo(
-        () => [
-            { label: '-- Chọn lĩnh vực --', value: '' },
-            ...Object.entries(FieldCooperationLabels).map(([value, label]) => ({ value, label })),
-        ],
-        []
-    );
 
     return (
         <Box component="form" onSubmit={onSubmit} noValidate sx={formGridStyles.form}>
@@ -51,17 +40,9 @@ const CollaboratorForm: React.FC<Props> = ({
             />
 
             <FormTextField
-                name="field_cooperation"
-                control={control}
-                label="Lĩnh vực hợp tác"
-                required
-                options={fieldOptions}
-            />
-
-            <FormTextField
                 name="note"
                 control={control}
-                label="Mô tả"
+                label="Ghi chú"
                 multiline
                 minRows={1}
                 maxRows={10}
@@ -77,4 +58,4 @@ const CollaboratorForm: React.FC<Props> = ({
     );
 };
 
-export default CollaboratorForm;
+export default TenantForm;

@@ -3,9 +3,9 @@ import { Box, Button, Snackbar, Alert } from '@mui/material';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 
 const TiktokShopScraperCodeBlock = () => {
-    const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(false);
 
-    const code = `// ✅ Lấy danh sách sản phẩm TikTok Shop
+  const code = `// ✅ Lấy danh sách sản phẩm TikTok Shop
 const products = [...document.querySelectorAll('a[href*="/shop/vn/pdp/"]')].map(aTag => {
   const nameTag = aTag.querySelector('h3');
   return {
@@ -43,7 +43,7 @@ Object.assign(container.style, {
 
 // ✅ Hiển thị danh sách sản phẩm
 const pre = document.createElement('pre');
-pre.textContent = text || 'Không tìm thấy sản phẩm nào!';
+pre.textContent = text || 'Không tìm thấy sản phẩm nào';
 Object.assign(pre.style, {
   whiteSpace: 'pre-wrap',
   fontSize: '13px',
@@ -68,7 +68,7 @@ if (text.trim()) {
     await navigator.clipboard.writeText(text);
     // 🔥 Ẩn toàn bộ khung sau khi copy
     container.remove();
-    alert('✅ Đã copy toàn bộ danh sách sản phẩm!');
+    alert('✅ Đã copy toàn bộ danh sách sản phẩm');
   };
 
   container.appendChild(btn);
@@ -77,57 +77,57 @@ if (text.trim()) {
 // ✅ Gắn vào trang
 document.body.appendChild(container);`;
 
-    const handleCopy = async () => {
-        try {
-            await navigator.clipboard.writeText(code);
-            setOpen(true);
-        } catch (err) {
-            console.error('Copy failed', err);
-        }
-    };
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(code);
+      setOpen(true);
+    } catch (err) {
+      console.error('Copy failed', err);
+    }
+  };
 
-    return (
-        <>
-            <Box
-                sx={{
-                    bgcolor: '#1e1e1e',
-                    color: '#fff',
-                    p: 2,
-                    borderRadius: 2,
-                    fontFamily: 'monospace',
-                    fontSize: '14px',
-                    whiteSpace: 'pre-wrap',
-                    overflowX: 'auto',
-                    position: 'relative',
-                    marginTop: '20px',
-                    marginBottom: '30px',
-                }}
-            >
-                <Button
-                    onClick={handleCopy}
-                    startIcon={<ContentCopyIcon />}
-                    size="small"
-                    sx={{
-                        position: 'absolute',
-                        top: 8,
-                        right: 8,
-                        color: 'white',
-                        borderColor: 'white',
-                    }}
-                    variant="outlined"
-                >
-                    Copy
-                </Button>
-                <code>{code}</code>
-            </Box>
+  return (
+    <>
+      <Box
+        sx={{
+          bgcolor: '#1e1e1e',
+          color: '#fff',
+          p: 2,
+          borderRadius: 2,
+          fontFamily: 'monospace',
+          fontSize: '14px',
+          whiteSpace: 'pre-wrap',
+          overflowX: 'auto',
+          position: 'relative',
+          marginTop: '20px',
+          marginBottom: '30px',
+        }}
+      >
+        <Button
+          onClick={handleCopy}
+          startIcon={<ContentCopyIcon />}
+          size="small"
+          sx={{
+            position: 'absolute',
+            top: 8,
+            right: 8,
+            color: 'white',
+            borderColor: 'white',
+          }}
+          variant="outlined"
+        >
+          Copy
+        </Button>
+        <code>{code}</code>
+      </Box>
 
-            <Snackbar open={open} autoHideDuration={2000} onClose={() => setOpen(false)}>
-                <Alert onClose={() => setOpen(false)} severity="success" sx={{ width: '100%' }}>
-                    Đã sao chép vào clipboard!
-                </Alert>
-            </Snackbar>
-        </>
-    );
+      <Snackbar open={open} autoHideDuration={2000} onClose={() => setOpen(false)}>
+        <Alert onClose={() => setOpen(false)} severity="success" sx={{ width: '100%' }}>
+          Đã sao chép vào clipboard!
+        </Alert>
+      </Snackbar>
+    </>
+  );
 };
 
 export default TiktokShopScraperCodeBlock;

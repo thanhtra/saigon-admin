@@ -10,7 +10,7 @@ type Props = {
     name: string;
     control: any;
     label: string;
-    options: Option[]; // 🔹 truyền toàn bộ danh sách từ parent
+    options: Option[];
     required?: boolean;
     disabled?: boolean;
 };
@@ -37,16 +37,23 @@ export default function FormAutocompleteSimple({
             control={control}
             rules={required ? { required: 'Trường bắt buộc' } : undefined}
             render={({ field, fieldState }) => {
-                const selected = options.find((o) => o.value === field.value) || null;
+                // 🔹 tìm option hiện tại từ value
+                const selectedOption =
+                    options.find((o) => o.value === field.value) ||
+                    (field.value
+                        ? { label: field.value, value: field.value }
+                        : null);
 
                 return (
                     <Autocomplete
                         options={filteredOptions}
-                        value={selected}
-                        onChange={(_, newValue) => field.onChange(newValue?.value || '')}
+                        value={selectedOption}
+                        onChange={(_, newValue) =>
+                            field.onChange(newValue?.value || '')
+                        }
                         inputValue={inputValue}
                         onInputChange={(_, value) => setInputValue(value)}
-                        getOptionLabel={(o) => o.label}
+                        getOptionLabel={(o) => o.label} // 🔹 hiển thị label
                         isOptionEqualToValue={(o, v) => o.value === v.value}
                         disabled={disabled}
                         renderInput={(params) => (

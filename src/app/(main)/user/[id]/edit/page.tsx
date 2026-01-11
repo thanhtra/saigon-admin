@@ -36,7 +36,6 @@ export default function EditUser() {
         (async () => {
             try {
                 const res = await getUserDetail(id);
-
                 if (res?.success) {
                     reset({
                         ...USER_DEFAULT_VALUES,
@@ -56,15 +55,21 @@ export default function EditUser() {
 
     const onSubmit = async (data: User) => {
         try {
-            const res = await updateUser(id, data);
+            const res = await updateUser(id, {
+                name: data.name,
+                phone: data.phone,
+                role: data.role,
+                active: data.active,
+                ...(data.email && { email: data.email }),
+                ...(data.note && { note: data.note }),
+            });
 
             if (res?.success) {
-                toast.success('Cập nhật thành công!');
+                toast.success('Cập nhật thành công');
                 router.push('/user');
-                return;
+            } else {
+                toast.error('Cập nhật thất bại');
             }
-
-            toast.error('Cập nhật thất bại');
         } catch {
             toast.error(ErrorMessage.SYSTEM);
         }

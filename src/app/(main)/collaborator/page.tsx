@@ -1,11 +1,15 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useCallback, useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 
+import CancelIcon from '@mui/icons-material/Cancel';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import DeleteIcon from '@mui/icons-material/Delete';
+import EditIcon from '@mui/icons-material/Edit';
+import VisibilityIcon from '@mui/icons-material/Visibility';
 import {
-    Box,
     Button,
     CircularProgress,
     IconButton,
@@ -17,24 +21,21 @@ import {
     TableHead,
     TableRow,
     TextField,
-    Tooltip,
+    Tooltip
 } from '@mui/material';
-import DeleteIcon from '@mui/icons-material/Delete';
-import EditIcon from '@mui/icons-material/Edit';
-import VisibilityIcon from '@mui/icons-material/Visibility';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import CancelIcon from '@mui/icons-material/Cancel';
 
-import { CardItem, HeaderRow, TitleMain } from '@/styles/common';
-import { Collaborator } from '@/common/type';
 import {
     CollaboratorTypeLabels,
     ErrorMessage,
     FieldCooperationLabels,
 } from '@/common/const';
-import useGetCollaborators from '@/hooks/Collaborator/useGetCollaborators';
-import useDeleteCollaborator from '@/hooks/Collaborator/useDeleteCollaborator';
+import { Collaborator } from '@/common/type';
 import ConfirmDialog from '@/components/ConfirmDialog';
+import PaginationWrapper from '@/components/common/PaginationWrapper';
+import useDeleteCollaborator from '@/hooks/Collaborator/useDeleteCollaborator';
+import useGetCollaborators from '@/hooks/Collaborator/useGetCollaborators';
+import { CardItem, HeaderRow, TitleMain } from '@/styles/common';
+import { TruncateWithTooltip } from '@/components/TruncateWithTooltip';
 
 export default function CollaboratorsPage() {
     const router = useRouter();
@@ -128,6 +129,7 @@ export default function CollaboratorsPage() {
                                 <TableCell><strong>SĐT</strong></TableCell>
                                 <TableCell><strong>Loại</strong></TableCell>
                                 <TableCell><strong>Lĩnh vực</strong></TableCell>
+                                <TableCell><strong>Note</strong></TableCell>
                                 <TableCell align="center"><strong>Trạng thái</strong></TableCell>
                                 <TableCell align="center"><strong>Hành động</strong></TableCell>
                             </TableRow>
@@ -151,6 +153,7 @@ export default function CollaboratorsPage() {
                                         <TableCell>
                                             {FieldCooperationLabels[item.field_cooperation]}
                                         </TableCell>
+                                        <TableCell>{TruncateWithTooltip({ text: (item?.note || "") + ' - ' + (item?.user?.note || "") })}</TableCell>
                                         <TableCell align="center">
                                             <Tooltip
                                                 title={item.active ? 'Đang hoạt động' : 'Đã khoá'}
@@ -207,13 +210,13 @@ export default function CollaboratorsPage() {
                 </Paper>
 
                 {!loading && totalPages > 1 && (
-                    <Box display="flex" justifyContent="center" mt={2}>
+                    <PaginationWrapper>
                         <Pagination
                             count={totalPages}
                             page={page + 1}
                             onChange={(_, value) => setPage(value - 1)}
                         />
-                    </Box>
+                    </PaginationWrapper>
                 )}
 
                 <ConfirmDialog
@@ -222,10 +225,10 @@ export default function CollaboratorsPage() {
                     onConfirm={handleDelete}
                     loading={deleting}
                     title="Xác nhận xoá"
-                    description="Bạn có chắc chắn muốn xoá chủ nhà / môi giới này? Hành động này không thể hoàn tác."
+                    description={`Bạn có chắc chắn muốn xoá ${collaboratorToDelete?.user?.name} - ${collaboratorToDelete?.user?.phone}? Hành động này không thể hoàn tác.`}
                 />
 
-            </CardItem>
+            </CardItem >
         </>
     );
 }

@@ -1,4 +1,4 @@
-import { CollaboratorType, CommissionStatus, FieldCooperation, RentalAmenity, RentalType, UserRole } from "./enum";
+import { CollaboratorType, CommissionStatus, FieldCooperation, RentalAmenity, RentalStatus, RentalType, UserRole } from "./enum";
 
 // ---------------------    COMMON    --------------------- //
 export type Option = {
@@ -85,7 +85,7 @@ export type Rental = {
 };
 
 export type RentalInput = {
-    title: string;
+    title?: string;
     rental_type: RentalType;
     province: string;
     district: string;
@@ -96,11 +96,11 @@ export type RentalInput = {
     address_detail: string;
     address_detail_display: string;
 
-    commission_value: string; // 🔥 STRING (match entity)
+    commission_value: string;
 
     collaborator_id: string;
 
-    price?: number;
+    price?: number | undefined;
 
     amenities?: RentalAmenity[];
 
@@ -111,18 +111,18 @@ export type RentalInput = {
     images?: UploadPreview[];   // 👉 chỉ dùng ở UI
     upload_ids?: string[];      // 👉 chỉ gửi backend
 
-    cover_index?: number;
-
     floor?: number | undefined;
     area?: number | undefined;
     room_number?: string;
+
+    status?: RentalStatus;
 }
 
 
 // ---------------------    ROOM    --------------------- //
 export type RoomInput = {
     rental_id: string;
-    collaborator_id: string;
+    collaborator_id?: string;
     title: string;
     floor?: number;
     room_number?: string;
@@ -136,15 +136,17 @@ export type RoomInput = {
     upload_ids?: string[];
     description: string;
     active?: boolean;
+    delete_upload_ids?: string[];
 }
-
 
 export interface UploadPreview {
-    file: File;
+    id?: string;              // tồn tại nếu là ảnh từ DB
+    file?: File;              // tồn tại nếu là ảnh mới
     preview: string;
-    isCover: boolean;
+    isCover?: boolean;
+    isExisting?: boolean;     // ⭐ QUAN TRỌNG
+    client_id?: string;
 }
-
 
 
 // ---------------------    COLLABORATOR    --------------------- //
@@ -155,6 +157,7 @@ export type Collaborator = {
     type: CollaboratorType;
     field_cooperation: FieldCooperation;
     active?: boolean;
+    note?: string;
 };
 
 
@@ -172,7 +175,8 @@ export type Tenant = {
     user_id: string;
     note?: string;
     created_at: string;
-
+    active: boolean;
+    contracts?: any[];
     user: {
         id: string;
         name: string;
@@ -181,8 +185,6 @@ export type Tenant = {
         link_facebook?: string;
         active: boolean;
     };
-
-    contracts?: any[];
 };
 
 export type TenantInput = {
@@ -190,9 +192,6 @@ export type TenantInput = {
     note?: string;
     active: boolean;
 };
-
-
-
 
 
 

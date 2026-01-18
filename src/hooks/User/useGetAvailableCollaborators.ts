@@ -16,7 +16,7 @@ const useGetAvailableCollaborators = () => {
         ): Promise<any> => {
             setLoading(true);
             try {
-                return await get('/users/available-collaborator', params);
+                return await get('/users/available-collaborator/admintra', params);
             } catch (error) {
                 console.error('Error getAvailableCollaborators:', error);
                 throw error;

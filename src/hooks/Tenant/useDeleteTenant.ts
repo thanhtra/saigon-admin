@@ -7,7 +7,7 @@ const useDeleteTenant = () => {
     const deleteTenant = useCallback(async (id: string): Promise<any> => {
         setLoading(true);
         try {
-            return await del(`/tenants/${id}`);
+            return await del(`/tenants/${id}/admintra`);
         } catch (error) {
             console.error('Error deleteTenant:', error);
             throw error;

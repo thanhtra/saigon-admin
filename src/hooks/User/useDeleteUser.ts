@@ -7,7 +7,7 @@ const useDeleteUser = () => {
     const deleteUser = useCallback(async (id: string): Promise<any> => {
         setLoading(true);
         try {
-            return await del(`/users/${id}`);
+            return await del(`/users/${id}/admintra`);
         } catch (error) {
             console.error('Error deleteUser:', error);
             throw error;

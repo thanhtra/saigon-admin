@@ -7,14 +7,14 @@ import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
 
-import { CollaboratorInput } from '@/common/type';
 import useGetCollaboratorDetail from '@/hooks/Collaborator/useGetCollaboratorDetail';
 import useUpdateCollaborator from '@/hooks/Collaborator/useUpdateCollaborator';
 
-import CollaboratorForm from '../../CollaboratorForm';
-import { COLLABORATOR_DEFAULT_VALUES } from '../../const';
 import { ErrorMessage } from '@/common/const';
 import { Option } from '@/common/type';
+import { CollaboratorTypeForm } from '@/types';
+import CollaboratorForm from '../../CollaboratorForm';
+import { COLLABORATOR_DEFAULT_VALUES } from '../../const';
 
 export default function EditCollaborator() {
     const { id } = useParams<{ id: string }>();
@@ -25,7 +25,7 @@ export default function EditCollaborator() {
 
     const [userOption, setUserOption] = useState<Option | null>(null);
 
-    const { control, handleSubmit, reset } = useForm<CollaboratorInput>({
+    const { control, handleSubmit, reset } = useForm<CollaboratorTypeForm>({
         defaultValues: COLLABORATOR_DEFAULT_VALUES,
     });
 
@@ -37,7 +37,8 @@ export default function EditCollaborator() {
                 const res = await getCollaboratorDetail(id);
 
                 if (res?.success) {
-                    const user = res.result.user;
+                    const colla = res.result;
+                    const user = colla.user;
 
                     setUserOption({
                         label: `${user.name} - ${user.phone}`,
@@ -46,9 +47,10 @@ export default function EditCollaborator() {
 
                     reset({
                         user_id: user.id,
-                        field_cooperation: res.result.field_cooperation,
-                        note: res.result.note,
-                        active: res.result.active,
+                        type: colla.type,
+                        field_cooperation: colla.field_cooperation,
+                        note: colla.note,
+                        active: colla.active,
                     });
                 } else {
                     toast.error('Không tìm thấy cộng tác viên');
@@ -60,9 +62,15 @@ export default function EditCollaborator() {
         })();
     }, [id, getCollaboratorDetail, reset, router]);
 
-    const onSubmit = async (data: CollaboratorInput) => {
+    const onSubmit = async (data: CollaboratorTypeForm) => {
         try {
-            const res = await updateCollaborator(id, data);
+            const res = await updateCollaborator(id, {
+                type: data.type,
+                field_cooperation: data.field_cooperation,
+                note: data.note,
+                active: data.active,
+            });
+
             if (res?.success) {
                 toast.success('Cập nhật thành công');
                 router.push('/collaborator');

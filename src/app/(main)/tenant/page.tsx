@@ -128,7 +128,7 @@ export default function TenantsPage() {
                                 <TableCell><strong>Facebook</strong></TableCell>
                                 <TableCell><strong>Số hợp đồng</strong></TableCell>
                                 <TableCell><strong>Ghi chú</strong></TableCell>
-                                <TableCell align="center"><strong>Trạng thái</strong></TableCell>
+                                <TableCell align="center"><strong>Kích hoạt</strong></TableCell>
                                 <TableCell align="center"><strong>Hành động</strong></TableCell>
                             </TableRow>
                         </TableHead>

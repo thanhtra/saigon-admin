@@ -23,11 +23,10 @@ export default function FormAmenityCheckbox({
             defaultValue={[]}
             render={({ field }) => (
                 <FormGroup>
-                    <Typography style={{ fontWeight: "bold" }}>Tiện ích</Typography>
                     <Box
                         sx={{
                             display: 'grid',
-                            gridTemplateColumns: 'repeat(2, 1fr)',
+                            gridTemplateColumns: 'repeat(3, 1fr)',
                             gap: 1,
                         }}
                     >

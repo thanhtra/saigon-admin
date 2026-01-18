@@ -8,14 +8,14 @@ import FormAutocompleteSimple from '@/components/FormAutocompleteSimple';
 import FormSwitch from '@/components/FormSwitch';
 import FormTextField from '@/components/FormTextField';
 
-import { FieldCooperationLabels } from '@/common/const';
-import { CollaboratorInput } from '@/common/type';
+import { CollaboratorTypeLabels, FieldCooperationLabels } from '@/common/const';
 import { formGridStyles } from '@/styles/formGrid';
 import { Option } from '@/common/type';
+import { CollaboratorTypeForm } from '@/types';
 
 
 type Props = {
-    control: Control<CollaboratorInput>;
+    control: Control<CollaboratorTypeForm>;
     loading?: boolean;
     onSubmit: () => void;
     isEdit?: boolean;
@@ -39,6 +39,14 @@ const CollaboratorForm: React.FC<Props> = ({
         []
     );
 
+    const typeOptions = useMemo(
+        () => [
+            { label: '-- Chọn loại tài khoản --', value: '' },
+            ...Object.entries(CollaboratorTypeLabels).map(([value, label]) => ({ value, label })),
+        ],
+        []
+    );
+
     return (
         <Box component="form" onSubmit={onSubmit} noValidate sx={formGridStyles.form}>
             <FormAutocompleteSimple
@@ -48,6 +56,14 @@ const CollaboratorForm: React.FC<Props> = ({
                 options={isEdit && userOption ? [userOption] : userOptions}
                 required
                 disabled={isEdit}
+            />
+
+            <FormTextField
+                name="type"
+                control={control}
+                label="Loại tài khoản"
+                required
+                options={typeOptions}
             />
 
             <FormTextField
@@ -68,10 +84,13 @@ const CollaboratorForm: React.FC<Props> = ({
             />
 
             <Box sx={formGridStyles.actionRow}>
-                <FormSwitch name="active" control={control} label="Kích hoạt" />
-                <Button type="submit" variant="contained" disabled={loading} sx={formGridStyles.submitButton}>
-                    {loading ? 'Đang lưu...' : 'Lưu'}
-                </Button>
+                <Box sx={formGridStyles.actionLeft}></Box>
+                <Box sx={formGridStyles.actionRight}>
+                    <FormSwitch name="active" control={control} label="Kích hoạt" />
+                    <Button type="submit" variant="contained" disabled={loading} sx={formGridStyles.submitButton}>
+                        {loading ? 'Đang lưu...' : 'Lưu'}
+                    </Button>
+                </Box>
             </Box>
         </Box>
     );

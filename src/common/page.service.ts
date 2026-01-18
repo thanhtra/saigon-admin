@@ -53,7 +53,6 @@ export const formatPriceRange = (
     return prices.map(p => formatVnd(p)).join(' - ');
 };
 
-
 export const normalizeImagesPayload = async ({
     images,
     uploadImages,

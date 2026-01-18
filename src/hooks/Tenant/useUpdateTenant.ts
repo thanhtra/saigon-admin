@@ -8,7 +8,7 @@ const useUpdateTenant = () => {
     const updateTenant = useCallback(async (id: string, body: TenantInput): Promise<any> => {
         setLoading(true);
         try {
-            return await put(`/tenants/${id}`, body);
+            return await put(`/tenants/${id}/admintra`, body);
         } catch (error) {
             console.log('Error updateTenant: ', error);
             throw error;

@@ -7,7 +7,7 @@ const useGetTenantDetail = () => {
     const getTenantDetail = useCallback(async (id: string): Promise<any> => {
         setLoading(true);
         try {
-            return await get(`/tenants/${id}`);
+            return await get(`/tenants/${id}/admintra`);
         } catch (error) {
             console.log('Error getTenantDetail: ', error);
             throw error;

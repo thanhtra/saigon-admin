@@ -4,6 +4,7 @@ import { ErrorMessage, UserRoleOptions } from '@/common/const';
 import { UserRole } from '@/common/enum';
 import { User } from '@/common/type';
 import PaginationWrapper from '@/components/common/PaginationWrapper';
+import UserRoleTag from '@/components/common/UserRoleTag';
 import ConfirmDialog from '@/components/ConfirmDialog';
 import ResetPasswordDialog, { UserResetInfo } from '@/components/ResetPasswordDialog';
 import { TruncateWithTooltip } from '@/components/TruncateWithTooltip';
@@ -155,10 +156,10 @@ export default function UsersPage() {
                             <TableRow>
                                 <TableCell><strong>Tên</strong></TableCell>
                                 <TableCell><strong>Số điện thoại</strong></TableCell>
-                                <TableCell><strong>Phân quyền</strong></TableCell>
+                                <TableCell align="left"><strong>Phân quyền</strong></TableCell>
                                 <TableCell><strong>Liên hệ</strong></TableCell>
                                 <TableCell><strong>Mô tả</strong></TableCell>
-                                <TableCell align="center"><strong>Trạng thái</strong></TableCell>
+                                <TableCell align="center"><strong>Kích hoạt</strong></TableCell>
                                 <TableCell align="center"><strong>Hành động</strong></TableCell>
                             </TableRow>
                         </TableHead>
@@ -191,7 +192,10 @@ export default function UsersPage() {
                                                 </IconButton>
                                             </Tooltip>
                                         </TableCell>
-                                        <TableCell>{UserRoleOptions[user.role as UserRole]}</TableCell>
+                                        <TableCell align="left">
+                                            <UserRoleTag value={user.role as UserRole} />
+                                        </TableCell>
+
                                         <TableCell>
                                             <Box display="flex" gap={1}>
                                                 {user?.link_facebook && (

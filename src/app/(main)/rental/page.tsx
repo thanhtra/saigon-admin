@@ -1,14 +1,18 @@
 'use client';
 
 import { ErrorMessage, RentalTypeLabels } from '@/common/const';
-import { RentalType } from '@/common/enum';
-import { formatDateTime } from '@/common/service';
+import { RentalStatus, RentalType } from '@/common/enum';
+import { formatPriceRange, resolveRentalPrice } from '@/common/page.service';
 import PaginationWrapper from '@/components/common/PaginationWrapper';
+import RentalStatusDialog from '@/components/common/RentalStatusDialog';
+import RentalStatusTag from '@/components/common/RentalStatusTag';
 import ConfirmDialog from '@/components/ConfirmDialog';
 import { TruncateWithTooltip } from '@/components/TruncateWithTooltip';
 import useDeleteRental from '@/hooks/Rental/useDeleteRental';
 import useGetRentals from '@/hooks/Rental/useGetRentals';
+import useUpdateRental from '@/hooks/Rental/useUpdateRental';
 import { CardItem, HeaderRow, TitleMain } from '@/styles/common';
+import { Rental } from '@/types';
 import CancelIcon from '@mui/icons-material/Cancel';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -27,16 +31,17 @@ import {
     TextField,
     Tooltip
 } from '@mui/material';
+import dayjs from 'dayjs';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { toast } from 'react-toastify';
-import { formatPriceRange, resolveRentalPrice } from './service';
 
 
 export default function RentalPage() {
     const router = useRouter();
     const { getRentals } = useGetRentals();
     const { deleteRental } = useDeleteRental();
+    const { updateRental } = useUpdateRental();
 
     const [rentals, setRentals] = useState<any[]>([]);
     const [keySearch, setKeySearch] = useState('');
@@ -46,6 +51,12 @@ export default function RentalPage() {
 
     const [openConfirm, setOpenConfirm] = useState(false);
     const [rentalToDelete, setRentalToDelete] = useState<any | null>(null);
+
+    const [openStatusDialog, setOpenStatusDialog] = useState(false);
+    const [selectedRental, setSelectedRental] = useState<Rental | null>(null);
+    const [updatingStatus, setUpdatingStatus] = useState(false);
+
+
 
 
     const fetchData = useCallback(async () => {
@@ -95,6 +106,30 @@ export default function RentalPage() {
         }
     };
 
+    const handleUpdateRentalStatus = async (status: RentalStatus) => {
+        if (!selectedRental?.id) return;
+
+        try {
+            setUpdatingStatus(true);
+
+            const res = await updateRental(selectedRental.id, { status });
+            if (!res?.success) {
+                toast.error('Cập nhật trạng thái thất bại');
+                return;
+            }
+
+            toast.success('Cập nhật trạng thái thành công');
+            setOpenStatusDialog(false);
+            setSelectedRental(null);
+            fetchData();
+        } catch {
+            toast.error(ErrorMessage.SYSTEM);
+        } finally {
+            setUpdatingStatus(false);
+        }
+    };
+
+
     const rentalsWithPrice = useMemo(
         () =>
             rentals.map(r => ({
@@ -136,11 +171,12 @@ export default function RentalPage() {
                                 <TableCell><strong>Chủ nhà</strong></TableCell>
                                 <TableCell><strong>Người đăng</strong></TableCell>
                                 <TableCell><strong>Hoa hồng</strong></TableCell>
+                                <TableCell align="center"><strong>Trạng thái</strong></TableCell>
                                 <TableCell><strong>Loại hình</strong></TableCell>
                                 <TableCell><strong>Địa chỉ</strong></TableCell>
                                 <TableCell><strong>Giá</strong></TableCell>
                                 <TableCell><strong>Ngày tạo</strong></TableCell>
-                                <TableCell align="center"><strong>Trạng thái</strong></TableCell>
+                                <TableCell align="center"><strong>Kích hoạt</strong></TableCell>
                                 <TableCell align="center"><strong>Hành động</strong></TableCell>
                             </TableRow>
                         </TableHead>
@@ -158,7 +194,17 @@ export default function RentalPage() {
                                         <TableCell>{r.collaborator?.user?.name} - {r.collaborator?.user?.phone}</TableCell>
                                         <TableCell>{r.createdBy?.name} - {r.createdBy?.phone}</TableCell>
                                         <TableCell>
-                                            {r.commission_value}
+                                            {r.commission}
+                                        </TableCell>
+                                        <TableCell align="center">
+                                            <RentalStatusTag
+                                                status={r.status as RentalStatus}
+                                                clickable
+                                                onClick={() => {
+                                                    setSelectedRental(r);
+                                                    setOpenStatusDialog(true);
+                                                }}
+                                            />
                                         </TableCell>
                                         <TableCell>
                                             {RentalTypeLabels[r.rental_type as RentalType]}
@@ -169,7 +215,12 @@ export default function RentalPage() {
                                         <TableCell>
                                             {formatPriceRange(resolveRentalPrice(r))}
                                         </TableCell>
-                                        <TableCell> {formatDateTime(r.createdAt)}</TableCell>
+                                        <TableCell>
+                                            {dayjs(r.createdAt).format(
+                                                'DD/MM/YYYY HH:mm',
+                                            )}
+                                        </TableCell>
+
                                         <TableCell align="center">
                                             <Tooltip
                                                 title={r.active ? 'Đang hoạt động' : 'Tạm ẩn'}
@@ -235,8 +286,21 @@ export default function RentalPage() {
                     onClose={() => setOpenConfirm(false)}
                     onConfirm={handleDelete}
                     title="Xác nhận xoá"
-                    description={`Bạn có chắc chắn muốn xoá "${rentalToDelete?.title}" không?`}
+                    description={`Tất cả dữ liệu về nhà, phòng, hình ảnh, hợp đồng sẽ bị xoá, có chắc chắn xoá nhà "${rentalToDelete?.address_detail}" của "${rentalToDelete?.collaborator?.user?.name} - ${rentalToDelete?.collaborator?.user?.phone}" không?`}
                 />
+
+                <RentalStatusDialog
+                    open={openStatusDialog}
+                    loading={updatingStatus}
+                    currentStatus={selectedRental?.status as RentalStatus}
+                    onClose={() => {
+                        setOpenStatusDialog(false);
+                        setSelectedRental(null);
+                    }}
+                    onConfirm={handleUpdateRentalStatus}
+                />
+
+
             </CardItem>
         </>
     );

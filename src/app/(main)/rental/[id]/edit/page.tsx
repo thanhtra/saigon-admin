@@ -22,7 +22,8 @@ import {
     ErrorMessage,
     isUnitRental,
     RentalStatusLabels,
-    RentalTypeLabels
+    RentalTypeLabels,
+    RoomStatusLabels
 } from '@/common/const';
 import {
     CollaboratorType,
@@ -36,7 +37,7 @@ import {
     getWardOptions,
     resolveUploadUrl,
 } from '@/common/service';
-import { Option, RentalInput, UploadPreview } from '@/common/type';
+import { Option } from '@/common/type';
 import { formGridStyles } from '@/styles/formGrid';
 
 import useGetCollaboratorsAvailable from '@/hooks/Collaborator/useGetCollaboratorsAvailable';
@@ -44,7 +45,8 @@ import useGetRentalDetail from '@/hooks/Rental/useGetRentalDetail';
 import useUpdateRental from '@/hooks/Rental/useUpdateRental';
 import useUpdateRoom from '@/hooks/Room/useUpdateRoom';
 import useUploadImages from '@/hooks/Upload/uploadImages';
-import { normalizeImagesPayload } from '../../service';
+import { normalizeImagesPayload } from '@/common/page.service';
+import { RentalForm, UploadPreview } from '@/types';
 
 export default function EditRentalPage() {
     const { id } = useParams<{ id: string }>();
@@ -70,7 +72,7 @@ export default function EditRentalPage() {
         handleSubmit,
         reset,
         setValue,
-    } = useForm<RentalInput>({
+    } = useForm<RentalForm>({
         shouldUnregister: false,
         defaultValues: {
             active: true,
@@ -155,7 +157,7 @@ export default function EditRentalPage() {
             reset({
                 /* ===== RENTAL ===== */
                 rental_type: rental.rental_type,
-                status: rental.status,
+
                 province: rental.province,
                 district: rental.district,
                 ward: rental.ward,
@@ -163,17 +165,31 @@ export default function EditRentalPage() {
                 house_number: rental.house_number,
                 address_detail: rental.address_detail,
                 address_detail_display: rental.address_detail_display,
-                commission_value: rental.commission_value,
+                commission: rental.commission,
+                note: rental?.note ?? '',
+                status: rental.status,
                 active: rental.active,
-                description: rental.description,
+
+                fee_electric: rental.fee_electric,
+                fee_water: rental.fee_water,
+                fee_wifi: rental.fee_wifi,
+                fee_service: rental.fee_service,
+                fee_parking: rental.fee_parking,
+                fee_other: rental.fee_other,
 
                 /* ===== ROOM ===== */
-                title: room?.title ?? '',
-                price: room?.price ? Number(room.price) : undefined,
-                area: room?.area ?? undefined,
-                amenities: room?.amenities ?? [],
-                description_detail: room?.description ?? '',
 
+                title: room?.title ?? '',
+                price: room?.price,
+                area: room?.area ?? undefined,
+                description: room.description ?? '',
+                room_status: room?.status ?? '',
+                deposit: room?.deposit,
+                max_people: room?.max_people,
+                floor: room?.floor,
+                room_number: room?.room_number,
+
+                amenities: room?.amenities ?? [],
                 images: uploads.map((u: any, idx: number) => ({
                     id: u.id,
                     preview: resolveUploadUrl(u.file_path),
@@ -203,10 +219,10 @@ export default function EditRentalPage() {
     }, [collaboratorOptions, initialCollaboratorId, setValue]);
 
 
-    const onSubmit: SubmitHandler<RentalInput> = async (data) => {
+    const onSubmit: SubmitHandler<RentalForm> = async (data) => {
         setLoading(true);
         try {
-            const { images, ...payload } = data;
+            const { images } = data;
 
             const updateRes = await updateRental(id, {
                 title: data.title,
@@ -214,19 +230,29 @@ export default function EditRentalPage() {
                 address_detail: data.address_detail,
                 address_detail_display: data.address_detail_display,
                 collaborator_id: data.collaborator_id,
-                commission_value: data.commission_value,
+                commission: data.commission,
                 description: data.description,
                 district: data.district,
                 house_number: data.house_number,
                 province: data.province,
-                rental_type: data.rental_type,
                 status: data.status,
                 street: data.street,
                 ward: data.ward,
-                price: payload.price ? Number(payload.price) : undefined,
+                price: data.price ? Number(data.price) : undefined,
                 amenities: data.amenities,
-                description_detail: data.description_detail,
+                note: data.note,
                 area: data.area,
+                room_status: data.room_status,
+                deposit: data.deposit,
+                max_people: data.max_people,
+                floor: data.floor ? Number(data.floor) : undefined,
+                room_number: data.room_number,
+                fee_electric: data.fee_electric,
+                fee_water: data.fee_water,
+                fee_wifi: data.fee_wifi,
+                fee_service: data.fee_service,
+                fee_parking: data.fee_parking,
+                fee_other: data.fee_other,
             });
 
             if (!updateRes?.success) {
@@ -263,7 +289,6 @@ export default function EditRentalPage() {
         }
     };
 
-
     if (pageLoading) {
         return (
             <Box display="flex" justifyContent="center" mt={10}>
@@ -287,7 +312,7 @@ export default function EditRentalPage() {
                     component="form"
                     onSubmit={handleSubmit(onSubmit)}
                     noValidate
-                    sx={formGridStyles.form}
+                    sx={formGridStyles.formFour}
                 >
 
                     <FormAutocomplete
@@ -341,28 +366,67 @@ export default function EditRentalPage() {
                     />
 
                     <FormTextField
-                        name="commission_value"
-                        control={control}
-                        label="Giá trị hoa hồng"
-                        multiline
-                        required
-                    />
-
-                    <FormTextField
                         name="address_detail_display"
                         control={control}
                         label="Địa chỉ hiển thị"
                         multiline
                         rows={1}
                         required
+                        sx={formGridStyles.fullWidth}
                     />
 
                     <FormTextField
-                        name="description"
+                        name="fee_electric"
                         control={control}
-                        label="Mô tả tổng quan căn nhà"
+                        label="Điện (đ/kWh)"
+                        type="number"
+                        inputProps={{ min: 0 }}
+                    />
+
+                    <FormTextField
+                        name="fee_water"
+                        control={control}
+                        label="Nước (đ/m³)"
+                        type="number"
+                        inputProps={{ min: 0 }}
+                    />
+
+                    <FormTextField
+                        name="fee_wifi"
+                        control={control}
+                        label="Wifi (đ/tháng)"
+                        type="number"
+                        inputProps={{ min: 0 }}
+                    />
+
+                    <FormTextField
+                        name="fee_parking"
+                        control={control}
+                        label="Phí gửi xe (đ/tháng)"
+                        type="number"
+                        inputProps={{ min: 0 }}
+                    />
+
+                    <FormTextField
+                        name="fee_service"
+                        control={control}
+                        label="Phí dịch vụ (đ/tháng)"
+                        type="number"
+                        inputProps={{ min: 0 }}
+                    />
+
+                    <FormTextField
+                        name="fee_other"
+                        control={control}
+                        label="Phí khác"
+                    />
+
+                    <FormTextField
+                        name="note"
+                        control={control}
+                        label="Note"
                         multiline
-                        rows={5}
+                        rows={1}
                         sx={formGridStyles.fullWidth}
                     />
 
@@ -378,10 +442,30 @@ export default function EditRentalPage() {
                     />
 
                     <FormTextField
+                        name="commission"
+                        control={control}
+                        label="Giá trị hoa hồng"
+                        multiline
+                    />
+
+                    <FormTextField
+                        name="status"
+                        control={control}
+                        label="Trạng thái nhà"
+                        options={[
+                            { label: '-- Chọn tình trạng --', value: '' },
+                            ...Object.entries(RentalStatusLabels).map(([value, label]) => ({
+                                label,
+                                value,
+                            })),
+                        ]}
+                        required
+                    />
+
+                    <FormTextField
                         name="rental_type"
                         control={control}
                         label="Loại hình cho thuê"
-                        disabled
                         options={[
                             { label: '-- Chọn loại hình --', value: '' },
                             ...Object.entries(RentalTypeLabels).map(([value, label]) => ({
@@ -390,6 +474,7 @@ export default function EditRentalPage() {
                             })),
                         ]}
                         required
+                        disabled
                     />
 
                     {
@@ -400,22 +485,40 @@ export default function EditRentalPage() {
                                 control={control}
                                 label="Tiêu đề"
                                 required
-                                sx={formGridStyles.fullWidth}
+                                sx={formGridStyles.fullWidthFormFour}
                             />
 
                             <FormTextField
                                 name="price"
                                 control={control}
-                                label="Giá thuê"
+                                label="Giá thuê (VNĐ/tháng)"
                                 type="number"
+                                inputProps={{ min: 0 }}
                                 required
+                            />
+
+                            <FormTextField
+                                name="deposit"
+                                control={control}
+                                label="Cọc giữ chỗ (VNĐ)"
+                                type="number"
+                                inputProps={{ min: 0 }}
                             />
 
                             <FormTextField
                                 name="area"
                                 control={control}
-                                label="Diện tích"
+                                label="Diện tích (m²)"
                                 type="number"
+                                inputProps={{ min: 0 }}
+                            />
+
+                            <FormTextField
+                                name="max_people"
+                                control={control}
+                                label="Số người tối đa"
+                                type="number"
+                                inputProps={{ min: 0 }}
                             />
 
                             {
@@ -425,8 +528,7 @@ export default function EditRentalPage() {
                                         name="floor"
                                         control={control}
                                         label="Tầng"
-                                        type="number"
-                                        required
+                                        placeholder='Để trống nếu tầng trệt'
                                     />
 
                                     <FormTextField
@@ -437,22 +539,14 @@ export default function EditRentalPage() {
                                 </>
                             }
 
-
-
-                            <Box
-                                sx={{
-                                    gridColumn: 'span 2',
-                                    display: 'grid',
-                                    gridTemplateColumns: '1fr 1fr',
-                                    gap: 2,
-                                    alignItems: 'flex-start',
-                                }}
-                            >
-
+                            <Box sx={formGridStyles.fullWidth}>
                                 <FormAmenityCheckbox
                                     name="amenities"
                                     control={control}
+
                                 />
+                            </Box>
+                            <Box sx={formGridStyles.fullWidth}>
                                 <Controller
                                     name="images"
                                     control={control}
@@ -467,33 +561,33 @@ export default function EditRentalPage() {
                                 />
                             </Box>
 
-
                             <FormTextField
-                                name="description_detail"
+                                name="description"
                                 control={control}
-                                label="Mô tả chi tiết căn nhà cho thuê"
+                                label="Mô tả chi tiết"
                                 multiline
                                 rows={6}
-                                sx={formGridStyles.fullWidth}
+                                sx={formGridStyles.fullWidthFormFour}
                             />
                         </>
                     }
 
-                    <Box sx={formGridStyles.actionRow}>
-                        <Box sx={formGridStyles.actionLeft}>
-                            <FormTextField
-                                name="status"
+                    <Box sx={formGridStyles.actionRowFormFour}>
+                        <Box sx={formGridStyles.actionRightInLeft}>
+                            {isUnitRental(rentalType) && <FormTextField
+                                name="room_status"
                                 control={control}
-                                label="Tình trạng nhà"
+                                label="Trạng thái phòng"
                                 options={[
-                                    { label: '-- Chọn tình trạng --', value: '' },
-                                    ...Object.entries(RentalStatusLabels).map(([value, label]) => ({
+                                    { label: '-- Chọn --', value: '' },
+                                    ...Object.entries(RoomStatusLabels).map(([value, label]) => ({
                                         label,
                                         value,
                                     })),
                                 ]}
                                 required
-                            />
+                                sx={{ width: "50%" }}
+                            />}
                         </Box>
 
                         <Box sx={formGridStyles.actionRight}>
@@ -502,13 +596,14 @@ export default function EditRentalPage() {
                                 control={control}
                                 label="Kích hoạt"
                             />
+
                             <Button
                                 type="submit"
                                 variant="contained"
                                 disabled={loading}
                                 sx={formGridStyles.submitButton}
                             >
-                                {loading ? 'Đang lưu...' : 'Cập nhật'}
+                                {loading ? 'Đang lưu...' : 'Lưu'}
                             </Button>
                         </Box>
                     </Box>

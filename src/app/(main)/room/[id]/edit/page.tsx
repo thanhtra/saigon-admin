@@ -1,145 +1,285 @@
 'use client';
 
-import ControlledSwitch from '@/components/ControlledSwitch';
-import FormTextField from '@/components/FormTextField';
-import useGetThreadDetail from '@/hooks/Thread/useGetThreadDetail';
-import useUpdateThread from '@/hooks/Thread/useUpdateThread';
-import { BackLink, CardItem, HeaderRow, TitleMain } from '@/styles/common';
-import { ThreadInput } from '@/utils/type';
 import {
-    Box,
-    Button
-} from '@mui/material';
+    BackLink,
+    CardItem,
+    HeaderRowOneItem,
+    TitleMain,
+} from '@/styles/common';
+import { Box, Button, CircularProgress } from '@mui/material';
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { SubmitHandler, useForm } from 'react-hook-form';
+import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
 
-export default function EditThread() {
-    const router = useRouter();
-    const params = useParams();
-    const id = Array.isArray(params.id) ? params.id[0] : params.id;
+import ControlledSwitch from '@/components/ControlledSwitch';
+import FormAmenityCheckbox from '@/components/FormAmenityCheckbox';
+import FormImageUpload from '@/components/FormImageUpload';
+import FormTextField from '@/components/FormTextField';
 
-    const { getThreadDetail } = useGetThreadDetail();
-    const { updateThread } = useUpdateThread();
+import { ErrorMessage, RoomStatusLabels } from '@/common/const';
+import { formGridStyles } from '@/styles/formGrid';
+
+import useGetRoomDetail from '@/hooks/Room/useGetRoomDetail';
+import useUpdateRoom from '@/hooks/Room/useUpdateRoom';
+import useUploadImages from '@/hooks/Upload/uploadImages';
+import { resolveUploadUrl } from '@/common/service';
+import { normalizeImagesPayload } from '@/common/page.service';
+import { RoomForm, UploadPreview } from '@/types';
+
+
+export default function EditRoomPage() {
+    const { id } = useParams<{ id: string }>();
+    const router = useRouter();
+
+    const { getRoomDetail } = useGetRoomDetail();
+    const { updateRoom } = useUpdateRoom();
+    const { uploadImages } = useUploadImages();
 
     const [loading, setLoading] = useState(false);
-    const [thread, setThread] = useState<ThreadInput | null>(null);
+    const [pageLoading, setPageLoading] = useState(true);
+    const [originalUploadIds, setOriginalUploadIds] = useState<string[]>([]);
 
-    const {
-        register,
-        handleSubmit,
-        formState: { errors },
-        reset,
-        getValues,
-        control
-    } = useForm<ThreadInput>({
+    const { control, handleSubmit, reset } = useForm<RoomForm>({
+        shouldUnregister: false,
         defaultValues: {
-            name: '',
-            gmail: '',
-            username: '',
-            password: '',
-            active: false,
+            images: [],
+            active: true,
         },
     });
 
     useEffect(() => {
-        const fetchData = async () => {
-            if (!id) return;
+        if (!id) return;
 
-            const resDetail = await getThreadDetail(id);
-            if (resDetail?.success) {
-                setThread(resDetail.result);
-                reset(resDetail.result);
-            } else {
-                toast.error('Không tìm thấy dữ liệu tài khoản');
-                router.push('/threa/thread-acocunt');
+        (async () => {
+            setPageLoading(true);
+
+            const res = await getRoomDetail(id);
+            if (!res?.success) {
+                toast.error('Không tìm thấy phòng');
+                router.push('/room');
+                return;
             }
-        };
 
-        fetchData();
-    }, [id, getThreadDetail, reset, router]);
+            const room = res.result;
+            const uploads = room.uploads ?? [];
 
-    const onSubmit: SubmitHandler<ThreadInput> = async (data) => {
+            setOriginalUploadIds(uploads.map((u: any) => u.id));
+
+            reset({
+                title: room.title,
+                price: room.price,
+                floor: room.floor,
+                room_number: room.room_number ?? '',
+                area: room.area ?? undefined,
+                max_people: room.max_people ?? undefined,
+                status: room.status,
+                amenities: room.amenities ?? [],
+                description: room.description ?? '',
+                active: room.active,
+
+                images: uploads.map((u: any, idx: number) => ({
+                    id: u.id,
+                    preview: resolveUploadUrl(u.file_path),
+                    isCover: idx === room.cover_index,
+                    isExisting: true,
+                })) as UploadPreview[],
+            });
+
+            setPageLoading(false);
+        })();
+    }, [id, getRoomDetail, reset, router]);
+
+
+    const onSubmit: SubmitHandler<RoomForm> = async (data) => {
         setLoading(true);
         try {
-            if (!id) return;
-            const res = await updateThread(id, {
-                gmail: data.gmail,
-                name: data.name,
-                username: data.username,
-                password: data.password,
+            const { images } = data;
+
+            const updateRes = await updateRoom(id, {
+                title: data.title,
+                price: data.price ? Number(data.price) : undefined,
+                floor: data.floor ? Number(data.floor) : undefined,
+                room_number: data.room_number,
+                area: data.area ? Number(data.area) : undefined,
+                max_people: data.max_people ? Number(data.max_people) : undefined,
+                status: data.status,
+                amenities: data.amenities,
+                description: data.description,
                 active: data.active,
             });
-            if (res?.success) {
-                toast.success('Cập nhật tài khoản Thread thành công');
-            } else {
-                toast.error('Cập nhật thất bại');
+
+            if (!updateRes?.success) {
+                toast.error('Cập nhật phòng thất bại');
+                return;
             }
-        } catch (err) {
+
+            const {
+                upload_ids,
+                cover_index,
+                delete_upload_ids,
+            } = await normalizeImagesPayload({
+                images: images ?? [],
+                uploadImages,
+                roomId: id,
+                originalUploadIds,
+            });
+
+            await updateRoom(id, {
+                upload_ids,
+                cover_index,
+                delete_upload_ids,
+            });
+
+            toast.success('Cập nhật phòng thành công');
+            router.push('/room');
+        } catch (e) {
+            console.error(e);
             toast.error(ErrorMessage.SYSTEM);
         } finally {
             setLoading(false);
         }
     };
 
+    if (pageLoading) {
+        return (
+            <Box display="flex" justifyContent="center" mt={10}>
+                <CircularProgress />
+            </Box>
+        );
+    }
 
+    /* ================= RENDER ================= */
     return (
         <>
-            <TitleMain>Chỉnh sửa tài khoản Thread</TitleMain>
+            <TitleMain>Chỉnh sửa phòng</TitleMain>
+
             <CardItem>
-                <HeaderRow>
-                    <BackLink href="/thread/thread-account">
-                        <span className="mr-1">←</span> Trở về danh sách
+                <HeaderRowOneItem>
+                    <BackLink href="/room">
+                        ← Trở về danh sách
                     </BackLink>
-                </HeaderRow>
+                </HeaderRowOneItem>
 
-                <Box component="form" onSubmit={handleSubmit(onSubmit)} noValidate>
+                <Box
+                    component="form"
+                    onSubmit={handleSubmit(onSubmit)}
+                    noValidate
+                    sx={formGridStyles.form}
+                >
                     <FormTextField
-                        name="gmail"
+                        name="title"
                         control={control}
-                        label="Gmail"
+                        label="Tiêu đề"
+                        required
+                        sx={formGridStyles.fullWidth}
+                    />
+
+                    <FormTextField
+                        name="floor"
+                        type='number'
+                        control={control}
+                        label="Tầng"
+                        placeholder='Để trống nếu tầng trệt'
+                    />
+
+                    <FormTextField
+                        name="room_number"
+                        control={control}
+                        label="Phòng số"
+                    />
+
+                    <FormTextField
+                        name="price"
+                        control={control}
+                        label="Giá thuê"
+                        type="number"
                         required
                     />
 
                     <FormTextField
-                        name="name"
+                        name="area"
                         control={control}
-                        label="Tên tài khoản"
-                        required
+                        label="Diện tích (m²)"
+                        type="number"
                     />
 
                     <FormTextField
-                        name="username"
+                        name="max_people"
                         control={control}
-                        label="Username"
-                        required
+                        label="Số người tối đa"
+                        type="number"
                     />
 
                     <FormTextField
-                        name="password"
+                        name="description"
                         control={control}
-                        label="Password"
-                        required
+                        label="Mô tả chi tiết"
+                        multiline
+                        rows={5}
+                        sx={formGridStyles.fullWidth}
                     />
 
-                    <ControlledSwitch
-                        name="active"
-                        control={control}
-                        label="Kích hoạt"
-                    />
+                    <Box
+                        sx={{
+                            gridColumn: 'span 2',
+                            display: 'grid',
+                            gridTemplateColumns: '1fr 1fr',
+                            gap: 2,
+                            alignItems: 'flex-start',
+                        }}
+                    >
+                        <FormAmenityCheckbox
+                            name="amenities"
+                            control={control}
+                        />
 
-                    <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-                        <Button
-                            type="submit"
-                            variant="contained"
-                            sx={{ mt: 2, width: "200px", display: "block" }}
-                            disabled={loading}
-                        >
-                            {loading ? 'Đang lưu...' : 'Lưu'}
-                        </Button>
+                        <Controller
+                            name="images"
+                            control={control}
+                            render={({ field }) => (
+                                <FormImageUpload
+                                    value={field.value}
+                                    onChange={field.onChange}
+                                    label="Upload hình phòng"
+                                />
+                            )}
+                        />
                     </Box>
 
+                    <Box sx={formGridStyles.actionRow}>
+                        <Box sx={formGridStyles.actionLeft}>
+                            <FormTextField
+                                name="status"
+                                control={control}
+                                label="Trạng thái"
+                                options={Object.entries(RoomStatusLabels).map(
+                                    ([value, label]) => ({
+                                        value,
+                                        label,
+                                    }),
+                                )}
+                                required
+                            />
+                        </Box>
+
+                        <Box sx={formGridStyles.actionRight}>
+                            <ControlledSwitch
+                                name="active"
+                                control={control}
+                                label="Kích hoạt"
+                            />
+
+                            <Button
+                                type="submit"
+                                variant="contained"
+                                disabled={loading}
+                                sx={formGridStyles.submitButton}
+                            >
+                                {loading ? 'Đang lưu...' : 'Cập nhật'}
+                            </Button>
+                        </Box>
+                    </Box>
                 </Box>
             </CardItem>
         </>

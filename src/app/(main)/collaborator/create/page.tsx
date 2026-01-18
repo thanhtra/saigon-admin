@@ -5,14 +5,14 @@ import { SubmitHandler, useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
 
 import { ErrorMessage } from '@/common/const';
-import { CollaboratorInput } from '@/common/type';
+import { Option } from '@/common/type';
 import BackToList from '@/components/BackToList';
 import useCreateCollaborator from '@/hooks/Collaborator/useCreateCollaborator';
+import useGetAvailableCollaborators from '@/hooks/User/useGetAvailableCollaborators';
 import { CardItem, HeaderRowOneItem, TitleMain } from '@/styles/common';
+import { CollaboratorTypeForm } from '@/types';
 import CollaboratorForm from '../CollaboratorForm';
 import { COLLABORATOR_DEFAULT_VALUES } from '../const';
-import useGetAvailableCollaborators from '@/hooks/User/useGetAvailableCollaborators';
-import { Option } from '@/common/type';
 
 export default function CreateCollaborator() {
     const { createCollaborator, loading } = useCreateCollaborator();
@@ -21,7 +21,7 @@ export default function CreateCollaborator() {
     const [userOptions, setUserOptions] = useState<Option[]>([]);
     const [loadingOptions, setLoadingOptions] = useState(true);
 
-    const { control, handleSubmit, reset } = useForm<CollaboratorInput>({
+    const { control, handleSubmit, reset } = useForm<CollaboratorTypeForm>({
         defaultValues: COLLABORATOR_DEFAULT_VALUES,
     });
 
@@ -45,11 +45,12 @@ export default function CreateCollaborator() {
         })();
     }, [getAvailableCollaborators]);
 
-    const onSubmit: SubmitHandler<CollaboratorInput> = useCallback(
+    const onSubmit: SubmitHandler<CollaboratorTypeForm> = useCallback(
         async (data) => {
             try {
-                const payload: CollaboratorInput = {
+                const payload: CollaboratorTypeForm = {
                     user_id: data.user_id,
+                    type: data.type,
                     field_cooperation: data.field_cooperation,
                     note: data.note,
                     active: data.active,

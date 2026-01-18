@@ -7,7 +7,7 @@ const useDeleteCollaborator = () => {
     const deleteCollaborator = useCallback(async (id: string): Promise<any> => {
         setLoading(true);
         try {
-            return await del(`/collaborators/${id}`);
+            return await del(`/collaborators/${id}/admintra`);
         } catch (error) {
             console.error('Error deleteCollaborator:', error);
             throw error;

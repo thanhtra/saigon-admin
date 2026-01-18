@@ -7,7 +7,7 @@ const useGetUserDetail = () => {
     const getUserDetail = useCallback(async (id: string): Promise<any> => {
         setLoading(true);
         try {
-            return await get(`/users/${id}`);
+            return await get(`/users/${id}/admintra`);
         } catch (error) {
             console.log('Error getUserDetail: ', error);
             throw error;

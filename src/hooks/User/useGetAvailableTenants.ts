@@ -16,7 +16,7 @@ const useGetAvailableTenants = () => {
         ): Promise<any> => {
             setLoading(true);
             try {
-                return await get('/users/available-tenant', params);
+                return await get('/users/available-tenant/admintra', params);
             } catch (error) {
                 console.error('Error getAvailableTenants:', error);
                 throw error;

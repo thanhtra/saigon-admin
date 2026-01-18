@@ -25,22 +25,27 @@ import {
 } from '@mui/material';
 
 import {
-    CollaboratorTypeLabels,
-    ErrorMessage,
-    FieldCooperationLabels,
+    ErrorMessage
 } from '@/common/const';
-import { Collaborator } from '@/common/type';
+import { CollaboratorType, FieldCooperation } from '@/common/enum';
 import ConfirmDialog from '@/components/ConfirmDialog';
+import { TruncateWithTooltip } from '@/components/TruncateWithTooltip';
+import CollaboratorTypeDialog from '@/components/common/CollaboratorTypeDialog';
+import CollaboratorTypeTag from '@/components/common/CollaboratorTypeTag';
+import FieldCooperationDialog from '@/components/common/FieldCooperationDialog';
+import FieldCooperationTag from '@/components/common/FieldCooperationTag';
 import PaginationWrapper from '@/components/common/PaginationWrapper';
 import useDeleteCollaborator from '@/hooks/Collaborator/useDeleteCollaborator';
 import useGetCollaborators from '@/hooks/Collaborator/useGetCollaborators';
+import useUpdateCollaborator from '@/hooks/Collaborator/useUpdateCollaborator';
 import { CardItem, HeaderRow, TitleMain } from '@/styles/common';
-import { TruncateWithTooltip } from '@/components/TruncateWithTooltip';
+import { Collaborator } from '@/types';
 
 export default function CollaboratorsPage() {
     const router = useRouter();
     const { getCollaborators } = useGetCollaborators();
     const { deleteCollaborator, loading: deleting } = useDeleteCollaborator();
+    const { updateCollaborator } = useUpdateCollaborator();
 
     const [openConfirm, setOpenConfirm] = useState(false);
     const [collaboratorToDelete, setCollaboratorToDelete] = useState<Collaborator | null>(null);
@@ -50,6 +55,13 @@ export default function CollaboratorsPage() {
     const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
     const [loading, setLoading] = useState(false);
+
+    const [openFieldDialog, setOpenFieldDialog] = useState(false);
+    const [selectedCollaborator, setSelectedCollaborator] = useState<Collaborator | null>(null);
+    const [updatingField, setUpdatingField] = useState(false);
+    const [openTypeDialog, setOpenTypeDialog] = useState(false);
+    const [updatingType, setUpdatingType] = useState(false);
+
 
     const fetchData = useCallback(async () => {
         setLoading(true);
@@ -96,6 +108,64 @@ export default function CollaboratorsPage() {
         }
     };
 
+    const handleUpdateField = async (value: FieldCooperation) => {
+        if (!selectedCollaborator?.id) return;
+
+        try {
+            setUpdatingField(true);
+
+            const res = await updateCollaborator(
+                selectedCollaborator.id,
+                {
+                    type: selectedCollaborator.type,
+                    field_cooperation: value,
+                },
+            );
+
+            if (!res?.success) {
+                toast.error('Cập nhật lĩnh vực thất bại');
+                return;
+            }
+
+            toast.success('Cập nhật lĩnh vực thành công');
+            setOpenFieldDialog(false);
+            setSelectedCollaborator(null);
+            fetchData();
+        } catch {
+            toast.error(ErrorMessage.SYSTEM);
+        } finally {
+            setUpdatingField(false);
+        }
+    };
+
+
+    const handleUpdateType = async (value: CollaboratorType) => {
+        if (!selectedCollaborator?.id) return;
+
+        try {
+            setUpdatingType(true);
+
+            const res = await updateCollaborator(
+                selectedCollaborator.id,
+                { type: value },
+            );
+
+            if (!res?.success) {
+                toast.error('Cập nhật loại thất bại');
+                return;
+            }
+
+            toast.success('Cập nhật loại thành công');
+            setOpenTypeDialog(false);
+            setSelectedCollaborator(null);
+            fetchData();
+        } catch {
+            toast.error(ErrorMessage.SYSTEM);
+        } finally {
+            setUpdatingType(false);
+        }
+    };
+
 
     return (
         <>
@@ -127,10 +197,10 @@ export default function CollaboratorsPage() {
                             <TableRow>
                                 <TableCell><strong>Tên</strong></TableCell>
                                 <TableCell><strong>SĐT</strong></TableCell>
-                                <TableCell><strong>Loại</strong></TableCell>
-                                <TableCell><strong>Lĩnh vực</strong></TableCell>
+                                <TableCell align="left"><strong>Loại</strong></TableCell>
+                                <TableCell align="left"><strong>Lĩnh vực</strong></TableCell>
                                 <TableCell><strong>Note</strong></TableCell>
-                                <TableCell align="center"><strong>Trạng thái</strong></TableCell>
+                                <TableCell align="center"><strong>Kích hoạt</strong></TableCell>
                                 <TableCell align="center"><strong>Hành động</strong></TableCell>
                             </TableRow>
                         </TableHead>
@@ -147,11 +217,25 @@ export default function CollaboratorsPage() {
                                     <TableRow key={item.id} hover>
                                         <TableCell>{item.user.name}</TableCell>
                                         <TableCell>{item.user.phone}</TableCell>
-                                        <TableCell>
-                                            {CollaboratorTypeLabels[item.type]}
+                                        <TableCell align="left">
+                                            <CollaboratorTypeTag
+                                                clickable
+                                                value={item.type}
+                                                onClick={() => {
+                                                    setSelectedCollaborator(item);
+                                                    setOpenTypeDialog(true);
+                                                }}
+                                            />
                                         </TableCell>
-                                        <TableCell>
-                                            {FieldCooperationLabels[item.field_cooperation]}
+                                        <TableCell align="left">
+                                            <FieldCooperationTag
+                                                clickable
+                                                value={item.field_cooperation}
+                                                onClick={() => {
+                                                    setSelectedCollaborator(item);
+                                                    setOpenFieldDialog(true);
+                                                }}
+                                            />
                                         </TableCell>
                                         <TableCell>{TruncateWithTooltip({ text: (item?.note || "") + ' - ' + (item?.user?.note || "") })}</TableCell>
                                         <TableCell align="center">
@@ -165,7 +249,7 @@ export default function CollaboratorsPage() {
                                                 )}
                                             </Tooltip>
                                         </TableCell>
-                                        <TableCell align="center">
+                                        <TableCell align="center" width={150}>
                                             <IconButton
                                                 size="small"
                                                 onClick={() =>
@@ -226,6 +310,28 @@ export default function CollaboratorsPage() {
                     loading={deleting}
                     title="Xác nhận xoá"
                     description={`Bạn có chắc chắn muốn xoá ${collaboratorToDelete?.user?.name} - ${collaboratorToDelete?.user?.phone}? Hành động này không thể hoàn tác.`}
+                />
+
+                <FieldCooperationDialog
+                    open={openFieldDialog}
+                    loading={updatingField}
+                    currentValue={selectedCollaborator?.field_cooperation || null}
+                    onClose={() => {
+                        setOpenFieldDialog(false);
+                        setSelectedCollaborator(null);
+                    }}
+                    onConfirm={handleUpdateField}
+                />
+
+                <CollaboratorTypeDialog
+                    open={openTypeDialog}
+                    loading={updatingType}
+                    currentValue={selectedCollaborator?.type || null}
+                    onClose={() => {
+                        setOpenTypeDialog(false);
+                        setSelectedCollaborator(null);
+                    }}
+                    onConfirm={handleUpdateType}
                 />
 
             </CardItem >

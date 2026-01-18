@@ -9,7 +9,7 @@ const useCreateTenant = () => {
 	const createTenant = useCallback(async (body: TenantInput): Promise<any> => {
 		setLoading(true);
 		try {
-			return await post('/tenants', body);
+			return await post('/tenants/admintra', body);
 		} catch (error) {
 			console.log('Error createTenant: ', error);
 			throw error;

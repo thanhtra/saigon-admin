@@ -1,3 +1,4 @@
+import { RentalType, RoomStatus } from '@/common/enum';
 import { get } from '@/utils/request';
 import { useCallback, useState } from 'react';
 
@@ -6,7 +7,9 @@ export type Params = {
     size?: number;
     key_search?: string;
     is_pagin?: boolean;
-    profession?: string;
+    rental_type?: RentalType;
+    rental_id?: string;
+    status?: RoomStatus;
 };
 
 const useGetRooms = () => {
@@ -15,7 +18,7 @@ const useGetRooms = () => {
     const getRooms = useCallback(async (params?: Params) => {
         setLoading(true);
         try {
-            return await get('/rooms', params);
+            return await get('/rooms/admintra', params);
         } catch (error) {
             console.error('Error getRooms:', error);
             throw error;

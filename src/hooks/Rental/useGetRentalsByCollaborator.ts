@@ -12,7 +12,7 @@ const useGetRentalsByCollaborator = () => {
         }) => {
             setLoading(true);
             try {
-                return await get('/rentals/by-collaborator', params);
+                return await get('/rentals/by-collaborator/admintra', params);
             } catch (error) {
                 console.log('Error getRentalsByCollaborator: ', error);
                 throw error;

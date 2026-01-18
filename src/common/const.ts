@@ -1,13 +1,16 @@
-import { CollaboratorType, FieldCooperation, RentalAmenity, RentalStatus, RentalType, RoomStatus, UserRole } from "./enum";
+import { BookingStatus, CollaboratorType, FieldCooperation, RentalAmenity, RentalStatus, RentalType, RoomStatus, UserRole } from "./enum";
 import { StatusType } from "./type";
 
 
 // ---------------------    COMMON    --------------------- //
+export const PHONE_REGEX = /^(0)(3|5|7|8|9)[0-9]{8}$/;
+
 export const HCM_PROVINCE_ID = '79';
 export const GO_VAP_DISTRICT_ID = '764';
 
 
 export const FieldCooperationLabels: Record<FieldCooperation, string> = {
+    [FieldCooperation.Undetermined]: 'Chưa xác định',
     [FieldCooperation.Rental]: 'Nhà ở cho thuê',
     [FieldCooperation.Land]: 'Bất động sản',
 };
@@ -25,7 +28,7 @@ export const LOGOUT_FLAG = 'force_logout';
 export const UserRoleOptions: Record<UserRole, string> = {
     [UserRole.Admin]: 'Quản trị hệ thống',
     [UserRole.Sale]: 'Nhân viên Sale',
-    [UserRole.Owner]: 'Chủ trọ',
+    [UserRole.Owner]: 'Chủ nhà',
     [UserRole.Broker]: 'Môi giới',
     [UserRole.Tenant]: 'Khách hàng',
 };
@@ -42,7 +45,7 @@ export const RentalTypeLabels: Record<RentalType, string> = {
     [RentalType.BoardingHouse]: 'Dãy trọ',
     [RentalType.WholeHouse]: 'Nhà nguyên căn',
     [RentalType.Apartment]: 'Chung cư',
-    [RentalType.BusinessPremises]: 'Mặt bằng kinh doanh',
+    [RentalType.BusinessPremises]: 'Mặt bằng kinh doanh, văn phòng',
 };
 
 
@@ -72,37 +75,52 @@ export const isUnitRental = (
 // ---------------------    ROOM    --------------------- //
 
 export const RoomStatusLabels: Record<RoomStatus, string> = {
+    [RoomStatus.PendingApproval]: 'Chờ duyệt',
     [RoomStatus.Available]: 'Trống',
     [RoomStatus.Rented]: 'Đã thuê',
-    [RoomStatus.Deposited]: 'Đã cọc',
     [RoomStatus.Maintenance]: 'Bảo trì',
     [RoomStatus.Disabled]: 'Vô hiệu hoá'
 };
 
-
-
 export const RentalAmenityOptions: Record<RentalAmenity, string> = {
-    [RentalAmenity.FullFurnished]: 'Đầy đủ nội thất',
-    [RentalAmenity.Mezzanine]: 'Có gác',
-    [RentalAmenity.KitchenShelf]: 'Có kệ bếp',
-    [RentalAmenity.AirConditioner]: 'Có máy lạnh',
-    [RentalAmenity.WashingMachine]: 'Có máy giặt',
-    [RentalAmenity.Refrigerator]: 'Có tủ lạnh',
-    [RentalAmenity.Elevator]: 'Có thang máy',
+    [RentalAmenity.FullFurnished]: 'Nội thất đầy đủ',
+    [RentalAmenity.Toilet]: 'WC riêng',
+    [RentalAmenity.Mezzanine]: 'Gác lửng',
+    [RentalAmenity.KitchenShelf]: 'Kệ bếp',
+    [RentalAmenity.AirConditioner]: 'Máy lạnh',
+    [RentalAmenity.WashingMachine]: 'Máy giặt',
+    [RentalAmenity.Refrigerator]: 'Tủ lạnh',
+    [RentalAmenity.Elevator]: 'Thang máy',
     [RentalAmenity.NoLiveWithOwner]: 'Không chung chủ',
     [RentalAmenity.FreeTime]: 'Giờ giấc tự do',
-    [RentalAmenity.Security247]: 'Có bảo vệ 24/24',
-    [RentalAmenity.BasementParking]: 'Có hầm để xe',
+    [RentalAmenity.Security247]: 'An ninh 24/7',
+    [RentalAmenity.BasementParking]: 'Chỗ để xe',
+    [RentalAmenity.PetAllowed]: 'Nuôi thú cưng',
+    [RentalAmenity.ElectricMotorbike]: 'Xe máy điện',
+    [RentalAmenity.Window]: 'Cửa sổ',
+    [RentalAmenity.Balcony]: 'Ban công',
 };
 
 
+// ---------------------    BOOKING    --------------------- //
+
+export const BookingStatusLabels: Record<BookingStatus, string> = {
+    [BookingStatus.Pending]: 'Đã đặt lịch',
+    [BookingStatus.Confirmed]: 'Đã xác nhận',
+    [BookingStatus.Completed]: 'Đã đi xem',
+    [BookingStatus.Cancelled]: 'Đã huỷ',
+    [BookingStatus.NoShow]: 'Không đến',
+};
+
+export const BookingStatusAdminLabels: Record<BookingStatus, string> = {
+    [BookingStatus.Pending]: 'Lịch mới',
+    [BookingStatus.Confirmed]: 'Đã xác nhận',
+    [BookingStatus.Completed]: 'Đã đi xem',
+    [BookingStatus.Cancelled]: 'Khách huỷ',
+    [BookingStatus.NoShow]: 'Không đến',
+};
 
 
-// ---------------------    COMMISSION    --------------------- //
-
-
-
-// ---------------------    COLLABORATOR    --------------------- //
 
 export const CollaboratorTypeLabels: Record<CollaboratorType, string> = {
     [CollaboratorType.Owner]: 'Chủ nhà',

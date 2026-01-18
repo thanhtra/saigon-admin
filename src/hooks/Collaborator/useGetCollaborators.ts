@@ -16,7 +16,7 @@ const useGetCollaborators = () => {
     const getCollaborators = useCallback(async (params?: Params) => {
         setLoading(true);
         try {
-            return await get('/collaborators', params);
+            return await get('/collaborators/admintra', params);
         } catch (error) {
             console.error('Error getCollaborators:', error);
             throw error;

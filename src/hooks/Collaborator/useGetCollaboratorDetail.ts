@@ -7,7 +7,7 @@ const useGetCollaboratorDetail = () => {
     const getCollaboratorDetail = useCallback(async (id: string): Promise<any> => {
         setLoading(true);
         try {
-            return await get(`/collaborators/${id}`);
+            return await get(`/collaborators/${id}/admintra`);
         } catch (error) {
             console.log('Error getCollaboratorDetail: ', error);
             throw error;

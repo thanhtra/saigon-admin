@@ -15,7 +15,7 @@ const useGetTenants = () => {
     const getTenants = useCallback(async (params?: Params) => {
         setLoading(true);
         try {
-            return await get('/tenants', params);
+            return await get('/tenants/admintra', params);
         } catch (error) {
             console.error('Error getTenants:', error);
             throw error;

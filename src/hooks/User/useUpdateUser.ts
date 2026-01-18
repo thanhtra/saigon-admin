@@ -8,7 +8,7 @@ const useUpdateUser = () => {
     const updateUser = useCallback(async (id: string, body: User): Promise<any> => {
         setLoading(true);
         try {
-            return await put(`/users/${id}`, body);
+            return await put(`/users/${id}/admintra`, body);
         } catch (error) {
             console.log('Error updateUser: ', error);
             throw error;

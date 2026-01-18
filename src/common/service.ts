@@ -1,5 +1,6 @@
 import { getLocationsCached } from "@/utils/location";
 import { Option } from './type';
+import { SelectOption } from "./interface";
 
 const locations = getLocationsCached();
 
@@ -160,3 +161,31 @@ export const resolveUploadUrl = (path?: string) => {
     const base = process.env.NEXT_PUBLIC_REACT_APP_API;
     return `${base}/uploads${path}`;
 };
+
+
+
+export function createOptionsFromLabels<
+    T extends string
+>(
+    labels: Record<T, string>,
+    {
+        includeAll = false,
+        allLabel = 'Tất cả',
+    }: {
+        includeAll?: boolean;
+        allLabel?: string;
+    } = {}
+): SelectOption<T>[] {
+    const options: SelectOption<T>[] = (
+        Object.keys(labels) as T[]
+    ).map((key) => ({
+        value: key,
+        label: labels[key], // ✅ string
+    }));
+
+    if (includeAll) {
+        return [{ value: '', label: allLabel }, ...options];
+    }
+
+    return options;
+}

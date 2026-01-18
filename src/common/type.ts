@@ -1,6 +1,5 @@
-import { CollaboratorType, CommissionStatus, FieldCooperation, RentalAmenity, RentalStatus, RentalType, UserRole } from "./enum";
+import { BookingStatus, CollaboratorType, CommissionStatus, FieldCooperation, RentalAmenity, RentalStatus, RentalType, UserRole } from "./enum";
 
-// ---------------------    COMMON    --------------------- //
 export type Option = {
     label: string;
     value: string;
@@ -26,9 +25,6 @@ export type Province = {
 
 
 
-
-
-// ---------------------    AUTH    --------------------- //
 export type LoginPayload = {
     phone: string;
     password: string;
@@ -45,8 +41,6 @@ export type LoginResponse = {
 };
 
 
-// ---------------------    USER    --------------------- //
-
 export type User = {
     id?: string;
     name: string;
@@ -61,112 +55,6 @@ export type User = {
     address?: string;
     active?: boolean;
 }
-
-
-
-// ---------------------    RENTAL    --------------------- //
-
-export type Rental = {
-    collaborator_id: string;
-    title: string;
-    rental_type: RentalType;
-    province: string;
-    district: string;
-    ward: string;
-    street: string;
-    house_number: string;
-    address_detail: string;
-    address_detail_display: string;
-    price: number;
-    active: boolean;
-    description?: string;
-    commission_value: string;
-    amenities?: RentalAmenity[];
-};
-
-export type RentalInput = {
-    title?: string;
-    rental_type: RentalType;
-    province: string;
-    district: string;
-    ward: string;
-    street?: string;
-    house_number?: string;
-
-    address_detail: string;
-    address_detail_display: string;
-
-    commission_value: string;
-
-    collaborator_id: string;
-
-    price?: number | undefined;
-
-    amenities?: RentalAmenity[];
-
-    active: boolean;
-    description?: string;
-    description_detail?: string;
-
-    images?: UploadPreview[];   // 👉 chỉ dùng ở UI
-    upload_ids?: string[];      // 👉 chỉ gửi backend
-
-    floor?: number | undefined;
-    area?: number | undefined;
-    room_number?: string;
-
-    status?: RentalStatus;
-}
-
-
-// ---------------------    ROOM    --------------------- //
-export type RoomInput = {
-    rental_id: string;
-    collaborator_id?: string;
-    title: string;
-    floor?: number;
-    room_number?: string;
-    price: number;
-    area?: number;
-    max_people?: number;
-    status: string;
-    images?: UploadPreview[];
-    amenities: RentalAmenity[];
-    cover_index?: number;
-    upload_ids?: string[];
-    description: string;
-    active?: boolean;
-    delete_upload_ids?: string[];
-}
-
-export interface UploadPreview {
-    id?: string;              // tồn tại nếu là ảnh từ DB
-    file?: File;              // tồn tại nếu là ảnh mới
-    preview: string;
-    isCover?: boolean;
-    isExisting?: boolean;     // ⭐ QUAN TRỌNG
-    client_id?: string;
-}
-
-
-// ---------------------    COLLABORATOR    --------------------- //
-
-export type Collaborator = {
-    id?: string;
-    user: User;
-    type: CollaboratorType;
-    field_cooperation: FieldCooperation;
-    active?: boolean;
-    note?: string;
-};
-
-
-export type CollaboratorInput = {
-    user_id: string;
-    field_cooperation: FieldCooperation;
-    note?: string;
-    active?: boolean;
-};
 
 
 // ---------------------    TENANT    --------------------- //
@@ -192,7 +80,6 @@ export type TenantInput = {
     note?: string;
     active: boolean;
 };
-
 
 
 export type Commission = {

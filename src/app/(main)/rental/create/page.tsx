@@ -17,15 +17,16 @@ import {
     isUnitRental,
     RentalStatusLabels,
     RentalTypeLabels,
+    RoomStatusLabels,
 } from '@/common/const';
-import { CollaboratorType, FieldCooperation, RentalStatus, RentalType, UploadDomain } from '@/common/enum';
+import { CollaboratorType, FieldCooperation, RentalStatus, RentalType, RoomStatus, UploadDomain } from '@/common/enum';
 import {
     buildAddressDetail,
     getDistrictOptions,
     getProvinceOptions,
     getWardOptions
 } from '@/common/service';
-import { Option, RentalInput, UploadPreview } from '@/common/type';
+import { Option, UploadPreview } from '@/common/type';
 import { formGridStyles } from '@/styles/formGrid';
 
 import FormAmenityCheckbox from '@/components/FormAmenityCheckbox';
@@ -37,6 +38,7 @@ import { Controller } from 'react-hook-form';
 
 import useGetCollaboratorsAvailable from '@/hooks/Collaborator/useGetCollaboratorsAvailable';
 import useUpdateRoom from '@/hooks/Room/useUpdateRoom';
+import { RentalForm } from '@/types';
 
 
 
@@ -55,9 +57,8 @@ export default function CreateRental() {
         handleSubmit,
         reset,
         setValue,
-    } = useForm<RentalInput>({
+    } = useForm<RentalForm>({
         defaultValues: {
-            title: '',
             rental_type: RentalType.BoardingHouse,
             province: HCM_PROVINCE_ID,
             district: GO_VAP_DISTRICT_ID,
@@ -68,14 +69,22 @@ export default function CreateRental() {
             address_detail_display: '',
             active: true,
             description: '',
-            commission_value: '',
+            commission: '',
             images: [],
             price: undefined,
-            description_detail: '',
+            note: '',
+            title: '',
             floor: undefined,
             area: undefined,
             room_number: '',
-            status: RentalStatus.New
+            status: RentalStatus.Confirmed,
+            fee_electric: undefined,
+            fee_water: undefined,
+            fee_wifi: undefined,
+            fee_service: undefined,
+            fee_parking: undefined,
+            fee_other: '',
+            room_status: RoomStatus.Available
         },
     });
 
@@ -139,7 +148,7 @@ export default function CreateRental() {
     }, [getCollaboratorsAvailable]);
 
 
-    const onSubmit: SubmitHandler<RentalInput> = async (data) => {
+    const onSubmit: SubmitHandler<RentalForm> = async (data) => {
         if (data.address_detail === data.address_detail_display) {
             toast.error('Cần sửa địa chỉ hiển thị');
             return;
@@ -147,7 +156,7 @@ export default function CreateRental() {
 
         setLoading(true);
         try {
-            const { images, ...payload } = data;
+            const { images } = data;
 
             const createRes = await createRental({
                 title: data.title,
@@ -155,7 +164,7 @@ export default function CreateRental() {
                 address_detail: data.address_detail,
                 address_detail_display: data.address_detail_display,
                 collaborator_id: data.collaborator_id,
-                commission_value: data.commission_value,
+                commission: data.commission,
                 description: data.description,
                 district: data.district,
                 house_number: data.house_number,
@@ -164,10 +173,21 @@ export default function CreateRental() {
                 status: data.status,
                 street: data.street,
                 ward: data.ward,
-                price: payload.price ? Number(payload.price) : undefined,
+                price: data.price ? Number(data.price) : undefined,
                 amenities: data.amenities,
-                description_detail: data.description_detail,
+                note: data.note,
                 area: data.area,
+                room_number: data.room_number,
+                floor: data.floor ? Number(data.floor) : undefined,
+                max_people: data.max_people,
+                deposit: data.deposit,
+                room_status: data.room_status,
+                fee_electric: data.fee_electric,
+                fee_water: data.fee_water,
+                fee_wifi: data.fee_wifi,
+                fee_service: data.fee_service,
+                fee_parking: data.fee_parking,
+                fee_other: data.fee_other,
             });
 
             if (!createRes?.success) {
@@ -208,7 +228,7 @@ export default function CreateRental() {
             }
 
             toast.success('Tạo tin cho thuê thành công');
-            reset({});
+            reset();
         } catch (e) {
             console.error(e);
             toast.error(ErrorMessage.SYSTEM);
@@ -233,7 +253,7 @@ export default function CreateRental() {
                     component="form"
                     onSubmit={handleSubmit(onSubmit)}
                     noValidate
-                    sx={formGridStyles.form}
+                    sx={formGridStyles.formFour}
                 >
 
                     <FormAutocomplete
@@ -287,28 +307,67 @@ export default function CreateRental() {
                     />
 
                     <FormTextField
-                        name="commission_value"
-                        control={control}
-                        label="Giá trị hoa hồng"
-                        multiline
-                        required
-                    />
-
-                    <FormTextField
                         name="address_detail_display"
                         control={control}
                         label="Địa chỉ hiển thị"
                         multiline
                         rows={1}
                         required
+                        sx={formGridStyles.fullWidth}
                     />
 
                     <FormTextField
-                        name="description"
+                        name="fee_electric"
                         control={control}
-                        label="Mô tả tổng quan căn nhà"
+                        label="Điện (đ/kWh)"
+                        type="number"
+                        inputProps={{ min: 0 }}
+                    />
+
+                    <FormTextField
+                        name="fee_water"
+                        control={control}
+                        label="Nước (đ/m³)"
+                        type="number"
+                        inputProps={{ min: 0 }}
+                    />
+
+                    <FormTextField
+                        name="fee_wifi"
+                        control={control}
+                        label="Wifi (đ/tháng)"
+                        type="number"
+                        inputProps={{ min: 0 }}
+                    />
+
+                    <FormTextField
+                        name="fee_parking"
+                        control={control}
+                        label="Phí gửi xe (đ/tháng)"
+                        type="number"
+                        inputProps={{ min: 0 }}
+                    />
+
+                    <FormTextField
+                        name="fee_service"
+                        control={control}
+                        label="Phí dịch vụ (đ/tháng)"
+                        type="number"
+                        inputProps={{ min: 0 }}
+                    />
+
+                    <FormTextField
+                        name="fee_other"
+                        control={control}
+                        label="Phí khác"
+                    />
+
+                    <FormTextField
+                        name="note"
+                        control={control}
+                        label="Note"
                         multiline
-                        rows={5}
+                        rows={1}
                         sx={formGridStyles.fullWidth}
                     />
 
@@ -319,6 +378,27 @@ export default function CreateRental() {
                         options={[
                             { label: '-- Chọn chủ nhà --', value: '' },
                             ...collaboratorOptions,
+                        ]}
+                        required
+                    />
+
+                    <FormTextField
+                        name="commission"
+                        control={control}
+                        label="Giá trị hoa hồng"
+                        multiline
+                    />
+
+                    <FormTextField
+                        name="status"
+                        control={control}
+                        label="Trạng thái nhà"
+                        options={[
+                            { label: '-- Chọn tình trạng --', value: '' },
+                            ...Object.entries(RentalStatusLabels).map(([value, label]) => ({
+                                label,
+                                value,
+                            })),
                         ]}
                         required
                     />
@@ -337,8 +417,6 @@ export default function CreateRental() {
                         required
                     />
 
-
-
                     {
                         isUnitRental(rentalType) &&
                         <>
@@ -347,22 +425,40 @@ export default function CreateRental() {
                                 control={control}
                                 label="Tiêu đề"
                                 required
-                                sx={formGridStyles.fullWidth}
+                                sx={formGridStyles.fullWidthFormFour}
                             />
 
                             <FormTextField
                                 name="price"
                                 control={control}
-                                label="Giá thuê"
+                                label="Giá thuê (VNĐ/tháng)"
                                 type="number"
+                                inputProps={{ min: 0 }}
                                 required
+                            />
+
+                            <FormTextField
+                                name="deposit"
+                                control={control}
+                                label="Cọc giữ chỗ (VNĐ)"
+                                type="number"
+                                inputProps={{ min: 0 }}
                             />
 
                             <FormTextField
                                 name="area"
                                 control={control}
-                                label="Diện tích"
+                                label="Diện tích (m²)"
                                 type="number"
+                                inputProps={{ min: 0 }}
+                            />
+
+                            <FormTextField
+                                name="max_people"
+                                control={control}
+                                label="Số người tối đa"
+                                type="number"
+                                inputProps={{ min: 0 }}
                             />
 
                             {
@@ -371,35 +467,29 @@ export default function CreateRental() {
                                     <FormTextField
                                         name="floor"
                                         control={control}
+                                        type='number'
                                         label="Tầng"
-                                        type="number"
-                                        required
+                                        placeholder='Để trống nếu tầng trệt'
+                                        sx={formGridStyles.fullWidth}
                                     />
 
                                     <FormTextField
                                         name="room_number"
                                         control={control}
                                         label="Nhà số mấy trong toà nhà (chung cư)"
+                                        sx={formGridStyles.fullWidth}
                                     />
                                 </>
                             }
 
-
-
-                            <Box
-                                sx={{
-                                    gridColumn: 'span 2',
-                                    display: 'grid',
-                                    gridTemplateColumns: '1fr 1fr',
-                                    gap: 2,
-                                    alignItems: 'flex-start',
-                                }}
-                            >
-
+                            <Box sx={formGridStyles.fullWidth}>
                                 <FormAmenityCheckbox
                                     name="amenities"
                                     control={control}
+
                                 />
+                            </Box>
+                            <Box sx={formGridStyles.fullWidth}>
                                 <Controller
                                     name="images"
                                     control={control}
@@ -414,35 +504,33 @@ export default function CreateRental() {
                                 />
                             </Box>
 
-
                             <FormTextField
-                                name="description_detail"
+                                name="description"
                                 control={control}
-                                label="Mô tả chi tiết căn nhà cho thuê"
+                                label="Mô tả chi tiết"
                                 multiline
                                 rows={6}
-                                sx={formGridStyles.fullWidth}
+                                sx={formGridStyles.fullWidthFormFour}
                             />
                         </>
                     }
 
-
-
-                    <Box sx={formGridStyles.actionRow}>
-                        <Box sx={formGridStyles.actionLeft}>
-                            <FormTextField
-                                name="status"
+                    <Box sx={formGridStyles.actionRowFormFour}>
+                        <Box sx={formGridStyles.actionRightInLeft}>
+                            {isUnitRental(rentalType) && <FormTextField
+                                name="room_status"
                                 control={control}
-                                label="Tình trạng nhà"
+                                label="Trạng thái phòng"
                                 options={[
-                                    { label: '-- Chọn tình trạng --', value: '' },
-                                    ...Object.entries(RentalStatusLabels).map(([value, label]) => ({
+                                    { label: '-- Chọn --', value: '' },
+                                    ...Object.entries(RoomStatusLabels).map(([value, label]) => ({
                                         label,
                                         value,
                                     })),
                                 ]}
                                 required
-                            />
+                                sx={{ width: "50%" }}
+                            />}
                         </Box>
 
                         <Box sx={formGridStyles.actionRight}>

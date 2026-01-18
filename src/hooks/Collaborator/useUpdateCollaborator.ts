@@ -1,14 +1,14 @@
-import { CollaboratorInput } from '@/common/type';
+import { UpdateCollaboratorDto } from '@/types';
 import { put } from '@/utils/request';
 import { useCallback, useState } from 'react';
 
 const useUpdateCollaborator = () => {
     const [loading, setLoading] = useState(false);
 
-    const updateCollaborator = useCallback(async (id: string, body: CollaboratorInput): Promise<any> => {
+    const updateCollaborator = useCallback(async (id: string, body: Partial<UpdateCollaboratorDto>): Promise<any> => {
         setLoading(true);
         try {
-            return await put(`/collaborators/${id}`, body);
+            return await put(`/collaborators/${id}/admintra`, body);
         } catch (error) {
             console.log('Error updateCollaborator: ', error);
             throw error;

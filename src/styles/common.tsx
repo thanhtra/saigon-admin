@@ -31,13 +31,44 @@ export const Note = styled(Typography)(() => ({
 }));
 
 
-export const HeaderRow = styled('div')({
+// export const HeaderRow = styled('div')({
+//     display: 'flex',
+//     justifyContent: 'space-between',
+//     alignItems: 'flex',
+//     marginBottom: '16px',
+//     width: '100%'
+// });
+
+export const HeaderRow = styled('div')(({ theme }) => ({
     display: 'flex',
+    alignItems: 'center',
     justifyContent: 'space-between',
-    alignItems: 'flex',
-    marginBottom: '16px',
-    width: '100%'
-});
+    gap: 12,
+    width: '100%',
+    marginBottom: 16,
+
+    /* Khi màn hình nhỏ → xếp dọc */
+    flexWrap: 'wrap',
+
+    /* Nhóm filter */
+    '& .header-filters': {
+        display: 'flex',
+        alignItems: 'center',
+        gap: 12,
+        flexWrap: 'wrap',
+        flex: 1,
+        minWidth: 0,
+    },
+
+    /* Nhóm action */
+    '& .header-actions': {
+        display: 'flex',
+        alignItems: 'center',
+        gap: 8,
+        whiteSpace: 'nowrap',
+    },
+}));
+
 
 export const HeaderRowOneItem = styled('div')({
     display: 'flex',

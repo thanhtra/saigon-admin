@@ -15,7 +15,7 @@ const useGetUsers = () => {
     const getUsers = useCallback(async (params?: Params) => {
         setLoading(true);
         try {
-            return await get('/users', params);
+            return await get('/users/admintra', params);
         } catch (error) {
             console.error('Error getUsers:', error);
             throw error;

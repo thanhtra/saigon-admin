@@ -5,62 +5,68 @@ import { useEffect, useState } from 'react';
 import { Controller, SubmitHandler, useForm, useWatch } from 'react-hook-form';
 import { toast } from 'react-toastify';
 
+import ControlledSwitch from '@/components/ControlledSwitch';
+import FormAmenityCheckbox from '@/components/FormAmenityCheckbox';
 import FormAutocomplete from '@/components/FormAutocomplete';
+import FormImageUpload from '@/components/FormImageUpload';
 import FormTextField from '@/components/FormTextField';
 
 import { BackLink, CardItem, HeaderRowOneItem, TitleMain } from '@/styles/common';
 import { formGridStyles } from '@/styles/formGrid';
 
 import { ErrorMessage, RoomStatusLabels } from '@/common/const';
-import { RoomInput, UploadPreview } from '@/common/type';
-import ControlledSwitch from '@/components/ControlledSwitch';
-import FormAmenityCheckbox from '@/components/FormAmenityCheckbox';
-import FormImageUpload from '@/components/FormImageUpload';
+import { CollaboratorType, FieldCooperation, RoomStatus, UploadDomain } from '@/common/enum';
+
 import useGetCollaboratorsAvailable from '@/hooks/Collaborator/useGetCollaboratorsAvailable';
 import useGetRentalsByCollaborator from '@/hooks/Rental/useGetRentalsByCollaborator';
 import useCreateRoom from '@/hooks/Room/useCreateRoom';
 import useUpdateRoom from '@/hooks/Room/useUpdateRoom';
 import useUploadImages from '@/hooks/Upload/uploadImages';
-import { CollaboratorType, FieldCooperation } from '@/common/enum';
+import { RoomForm } from '@/types';
 
 export default function CreateRoom() {
     const { createRoom } = useCreateRoom();
-    const { getRentalsByCollaborator } = useGetRentalsByCollaborator();
-    const { getCollaboratorsAvailable } = useGetCollaboratorsAvailable();
-    const { uploadImages } = useUploadImages();
     const { updateRoom } = useUpdateRoom();
+    const { uploadImages } = useUploadImages();
+    const { getCollaboratorsAvailable } = useGetCollaboratorsAvailable();
+    const { getRentalsByCollaborator } = useGetRentalsByCollaborator();
 
     const [loading, setLoading] = useState(false);
-    const [rentalOptions, setRentalOptions] = useState<any[]>([]);
     const [collaboratorOptions, setCollaboratorOptions] = useState<any[]>([]);
+    const [rentalOptions, setRentalOptions] = useState<any[]>([]);
 
-
-    const { control, handleSubmit, reset } = useForm<RoomInput>({
+    const {
+        control,
+        handleSubmit,
+        reset,
+        setValue,
+    } = useForm<RoomForm>({
         defaultValues: {
-            rental_id: '',
             collaborator_id: '',
-            price: undefined,
+            rental_id: '',
+            title: '',
             floor: undefined,
             room_number: '',
+            price: undefined,
             area: undefined,
             max_people: undefined,
-            status: 'available',
-            images: [],
-            amenities: [],
-            title: '',
             description: '',
-            active: true
+            amenities: [],
+            images: [],
+            status: RoomStatus.Available,
+            active: true,
         },
     });
 
-    const collaboratorId = useWatch({
-        control,
-        name: 'collaborator_id',
-    });
+    const collaboratorId = useWatch({ control, name: 'collaborator_id' });
 
     useEffect(() => {
         (async () => {
-            const res = await getCollaboratorsAvailable({ type: CollaboratorType.Owner, field_cooperation: FieldCooperation.Rental });
+            const res = await getCollaboratorsAvailable({
+                type: CollaboratorType.Owner,
+                field_cooperation: FieldCooperation.Rental,
+            });
+
             if (res?.success) {
                 setCollaboratorOptions(
                     res.result.map((c: any) => ({
@@ -72,16 +78,13 @@ export default function CreateRoom() {
         })();
     }, []);
 
+
     useEffect(() => {
         if (!collaboratorId) {
             setRentalOptions([]);
+            setValue('rental_id', '');
             return;
         }
-
-        reset((prev) => ({
-            ...prev,
-            rental_id: '',
-        }));
 
         (async () => {
             const res = await getRentalsByCollaborator({
@@ -92,37 +95,37 @@ export default function CreateRoom() {
             if (res?.success) {
                 setRentalOptions(
                     res.result.map((r: any) => ({
-                        label: `${r.address_detail}`,
+                        label: r.address_detail,
                         value: r.id,
                     })),
                 );
             }
         })();
-    }, [collaboratorId]);
+    }, [collaboratorId, getRentalsByCollaborator, setValue]);
 
 
-    const onSubmit: SubmitHandler<RoomInput> = async (data) => {
+    const onSubmit: SubmitHandler<RoomForm> = async (data) => {
+        if (!data.images?.length) {
+            toast.error('Cần ít nhất 1 hình ảnh');
+            return;
+        }
+
         setLoading(true);
-
         try {
-            if (!data.images?.length) {
-                toast.error('Cần ít nhất 1 tấm hình');
-                return;
-            }
-
             const { images, ...payload } = data;
+
             const createRes = await createRoom({
                 rental_id: payload.rental_id,
                 title: payload.title,
-                floor: payload?.floor ? Number(payload.floor) : undefined,
+                floor: payload.floor ? Number(payload.floor) : undefined,
                 room_number: payload.room_number,
                 price: Number(payload.price),
-                area: data?.area ? Number(payload.area) : undefined,
+                area: payload.area ? Number(payload.area) : undefined,
                 max_people: payload.max_people ? Number(payload.max_people) : undefined,
-                status: payload.status,
-                amenities: data.amenities,
                 description: payload.description,
-                active: payload.active
+                amenities: payload.amenities,
+                status: payload.status,
+                active: payload.active,
             });
 
             if (!createRes?.success || !createRes.result?.id) {
@@ -133,37 +136,31 @@ export default function CreateRoom() {
             const roomId = createRes.result.id;
 
             const uploadRes = await uploadImages(
-                data.images.map(i => i.file),
+                images.map(i => i.file!),
                 {
-                    domain: 'rooms',
+                    domain: UploadDomain.Rooms,
                     room_id: roomId,
                 },
             );
 
-            if (!uploadRes.success || !uploadRes.result.length) {
+            if (!uploadRes.success || !uploadRes.result?.length) {
                 toast.error('Upload hình thất bại');
                 return;
             }
 
-            const uploadIds = uploadRes.result.map(u => u.id);
-
+            const uploadIds = uploadRes.result.map((u: any) => u.id);
             const coverIndex =
-                data.images.findIndex(i => i.isCover) >= 0
-                    ? data.images.findIndex(i => i.isCover)
+                images.findIndex(i => i.isCover) >= 0
+                    ? images.findIndex(i => i.isCover)
                     : 0;
 
-            const updateRes = await updateRoom(roomId, {
+            await updateRoom(roomId, {
                 upload_ids: uploadIds,
                 cover_index: coverIndex,
             });
 
-            if (!updateRes?.success) {
-                toast.error('Cập nhật hình thất bại');
-                return;
-            }
-
             toast.success('Tạo phòng thành công');
-            reset({});
+            reset();
         } catch (error) {
             console.error(error);
             toast.error(ErrorMessage.SYSTEM);
@@ -172,16 +169,13 @@ export default function CreateRoom() {
         }
     };
 
-
     return (
         <>
             <TitleMain>Thêm mới phòng</TitleMain>
 
             <CardItem>
                 <HeaderRowOneItem>
-                    <BackLink href="/room">
-                        ← Trở về danh sách
-                    </BackLink>
+                    <BackLink href="/room">← Trở về danh sách</BackLink>
                 </HeaderRowOneItem>
 
                 <Box
@@ -190,7 +184,6 @@ export default function CreateRoom() {
                     noValidate
                     sx={formGridStyles.form}
                 >
-
                     <FormAutocomplete
                         name="collaborator_id"
                         control={control}
@@ -217,16 +210,17 @@ export default function CreateRoom() {
                     <FormTextField
                         name="title"
                         control={control}
-                        label="Tiêu đề"
+                        label="Tiêu đề phòng"
                         required
                         sx={formGridStyles.fullWidth}
                     />
 
                     <FormTextField
                         name="floor"
+                        type='number'
                         control={control}
                         label="Tầng"
-                        type="number"
+                        placeholder='Để trống nếu tầng trệt'
                     />
 
                     <FormTextField
@@ -243,32 +237,8 @@ export default function CreateRoom() {
                         required
                     />
 
-                    <FormTextField
-                        name="area"
-                        control={control}
-                        label="Diện tích (m²)"
-                        type="number"
-                    />
-
-                    <FormTextField
-                        name="max_people"
-                        control={control}
-                        label="Số người tối đa"
-                        type="number"
-                    />
-
-                    <FormTextField
-                        name="status"
-                        control={control}
-                        label="Trạng thái"
-                        options={Object.entries(RoomStatusLabels).map(
-                            ([value, label]) => ({
-                                value,
-                                label,
-                            }),
-                        )}
-                        required
-                    />
+                    <FormTextField name="area" control={control} label="Diện tích (m²)" type="number" />
+                    <FormTextField name="max_people" control={control} label="Số người tối đa" type="number" />
 
                     <FormTextField
                         name="description"
@@ -279,50 +249,47 @@ export default function CreateRoom() {
                         sx={formGridStyles.fullWidth}
                     />
 
-
-                    <Box
-                        sx={{
-                            gridColumn: 'span 2',
-                            display: 'grid',
-                            gridTemplateColumns: '1fr 1fr',
-                            gap: 2,
-                            alignItems: 'flex-start',
-                        }}
-                    >
-                        <FormAmenityCheckbox
-                            name="amenities"
-                            control={control}
-                        />
-
+                    <Box sx={{ gridColumn: 'span 2', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2 }}>
+                        <FormAmenityCheckbox name="amenities" control={control} />
                         <Controller
                             name="images"
                             control={control}
-                            defaultValue={[] as UploadPreview[]}
                             render={({ field }) => (
                                 <FormImageUpload
                                     value={field.value}
                                     onChange={field.onChange}
-                                    label="Upload hình phòng"
+                                    label="Hình ảnh phòng"
                                 />
                             )}
                         />
                     </Box>
 
                     <Box sx={formGridStyles.actionRow}>
-                        <ControlledSwitch
-                            name="active"
-                            control={control}
-                            label="Kích hoạt"
-                        />
+                        <Box sx={formGridStyles.actionLeft}>
+                            <FormTextField
+                                name="status"
+                                control={control}
+                                label="Trạng thái"
+                                options={Object.entries(RoomStatusLabels).map(([value, label]) => ({
+                                    value,
+                                    label,
+                                }))}
+                                required
+                            />
+                        </Box>
 
-                        <Button
-                            type="submit"
-                            variant="contained"
-                            disabled={loading}
-                            sx={formGridStyles.submitButton}
-                        >
-                            {loading ? 'Đang lưu...' : 'Lưu'}
-                        </Button>
+                        <Box sx={formGridStyles.actionRight}>
+                            <ControlledSwitch name="active" control={control} label="Kích hoạt" />
+
+                            <Button
+                                type="submit"
+                                variant="contained"
+                                disabled={loading}
+                                sx={formGridStyles.submitButton}
+                            >
+                                {loading ? 'Đang lưu...' : 'Lưu'}
+                            </Button>
+                        </Box>
                     </Box>
                 </Box>
             </CardItem>

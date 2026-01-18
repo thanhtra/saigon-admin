@@ -1,50 +1,8 @@
 import { UploadDomain } from '@/common/enum';
+import { UploadImagesOptions, UploadResponse } from '@/types';
 import { post } from '@/utils/request';
 import { useCallback, useState } from 'react';
 
-/* ================= TYPES ================= */
-
-export type FileType = 'image' | 'video';
-export type Domain = UploadDomain.Rooms | UploadDomain.RealEstates | UploadDomain.Contracts;
-
-interface BaseUploadOptions {
-    // file_type: FileType;
-    domain: Domain;
-}
-
-export interface UploadRoomOptions extends BaseUploadOptions {
-    domain: UploadDomain.Rooms;
-    room_id: string;
-}
-
-export interface UploadRealEstateOptions extends BaseUploadOptions {
-    domain: UploadDomain.RealEstates;
-    real_estate_id: string;
-}
-
-export interface UploadContractOptions extends BaseUploadOptions {
-    domain: UploadDomain.Contracts;
-    contract_id: string;
-}
-
-export type UploadImagesOptions =
-    | UploadRoomOptions
-    | UploadRealEstateOptions
-    | UploadContractOptions;
-
-export interface UploadResult {
-    id: string;
-    file_url: string;
-    // file_type: FileType;
-}
-
-export interface UploadResponse {
-    success: boolean;
-    result: UploadResult[];
-    message?: string;
-}
-
-/* ================= HOOK ================= */
 
 const useUploadImages = () => {
     const [loading, setLoading] = useState(false);

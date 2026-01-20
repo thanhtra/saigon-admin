@@ -14,6 +14,7 @@ export type Collaborator = BaseEntity & {
     user_id: string;
 
     rentals: Rental[];
+    is_confirmed_ctv?: boolean;
 
     is_blacklisted: boolean;
     blacklist_reason?: string | null;
@@ -51,6 +52,7 @@ export type UpdateCollaboratorDto = Partial<
         | 'active'
         | 'is_blacklisted'
         | 'blacklist_reason'
+        | 'is_confirmed_ctv'
     >
 >;
 
@@ -65,5 +67,6 @@ export type CollaboratorTypeForm = {
     field_cooperation: FieldCooperation;
     note?: string;
     active: boolean;
+    is_confirmed_ctv?: boolean;
 };
 

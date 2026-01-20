@@ -54,6 +54,7 @@ export default function CreateCollaborator() {
                     field_cooperation: data.field_cooperation,
                     note: data.note,
                     active: data.active,
+                    is_confirmed_ctv: data.is_confirmed_ctv
                 };
 
                 const res = await createCollaborator(payload);

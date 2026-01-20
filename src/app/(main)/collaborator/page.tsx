@@ -199,6 +199,7 @@ export default function CollaboratorsPage() {
                                 <TableCell><strong>SĐT</strong></TableCell>
                                 <TableCell align="left"><strong>Loại</strong></TableCell>
                                 <TableCell align="left"><strong>Lĩnh vực</strong></TableCell>
+                                <TableCell align="center"><strong>Cộng tác viên</strong></TableCell>
                                 <TableCell><strong>Note</strong></TableCell>
                                 <TableCell align="center"><strong>Kích hoạt</strong></TableCell>
                                 <TableCell align="center"><strong>Hành động</strong></TableCell>
@@ -236,6 +237,17 @@ export default function CollaboratorsPage() {
                                                     setOpenFieldDialog(true);
                                                 }}
                                             />
+                                        </TableCell>
+                                        <TableCell align="center">
+                                            <Tooltip
+                                                title={item.is_confirmed_ctv ? 'Đã đăng kí' : 'Chưa đăng kí'}
+                                            >
+                                                {item.is_confirmed_ctv ? (
+                                                    <CheckCircleIcon color="success" fontSize="small" />
+                                                ) : (
+                                                    <></>
+                                                )}
+                                            </Tooltip>
                                         </TableCell>
                                         <TableCell>{TruncateWithTooltip({ text: (item?.note || "") + ' - ' + (item?.user?.note || "") })}</TableCell>
                                         <TableCell align="center">

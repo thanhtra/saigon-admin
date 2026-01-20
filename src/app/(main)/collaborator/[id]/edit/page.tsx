@@ -36,6 +36,8 @@ export default function EditCollaborator() {
             try {
                 const res = await getCollaboratorDetail(id);
 
+                console.log('fasdfds', res);
+
                 if (res?.success) {
                     const colla = res.result;
                     const user = colla.user;
@@ -51,6 +53,7 @@ export default function EditCollaborator() {
                         field_cooperation: colla.field_cooperation,
                         note: colla.note,
                         active: colla.active,
+                        is_confirmed_ctv: colla.is_confirmed_ctv
                     });
                 } else {
                     toast.error('Không tìm thấy cộng tác viên');
@@ -69,6 +72,7 @@ export default function EditCollaborator() {
                 field_cooperation: data.field_cooperation,
                 note: data.note,
                 active: data.active,
+                is_confirmed_ctv: data.is_confirmed_ctv
             });
 
             if (res?.success) {

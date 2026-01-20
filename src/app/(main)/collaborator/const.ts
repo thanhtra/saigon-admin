@@ -6,4 +6,5 @@ export const COLLABORATOR_DEFAULT_VALUES: CollaboratorTypeForm = {
     field_cooperation: undefined as any,
     note: '',
     active: true,
+    is_confirmed_ctv: false
 };

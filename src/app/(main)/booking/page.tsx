@@ -32,14 +32,12 @@ import useDeleteBooking from '@/hooks/Booking/useDeleteBooking';
 import useGetBookings from '@/hooks/Booking/useGetBookings';
 import useUpdateBooking from '@/hooks/Booking/useUpdateBooking';
 import { Booking } from '@/types/booking';
-import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import BookingEditDialog from './components/BookingEditDialog';
+import { Room } from '@/types';
 
 export default function BookingsPage() {
-    const router = useRouter();
-
     const { getBookings } = useGetBookings();
     const { deleteBooking, loading: deleting } = useDeleteBooking();
     const { updateBooking } = useUpdateBooking();
@@ -55,7 +53,7 @@ export default function BookingsPage() {
     const [updatingStatus, setUpdatingStatus] = useState(false);
 
     const [openRoomDialog, setOpenRoomDialog] = useState(false);
-    const [selectedRoom, setSelectedRoom] = useState<any | null>(null);
+    const [selectedRoom, setSelectedRoom] = useState<Room | null>(null);
 
     const [openEdit, setOpenEdit] = useState(false);
     const [bookingToEdit, setBookingToEdit] = useState<Booking | null>(null);

@@ -245,7 +245,7 @@ export default function RoomPage() {
                                         <TableCell>{r.room_code}</TableCell>
                                         <TableCell>{truncate(r.title, 40)}</TableCell>
                                         <TableCell>
-                                            {formatVnd(r.price)}
+                                            {formatVnd(Number(r.price))}
                                         </TableCell>
                                         <TableCell>
                                             {formatArea(r.area)}

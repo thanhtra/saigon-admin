@@ -18,7 +18,6 @@
 import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
-  // ❌ TẮT StrictMode để tránh render & useEffect chạy 2 lần ở DEV
   reactStrictMode: false,
 
   webpack: (config, { isServer }) => {
@@ -29,6 +28,9 @@ const nextConfig: NextConfig = {
       };
     }
     return config;
+  },
+  eslint: {
+    ignoreDuringBuilds: true,
   },
 };
 

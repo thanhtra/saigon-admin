@@ -46,7 +46,7 @@ export default function CreateCollaborator() {
     }, [getAvailableCollaborators]);
 
     const onSubmit: SubmitHandler<CollaboratorTypeForm> = useCallback(
-        async (data) => {
+        async (data: CollaboratorTypeForm) => {
             try {
                 const payload: CollaboratorTypeForm = {
                     user_id: data.user_id,

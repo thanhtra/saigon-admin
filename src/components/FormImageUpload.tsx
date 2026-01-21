@@ -9,7 +9,7 @@ import {
 import DeleteIcon from '@mui/icons-material/Delete';
 import StarIcon from '@mui/icons-material/Star';
 import StarBorderIcon from '@mui/icons-material/StarBorder';
-import { UploadPreview } from '@/common/type';
+import { UploadPreview } from '@/types';
 
 export default function FormImageUpload({
     value = [],

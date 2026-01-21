@@ -1,10 +1,9 @@
 'use client';
 
-import { Box } from '@mui/material';
 import Navbar from '@/components/Navbar';
 import Sidebar from '@/components/Sidebar';
 import { useAuth } from '@/context/AuthContext';
-import { useEffect } from 'react';
+import { Box } from '@mui/material';
 
 export default function DashboardLayout({
   children,
@@ -12,8 +11,6 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   const { user, loading } = useAuth();
-
-  console.log('dsfadfdsa', user, loading);
 
   if (loading) {
     return null; // hoặc spinner

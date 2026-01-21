@@ -1,6 +1,6 @@
 import { RentalType, UploadDomain } from "@/common/enum";
 import { formatVnd } from "@/common/service";
-import { UploadPreview } from "@/common/type";
+import { UploadPreview } from "@/types";
 
 type RoomLite = {
     price?: number | string;

@@ -9,7 +9,7 @@ import {
 } from '@/common/enum';
 import { User } from './user';
 import { Collaborator } from './collaborator';
-import { UploadPreview } from '@/common/type';
+import { UploadPreview } from './upload';
 
 
 export interface Rental extends BaseEntity {

@@ -26,7 +26,7 @@ import {
     getProvinceOptions,
     getWardOptions
 } from '@/common/service';
-import { Option, UploadPreview } from '@/common/type';
+import { Option } from '@/common/type';
 import { formGridStyles } from '@/styles/formGrid';
 
 import FormAmenityCheckbox from '@/components/FormAmenityCheckbox';
@@ -38,7 +38,7 @@ import { Controller } from 'react-hook-form';
 
 import useGetCollaboratorsAvailable from '@/hooks/Collaborator/useGetCollaboratorsAvailable';
 import useUpdateRoom from '@/hooks/Room/useUpdateRoom';
-import { RentalForm } from '@/types';
+import { RentalForm, UploadPreview } from '@/types';
 
 
 

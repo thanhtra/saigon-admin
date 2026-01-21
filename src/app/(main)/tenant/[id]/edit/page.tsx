@@ -4,16 +4,14 @@ import BackToList from '@/components/BackToList';
 import { CardItem, HeaderRowOneItem, TitleMain } from '@/styles/common';
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
-
-import { TenantInput } from '@/common/type';
+import { useForm } from 'react-hook-form';
+import { ErrorMessage } from '@/common/const';
+import { Option, TenantInput } from '@/common/type';
 import useGetTenantDetail from '@/hooks/Tenant/useGetTenantDetail';
 import useUpdateTenant from '@/hooks/Tenant/useUpdateTenant';
-import { ErrorMessage } from '@/common/const';
 import { TENANT_DEFAULT_VALUES } from '../../const';
 import TenantForm from '../../TenantForm';
-import { Option } from '@/common/type';
 
 export default function EditTenant() {
     const { id } = useParams<{ id: string }>();

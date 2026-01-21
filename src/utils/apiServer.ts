@@ -1,9 +1,9 @@
 import axios from 'axios';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3000/api'; // link tới backend thật
+const baseUrl = process.env.NEXT_PUBLIC_REACT_APP_API;
 
 export const apiServer = axios.create({
-    baseURL: API_BASE_URL,
+    baseURL: `${baseUrl}/api`,
 });
 
 export async function getServer(url: string, params?: Record<string, any>) {

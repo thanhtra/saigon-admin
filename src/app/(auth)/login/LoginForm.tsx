@@ -8,6 +8,7 @@ import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
 import { toast } from 'react-toastify';
 import { LoginPayload } from '@/common/type';
+import { ErrorMessage } from '@/common/const';
 
 const LoginForm = () => {
     const router = useRouter();
@@ -31,6 +32,7 @@ const LoginForm = () => {
                 toast.error('Đăng nhập thất bại');
             }
         } catch (error) {
+            console.log('error', error);
             toast.error(ErrorMessage.SYSTEM);
         } finally {
             setLoading(false);

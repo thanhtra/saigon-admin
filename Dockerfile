@@ -16,6 +16,8 @@ RUN npm install -g npm@8.19.4 \
 COPY package.json package-lock.json ./
 RUN npm ci --legacy-peer-deps
 
+COPY .env.prod .env
+
 COPY . .
 RUN npm run build
 

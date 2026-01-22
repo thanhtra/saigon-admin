@@ -158,7 +158,7 @@ export const resolveUploadUrl = (path?: string) => {
     if (!path) return '';
     if (path.startsWith('http')) return path;
 
-    const base = process.env.NEXT_PUBLIC_REACT_APP_API;
+    const base = process.env.NEXT_PUBLIC_API_URL;
     return `${base}/uploads${path}`;
 };
 

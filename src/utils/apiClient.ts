@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { setupAuthInterceptor } from './authInterceptor';
 
-const baseUrl = process.env.NEXT_PUBLIC_REACT_APP_API;
+const baseUrl = process.env.NEXT_PUBLIC_API_URL;
 
 const apiClient = axios.create({
 	baseURL: `${baseUrl}/api`,

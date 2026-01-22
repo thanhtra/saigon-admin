@@ -35,6 +35,8 @@ export type Room = BaseEntity & {
      */
     uploads?: Upload[];
     rental?: Rental;
+
+    video_url?: string;
 };
 
 
@@ -50,6 +52,7 @@ export type RoomLite = Pick<
     | 'max_people'
     | 'description'
     | 'amenities'
+    | 'video_url'
 >;
 
 
@@ -77,4 +80,5 @@ export type RoomForm = {
     description: string;
     active?: boolean;
     delete_upload_ids?: string[];
+    video_url?: string;
 }

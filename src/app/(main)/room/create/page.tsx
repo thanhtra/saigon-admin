@@ -51,6 +51,7 @@ export default function CreateRoom() {
             area: undefined,
             max_people: undefined,
             description: '',
+            video_url: '',
             amenities: [],
             images: [],
             status: RoomStatus.Available,
@@ -126,6 +127,7 @@ export default function CreateRoom() {
                 amenities: payload.amenities,
                 status: payload.status,
                 active: payload.active,
+                video_url: payload.video_url
             });
 
             if (!createRes?.success || !createRes.result?.id) {
@@ -239,6 +241,12 @@ export default function CreateRoom() {
 
                     <FormTextField name="area" control={control} label="Diện tích (m²)" type="number" />
                     <FormTextField name="max_people" control={control} label="Số người tối đa" type="number" />
+
+                    <FormTextField
+                        name="video_url"
+                        control={control}
+                        label="Link Video"
+                    />
 
                     <FormTextField
                         name="description"

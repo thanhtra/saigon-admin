@@ -77,6 +77,7 @@ export default function EditRoomPage() {
                 amenities: room.amenities ?? [],
                 description: room.description ?? '',
                 active: room.active,
+                video_url: room.video_url,
 
                 images: uploads.map((u: any, idx: number) => ({
                     id: u.id,
@@ -107,6 +108,7 @@ export default function EditRoomPage() {
                 amenities: data.amenities,
                 description: data.description,
                 active: data.active,
+                video_url: data.video_url
             });
 
             if (!updateRes?.success) {
@@ -209,6 +211,12 @@ export default function EditRoomPage() {
                         control={control}
                         label="Số người tối đa"
                         type="number"
+                    />
+
+                    <FormTextField
+                        name="video_url"
+                        control={control}
+                        label="Link Video"
                     />
 
                     <FormTextField

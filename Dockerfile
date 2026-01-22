@@ -3,9 +3,13 @@
 # =========================
 FROM node:18-alpine AS builder
 
+# 🔥 BUILD-TIME ENV (NEXT_PUBLIC)
+ARG NEXT_PUBLIC_API_URL
+ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
+
 WORKDIR /app
 
-# ✅ Fix npm instability on VPS
+# Fix npm instability
 RUN npm install -g npm@8.19.4 \
     && npm config set registry https://registry.npmjs.org/ \
     && npm config set fetch-retries 5 \
@@ -16,11 +20,8 @@ RUN npm install -g npm@8.19.4 \
 COPY package.json package-lock.json ./
 RUN npm ci --legacy-peer-deps
 
-COPY .env.prod .env
-
 COPY . .
 RUN npm run build
-
 
 # =========================
 # RUNTIME STAGE
@@ -30,7 +31,6 @@ FROM node:18-alpine
 WORKDIR /app
 ENV NODE_ENV=production
 
-# ✅ Security: run as non-root
 RUN addgroup -S app && adduser -S app -G app
 
 COPY --from=builder /app/.next ./.next
@@ -40,5 +40,5 @@ COPY --from=builder /app/node_modules ./node_modules
 
 USER app
 
-EXPOSE 3002
+EXPOSE 3005
 CMD ["npm", "run", "start"]

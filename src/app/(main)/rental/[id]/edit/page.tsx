@@ -566,7 +566,7 @@ export default function EditRentalPage() {
                                 control={control}
                                 label="Mô tả chi tiết"
                                 multiline
-                                rows={6}
+                                rows={10}
                                 sx={formGridStyles.fullWidthFormFour}
                             />
                         </>

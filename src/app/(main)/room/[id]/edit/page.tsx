@@ -224,7 +224,7 @@ export default function EditRoomPage() {
                         control={control}
                         label="Mô tả chi tiết"
                         multiline
-                        rows={5}
+                        rows={10}
                         sx={formGridStyles.fullWidth}
                     />
 

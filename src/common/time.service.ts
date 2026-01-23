@@ -1,23 +1,22 @@
-export const formatDateTimeVN = (date: Date | string): string => {
-    const d = new Date(date);
-    const pad = (n: number) => n.toString().padStart(2, '0');
-
-    return `${pad(d.getDate())}-${pad(d.getMonth() + 1)}-${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
-};
-
-export const nowVN = () => new Date();
-
-export const toDatetimeLocal = (value: string | Date): string => {
+export const formatDateTimeVN = (value: string): string => {
     if (!value) return '';
 
-    const d = new Date(value);
-    const pad = (n: number) => n.toString().padStart(2, '0');
+    // value = "2026-01-23T19:00"
+    const [date, time] = value.split('T');
+    const [year, month, day] = date.split('-');
 
-    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(
-        d.getHours(),
-    )}:${pad(d.getMinutes())}`;
+    return `${day}-${month}-${year} ${time}`;
 };
 
+
+
+
+export const toDatetimeLocal = (value: string): string => {
+    if (!value) return '';
+
+    // value: "2026-01-23T19:00"
+    return value.slice(0, 16);
+};
 
 export const isAtLeastMinutesLater = (
     value?: string,
@@ -25,14 +24,15 @@ export const isAtLeastMinutesLater = (
 ): true | string => {
     if (!value) return 'Vui lòng chọn thời gian xem';
 
-    const selectedTime = new Date(value).getTime();
-    const minTime = Date.now() + minutes * 60 * 1000;
+    const now = new Date();
+    now.setMinutes(now.getMinutes() + minutes);
 
-    if (Number.isNaN(selectedTime)) {
-        return 'Thời gian xem không hợp lệ';
-    }
+    const pad = (n: number) => n.toString().padStart(2, '0');
+    const minValue =
+        `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}` +
+        `T${pad(now.getHours())}:${pad(now.getMinutes())}`;
 
-    return selectedTime >= minTime
+    return value >= minValue
         ? true
         : `Thời gian xem phải sau hiện tại ít nhất ${minutes} phút`;
 };

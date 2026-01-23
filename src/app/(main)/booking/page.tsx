@@ -136,6 +136,8 @@ export default function BookingsPage() {
         }
     };
 
+    console.log("bookingsbookings", bookings);
+
 
     return (
         <>
@@ -163,9 +165,9 @@ export default function BookingsPage() {
                                 <TableCell><strong>Khách hàng</strong></TableCell>
                                 <TableCell><strong>SĐT</strong></TableCell>
                                 <TableCell><strong>Người giới thiệu</strong></TableCell>
+                                <TableCell><strong>Thời gian xem</strong></TableCell>
                                 <TableCell align="center"><strong>Trạng thái</strong></TableCell>
                                 <TableCell><strong>Phòng</strong></TableCell>
-                                <TableCell><strong>Thời gian xem</strong></TableCell>
                                 <TableCell align="center"><strong>Hành động</strong></TableCell>
                             </TableRow>
                         </TableHead>
@@ -183,6 +185,9 @@ export default function BookingsPage() {
                                         <TableCell>{booking.customer_name}</TableCell>
                                         <TableCell>{booking.customer_phone}</TableCell>
                                         <TableCell>{booking.referrer_phone || '-'}</TableCell>
+                                        <TableCell>
+                                            {formatDateTimeVN(booking.viewing_at)}
+                                        </TableCell>
                                         <TableCell align="center">
                                             <BookingStatusTag
                                                 status={booking.status as BookingStatus}
@@ -212,9 +217,6 @@ export default function BookingsPage() {
                                             <Typography variant="caption" color="text.secondary">
                                                 {booking.room?.room_code}
                                             </Typography>
-                                        </TableCell>
-                                        <TableCell>
-                                            {formatDateTimeVN(booking.viewing_at)}
                                         </TableCell>
                                         <TableCell align="center" width={120}>
                                             <IconButton

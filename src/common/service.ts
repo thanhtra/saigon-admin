@@ -162,8 +162,6 @@ export const resolveUploadUrl = (path?: string) => {
     return `${base}/uploads${path}`;
 };
 
-
-
 export function createOptionsFromLabels<
     T extends string
 >(

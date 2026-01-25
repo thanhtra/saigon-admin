@@ -309,8 +309,8 @@ export default function CollaboratorsPage() {
                     <PaginationWrapper>
                         <Pagination
                             count={totalPages}
-                            page={page + 1}
-                            onChange={(_, value) => setPage(value - 1)}
+                            page={page}
+                            onChange={(_, value) => setPage(value)}
                         />
                     </PaginationWrapper>
                 )}

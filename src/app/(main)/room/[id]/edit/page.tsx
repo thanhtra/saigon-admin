@@ -69,6 +69,7 @@ export default function EditRoomPage() {
             reset({
                 title: room.title,
                 price: room.price,
+                deposit: room.deposit,
                 floor: room.floor,
                 room_number: room.room_number ?? '',
                 area: room.area ?? undefined,
@@ -82,7 +83,7 @@ export default function EditRoomPage() {
                 images: uploads.map((u: any, idx: number) => ({
                     id: u.id,
                     preview: resolveUploadUrl(u.file_path),
-                    isCover: idx === room.cover_index,
+                    isCover: u.is_cover === true,
                     isExisting: true,
                 })) as UploadPreview[],
             });
@@ -100,6 +101,7 @@ export default function EditRoomPage() {
             const updateRes = await updateRoom(id, {
                 title: data.title,
                 price: data.price ? Number(data.price) : undefined,
+                deposit: data.deposit ? Number(data.deposit) : undefined,
                 floor: data.floor ? Number(data.floor) : undefined,
                 room_number: data.room_number,
                 area: data.area ? Number(data.area) : undefined,
@@ -118,8 +120,8 @@ export default function EditRoomPage() {
 
             const {
                 upload_ids,
-                cover_index,
                 delete_upload_ids,
+                cover_upload_id
             } = await normalizeImagesPayload({
                 images: images ?? [],
                 uploadImages,
@@ -129,8 +131,8 @@ export default function EditRoomPage() {
 
             await updateRoom(id, {
                 upload_ids,
-                cover_index,
                 delete_upload_ids,
+                cover_upload_id
             });
 
             toast.success('Cập nhật phòng thành công');
@@ -180,6 +182,7 @@ export default function EditRoomPage() {
                     <FormTextField
                         name="floor"
                         type='number'
+                        inputProps={{ min: 1 }}
                         control={control}
                         label="Tầng"
                         placeholder='Để trống nếu tầng trệt'
@@ -195,8 +198,15 @@ export default function EditRoomPage() {
                         name="price"
                         control={control}
                         label="Giá thuê"
-                        type="number"
+                        format="currency"
                         required
+                    />
+
+                    <FormTextField
+                        name="deposit"
+                        control={control}
+                        label="Cọc giữ phòng"
+                        format="currency"
                     />
 
                     <FormTextField
@@ -204,6 +214,7 @@ export default function EditRoomPage() {
                         control={control}
                         label="Diện tích (m²)"
                         type="number"
+                        inputProps={{ min: 1 }}
                     />
 
                     <FormTextField
@@ -211,6 +222,7 @@ export default function EditRoomPage() {
                         control={control}
                         label="Số người tối đa"
                         type="number"
+                        inputProps={{ min: 1 }}
                     />
 
                     <FormTextField

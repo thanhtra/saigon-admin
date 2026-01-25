@@ -1,6 +1,6 @@
 import { RentalType, UploadDomain } from "@/common/enum";
 import { formatVnd } from "@/common/service";
-import { UploadPreview } from "@/types";
+import { NormalizedUploadPreview, UploadPreview } from "@/types";
 
 type RoomLite = {
     price?: number | string;
@@ -53,6 +53,7 @@ export const formatPriceRange = (
     return prices.map(p => formatVnd(p)).join(' - ');
 };
 
+
 export const normalizeImagesPayload = async ({
     images,
     uploadImages,
@@ -60,18 +61,39 @@ export const normalizeImagesPayload = async ({
     originalUploadIds,
 }: {
     images: UploadPreview[];
-    uploadImages: (files: File[], meta: any) => Promise<any>;
+    uploadImages: (
+        files: { file: File; is_cover?: boolean }[],
+        options: any,
+    ) => Promise<any>;
     roomId: string;
     originalUploadIds: string[];
 }) => {
-    /* ===== 1. Upload ảnh mới ===== */
-    const newImages = images.filter(i => i.file && i.client_id);
+    /* ===== 1. Chuẩn hoá cover (luôn có 1 cover) ===== */
+    const coverIndex = images.findIndex(i => i.isCover);
+
+    const normalizedImages = images.map((img, index) => ({
+        ...img,
+        isCover: coverIndex >= 0 ? index === coverIndex : index === 0,
+    }));
+
+    /* ===== 2. Upload ảnh mới ===== */
+    const newImages = normalizedImages.filter(
+        (i): i is NormalizedUploadPreview & { file: File; client_id: string } =>
+            i.file instanceof File && typeof i.client_id === 'string',
+    );
+
     const uploadedMap = new Map<string, string>();
 
     if (newImages.length) {
         const uploadRes = await uploadImages(
-            newImages.map(i => i.file!),
-            { domain: UploadDomain.Rooms, room_id: roomId },
+            newImages.map(i => ({
+                file: i.file,
+                is_cover: !!i.isCover,
+            })),
+            {
+                domain: UploadDomain.Rooms,
+                room_id: roomId,
+            },
         );
 
         if (!uploadRes?.success) {
@@ -79,12 +101,12 @@ export const normalizeImagesPayload = async ({
         }
 
         uploadRes.result.forEach((u: any, idx: number) => {
-            uploadedMap.set(newImages[idx].client_id!, u.id);
+            uploadedMap.set(newImages[idx].client_id, u.id);
         });
     }
 
-    /* ===== 2. build upload_ids theo thứ tự UI ===== */
-    const upload_ids = images
+    /* ===== 3. Build upload_ids theo thứ tự UI ===== */
+    const upload_ids = normalizedImages
         .map(img => {
             if (img.id) return img.id;
             if (img.client_id) return uploadedMap.get(img.client_id);
@@ -92,18 +114,24 @@ export const normalizeImagesPayload = async ({
         })
         .filter((id): id is string => Boolean(id));
 
-    /* ===== 3. cover_index ===== */
-    let cover_index = images.findIndex(i => i.isCover);
-    if (cover_index < 0) cover_index = 0;
-
-    /* ===== 4. delete_upload_ids (QUAN TRỌNG) ===== */
+    /* ===== 4. delete_upload_ids ===== */
     const delete_upload_ids = originalUploadIds.filter(
         id => !upload_ids.includes(id),
     );
 
+    /* ===== 5. cover_upload_id ===== */
+    const cover = normalizedImages.find(i => i.isCover);
+
+    const cover_upload_id =
+        cover?.id ??
+        (cover?.client_id
+            ? uploadedMap.get(cover.client_id)
+            : undefined);
+
+
     return {
         upload_ids,
-        cover_index,
         delete_upload_ids,
+        cover_upload_id
     };
 };

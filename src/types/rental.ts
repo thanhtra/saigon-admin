@@ -83,7 +83,9 @@ export type RentalForm = {
     amenities?: RentalAmenity[];
     description?: string;
     room_status?: RoomStatus;
+    water_unit?: string;
 
     images?: UploadPreview[];   // 👉 chỉ dùng ở UI
     upload_ids?: string[];      // 👉 chỉ gửi backend
+
 }

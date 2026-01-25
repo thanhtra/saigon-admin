@@ -136,9 +136,6 @@ export default function BookingsPage() {
         }
     };
 
-    console.log("bookingsbookings", bookings);
-
-
     return (
         <>
             <TitleMain>Quản lý lịch xem phòng</TitleMain>

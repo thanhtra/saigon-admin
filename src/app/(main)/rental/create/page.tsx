@@ -19,7 +19,7 @@ import {
     RentalTypeLabels,
     RoomStatusLabels,
 } from '@/common/const';
-import { CollaboratorType, FieldCooperation, RentalStatus, RentalType, RoomStatus, UploadDomain } from '@/common/enum';
+import { CollaboratorType, FieldCooperation, RentalStatus, RentalType, RoomStatus, UploadDomain, WaterUnit } from '@/common/enum';
 import {
     buildAddressDetail,
     getDistrictOptions,
@@ -80,6 +80,7 @@ export default function CreateRental() {
             status: RentalStatus.Confirmed,
             fee_electric: undefined,
             fee_water: undefined,
+            water_unit: WaterUnit.PerM3,
             fee_wifi: undefined,
             fee_service: undefined,
             fee_parking: undefined,
@@ -184,6 +185,7 @@ export default function CreateRental() {
                 room_status: data.room_status,
                 fee_electric: data.fee_electric,
                 fee_water: data.fee_water,
+                water_unit: data.water_unit,
                 fee_wifi: data.fee_wifi,
                 fee_service: data.fee_service,
                 fee_parking: data.fee_parking,
@@ -202,29 +204,29 @@ export default function CreateRental() {
                 images?.length &&
                 roomId
             ) {
-                const uploadRes = await uploadImages(
-                    images.map(i => i.file!),
-                    {
-                        domain: UploadDomain.Rooms,
-                        room_id: roomId,
-                    },
-                );
+                const hasCover = images.some(img => img.isCover);
+
+                const files = images
+                    .filter((img): img is UploadPreview & { file: File } => img.file instanceof File)
+                    .map((img, index) => ({
+                        file: img.file,
+                        is_cover: img.isCover || (index === 0 && !hasCover),
+                    }));
+
+                if (!files.length) {
+                    toast.error('Chưa có hình ảnh hợp lệ để upload');
+                    return;
+                }
+
+                const uploadRes = await uploadImages(files, {
+                    domain: UploadDomain.Rooms,
+                    room_id: roomId,
+                });
 
                 if (!uploadRes.success || !uploadRes.result?.length) {
                     toast.error('Upload hình thất bại');
                     return;
                 }
-
-                const uploadIds = uploadRes.result.map((u: any) => u.id);
-                const coverIndex =
-                    images.findIndex(i => i.isCover) >= 0
-                        ? images.findIndex(i => i.isCover)
-                        : 0;
-
-                await updateRoom(roomId, {
-                    upload_ids: uploadIds,
-                    cover_index: coverIndex,
-                });
             }
 
             toast.success('Tạo tin cho thuê thành công');
@@ -320,40 +322,46 @@ export default function CreateRental() {
                         name="fee_electric"
                         control={control}
                         label="Điện (đ/kWh)"
-                        type="number"
-                        inputProps={{ min: 0 }}
+                        format="currency"
                     />
 
                     <FormTextField
                         name="fee_water"
                         control={control}
-                        label="Nước (đ/m³)"
-                        type="number"
-                        inputProps={{ min: 0 }}
+                        label="Tiền nước"
+                        format="currency"
+                    />
+
+                    <FormTextField
+                        name="water_unit"
+                        control={control}
+                        label="Đơn vị nước"
+                        options={[
+                            { label: 'đ / m³', value: WaterUnit.PerM3 },
+                            { label: 'đ / người', value: WaterUnit.PerPerson },
+                        ]}
+                        required
                     />
 
                     <FormTextField
                         name="fee_wifi"
                         control={control}
                         label="Wifi (đ/tháng)"
-                        type="number"
-                        inputProps={{ min: 0 }}
+                        format="currency"
                     />
 
                     <FormTextField
                         name="fee_parking"
                         control={control}
                         label="Phí gửi xe (đ/tháng)"
-                        type="number"
-                        inputProps={{ min: 0 }}
+                        format="currency"
                     />
 
                     <FormTextField
                         name="fee_service"
                         control={control}
                         label="Phí dịch vụ (đ/tháng)"
-                        type="number"
-                        inputProps={{ min: 0 }}
+                        format="currency"
                     />
 
                     <FormTextField
@@ -432,17 +440,15 @@ export default function CreateRental() {
                                 name="price"
                                 control={control}
                                 label="Giá thuê (VNĐ/tháng)"
-                                type="number"
-                                inputProps={{ min: 0 }}
                                 required
+                                format="currency"
                             />
 
                             <FormTextField
                                 name="deposit"
                                 control={control}
                                 label="Cọc giữ chỗ (VNĐ)"
-                                type="number"
-                                inputProps={{ min: 0 }}
+                                format="currency"
                             />
 
                             <FormTextField

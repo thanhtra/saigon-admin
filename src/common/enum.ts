@@ -134,3 +134,8 @@ export enum RentalAmenity {
     Balcony = 'balcony',                        // Ban công
     Elevator = 'elevator',
 }
+
+export enum WaterUnit {
+    PerM3 = 'per_m3',
+    PerPerson = 'per_person'
+}

@@ -76,3 +76,7 @@ export interface UploadPreview {
     isExisting?: boolean;     // ⭐ QUAN TRỌNG
     client_id?: string;
 }
+
+export type NormalizedUploadPreview = UploadPreview & {
+    isCover: boolean;
+};

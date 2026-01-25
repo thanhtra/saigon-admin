@@ -36,8 +36,6 @@ export default function EditCollaborator() {
             try {
                 const res = await getCollaboratorDetail(id);
 
-                console.log('fasdfds', res);
-
                 if (res?.success) {
                     const colla = res.result;
                     const user = colla.user;

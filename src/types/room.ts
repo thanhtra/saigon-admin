@@ -70,6 +70,7 @@ export type RoomForm = {
     floor?: number;
     room_number?: string;
     price: number;
+    deposit?: number;
     area?: number;
     max_people?: number;
     status: string;
@@ -81,4 +82,5 @@ export type RoomForm = {
     active?: boolean;
     delete_upload_ids?: string[];
     video_url?: string;
+    cover_upload_id?: string;
 }

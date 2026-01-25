@@ -1,4 +1,4 @@
-import { BookingStatus, CollaboratorType, FieldCooperation, RentalAmenity, RentalStatus, RentalType, RoomStatus, UserRole } from "./enum";
+import { BookingStatus, CollaboratorType, FieldCooperation, RentalAmenity, RentalStatus, RentalType, RoomStatus, UserRole, WaterUnit } from "./enum";
 import { StatusType } from "./type";
 
 
@@ -145,4 +145,8 @@ export const Status: StatusType[] = [
     }
 ]
 
+export const WaterUnitOptions: Record<WaterUnit, string> = {
+    [WaterUnit.PerM3]: 'đ / m³',
+    [WaterUnit.PerPerson]: 'đ / người',
+};
 

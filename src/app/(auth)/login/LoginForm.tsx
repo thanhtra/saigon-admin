@@ -32,7 +32,6 @@ const LoginForm = () => {
                 toast.error('Đăng nhập thất bại');
             }
         } catch (error) {
-            console.log('error', error);
             toast.error(ErrorMessage.SYSTEM);
         } finally {
             setLoading(false);

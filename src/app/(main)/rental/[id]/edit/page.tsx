@@ -28,7 +28,8 @@ import {
 import {
     CollaboratorType,
     FieldCooperation,
-    RentalType
+    RentalType,
+    WaterUnit
 } from '@/common/enum';
 import {
     buildAddressDetail,
@@ -77,6 +78,7 @@ export default function EditRentalPage() {
         defaultValues: {
             active: true,
             images: [],
+            water_unit: WaterUnit.PerM3,
         },
     });
 
@@ -172,6 +174,7 @@ export default function EditRentalPage() {
 
                 fee_electric: rental.fee_electric,
                 fee_water: rental.fee_water,
+                water_unit: rental.water_unit ?? WaterUnit.PerM3,
                 fee_wifi: rental.fee_wifi,
                 fee_service: rental.fee_service,
                 fee_parking: rental.fee_parking,
@@ -193,7 +196,7 @@ export default function EditRentalPage() {
                 images: uploads.map((u: any, idx: number) => ({
                     id: u.id,
                     preview: resolveUploadUrl(u.file_path),
-                    isCover: idx === room.cover_index,
+                    isCover: !!u.is_cover,
                     isExisting: true,
                 })) ?? [],
             });
@@ -220,9 +223,14 @@ export default function EditRentalPage() {
 
 
     const onSubmit: SubmitHandler<RentalForm> = async (data) => {
-        setLoading(true);
         try {
             const { images } = data;
+            if (!images || images.length === 0) {
+                toast.error('Cần ít nhất 1 hình ảnh');
+                return;
+            }
+
+            setLoading(true);
 
             const updateRes = await updateRental(id, {
                 title: data.title,
@@ -249,6 +257,7 @@ export default function EditRentalPage() {
                 room_number: data.room_number,
                 fee_electric: data.fee_electric,
                 fee_water: data.fee_water,
+                water_unit: data.water_unit,
                 fee_wifi: data.fee_wifi,
                 fee_service: data.fee_service,
                 fee_parking: data.fee_parking,
@@ -263,8 +272,8 @@ export default function EditRentalPage() {
             if (roomId) {
                 const {
                     upload_ids,
-                    cover_index,
-                    delete_upload_ids
+                    delete_upload_ids,
+                    cover_upload_id
                 } = await normalizeImagesPayload({
                     images: images ?? [],
                     uploadImages,
@@ -274,8 +283,8 @@ export default function EditRentalPage() {
 
                 await updateRoom(roomId, {
                     upload_ids,
-                    cover_index,
                     delete_upload_ids,
+                    cover_upload_id
                 });
             }
 
@@ -379,40 +388,45 @@ export default function EditRentalPage() {
                         name="fee_electric"
                         control={control}
                         label="Điện (đ/kWh)"
-                        type="number"
-                        inputProps={{ min: 0 }}
+                        format="currency"
                     />
 
                     <FormTextField
                         name="fee_water"
                         control={control}
-                        label="Nước (đ/m³)"
-                        type="number"
-                        inputProps={{ min: 0 }}
+                        label="Tiền nước"
+                        format="currency"
+                    />
+
+                    <FormTextField
+                        name="water_unit"
+                        control={control}
+                        label="Đơn vị nước"
+                        options={[
+                            { label: 'đ / m³', value: WaterUnit.PerM3 },
+                            { label: 'đ / người', value: WaterUnit.PerPerson },
+                        ]}
                     />
 
                     <FormTextField
                         name="fee_wifi"
                         control={control}
                         label="Wifi (đ/tháng)"
-                        type="number"
-                        inputProps={{ min: 0 }}
+                        format="currency"
                     />
 
                     <FormTextField
                         name="fee_parking"
                         control={control}
                         label="Phí gửi xe (đ/tháng)"
-                        type="number"
-                        inputProps={{ min: 0 }}
+                        format="currency"
                     />
 
                     <FormTextField
                         name="fee_service"
                         control={control}
                         label="Phí dịch vụ (đ/tháng)"
-                        type="number"
-                        inputProps={{ min: 0 }}
+                        format="currency"
                     />
 
                     <FormTextField
@@ -492,17 +506,15 @@ export default function EditRentalPage() {
                                 name="price"
                                 control={control}
                                 label="Giá thuê (VNĐ/tháng)"
-                                type="number"
-                                inputProps={{ min: 0 }}
                                 required
+                                format="currency"
                             />
 
                             <FormTextField
                                 name="deposit"
                                 control={control}
                                 label="Cọc giữ chỗ (VNĐ)"
-                                type="number"
-                                inputProps={{ min: 0 }}
+                                format="currency"
                             />
 
                             <FormTextField

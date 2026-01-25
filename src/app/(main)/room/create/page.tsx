@@ -22,7 +22,7 @@ import useGetRentalsByCollaborator from '@/hooks/Rental/useGetRentalsByCollabora
 import useCreateRoom from '@/hooks/Room/useCreateRoom';
 import useUpdateRoom from '@/hooks/Room/useUpdateRoom';
 import useUploadImages from '@/hooks/Upload/uploadImages';
-import { RoomForm } from '@/types';
+import { RoomForm, UploadPreview } from '@/types';
 
 export default function CreateRoom() {
     const { createRoom } = useCreateRoom();
@@ -48,6 +48,7 @@ export default function CreateRoom() {
             floor: undefined,
             room_number: '',
             price: undefined,
+            deposit: undefined,
             area: undefined,
             max_people: undefined,
             description: '',
@@ -121,6 +122,7 @@ export default function CreateRoom() {
                 floor: payload.floor ? Number(payload.floor) : undefined,
                 room_number: payload.room_number,
                 price: Number(payload.price),
+                deposit: payload.deposit ? Number(payload.deposit) : undefined,
                 area: payload.area ? Number(payload.area) : undefined,
                 max_people: payload.max_people ? Number(payload.max_people) : undefined,
                 description: payload.description,
@@ -130,36 +132,36 @@ export default function CreateRoom() {
                 video_url: payload.video_url
             });
 
-            if (!createRes?.success || !createRes.result?.id) {
+            const roomId = createRes.result?.id;
+
+            if (!createRes?.success || !roomId) {
                 toast.error('Tạo phòng thất bại');
                 return;
             }
 
-            const roomId = createRes.result.id;
+            const hasCover = images.some(img => img.isCover);
 
-            const uploadRes = await uploadImages(
-                images.map(i => i.file!),
-                {
-                    domain: UploadDomain.Rooms,
-                    room_id: roomId,
-                },
-            );
+            const files = images
+                .filter((img): img is UploadPreview & { file: File } => img.file instanceof File)
+                .map((img, index) => ({
+                    file: img.file,
+                    is_cover: img.isCover || (index === 0 && !hasCover),
+                }));
+
+            if (!files.length) {
+                toast.error('Chưa có hình ảnh hợp lệ để upload');
+                return;
+            }
+
+            const uploadRes = await uploadImages(files, {
+                domain: UploadDomain.Rooms,
+                room_id: roomId,
+            });
 
             if (!uploadRes.success || !uploadRes.result?.length) {
                 toast.error('Upload hình thất bại');
                 return;
             }
-
-            const uploadIds = uploadRes.result.map((u: any) => u.id);
-            const coverIndex =
-                images.findIndex(i => i.isCover) >= 0
-                    ? images.findIndex(i => i.isCover)
-                    : 0;
-
-            await updateRoom(roomId, {
-                upload_ids: uploadIds,
-                cover_index: coverIndex,
-            });
 
             toast.success('Tạo phòng thành công');
             reset();
@@ -220,6 +222,7 @@ export default function CreateRoom() {
                     <FormTextField
                         name="floor"
                         type='number'
+                        inputProps={{ min: 1 }}
                         control={control}
                         label="Tầng"
                         placeholder='Để trống nếu tầng trệt'
@@ -235,12 +238,32 @@ export default function CreateRoom() {
                         name="price"
                         control={control}
                         label="Giá thuê"
-                        type="number"
+                        format="currency"
                         required
                     />
 
-                    <FormTextField name="area" control={control} label="Diện tích (m²)" type="number" />
-                    <FormTextField name="max_people" control={control} label="Số người tối đa" type="number" />
+                    <FormTextField
+                        name="deposit"
+                        control={control}
+                        label="Cọc giữ phòng"
+                        format="currency"
+                    />
+
+                    <FormTextField
+                        name="area"
+                        control={control}
+                        label="Diện tích (m²)"
+                        type="number"
+                        inputProps={{ min: 1 }}
+                    />
+
+                    <FormTextField
+                        name="max_people"
+                        control={control}
+                        label="Số người tối đa"
+                        type="number"
+                        inputProps={{ min: 1 }}
+                    />
 
                     <FormTextField
                         name="video_url"

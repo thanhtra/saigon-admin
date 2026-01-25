@@ -185,7 +185,7 @@ export default function EditRentalPage() {
                 title: room?.title ?? '',
                 price: room?.price,
                 area: room?.area ?? undefined,
-                description: room.description ?? '',
+                description: room?.description ?? '',
                 room_status: room?.status ?? '',
                 deposit: room?.deposit,
                 max_people: room?.max_people,

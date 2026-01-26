@@ -231,7 +231,7 @@ export default function RoomPage() {
                                 <TableCell><strong>Người đăng</strong></TableCell>
                                 <TableCell><strong>Chủ nhà</strong></TableCell>
                                 <TableCell><strong>Trạng thái nhà</strong></TableCell>
-                                <TableCell><strong>Hoa hồng</strong></TableCell>
+                                <TableCell sx={{ minWidth: "240px" }}><strong>Hoa hồng</strong></TableCell>
                                 <TableCell><strong>Mã phòng</strong></TableCell>
                                 <TableCell sx={{ minWidth: "80px" }}><strong>Loại phòng</strong></TableCell>
                                 <TableCell><strong>Tiêu đề</strong></TableCell>

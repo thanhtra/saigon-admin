@@ -177,10 +177,10 @@ export default function RentalPage() {
                                 <TableCell align="center"><strong>Trạng thái</strong></TableCell>
                                 <TableCell><strong>Người đăng</strong></TableCell>
                                 <TableCell><strong>Chủ nhà</strong></TableCell>
-                                <TableCell><strong>Địa chỉ thực tế</strong></TableCell>
+                                <TableCell sx={{ minWidth: "240px" }}><strong>Địa chỉ thực tế</strong></TableCell>
                                 <TableCell><strong>Loại hình</strong></TableCell>
                                 <TableCell><strong>Giá</strong></TableCell>
-                                <TableCell><strong>Hoa hồng</strong></TableCell>
+                                <TableCell sx={{ minWidth: "240px" }}><strong>Hoa hồng</strong></TableCell>
                                 <TableCell><strong>Ngày tạo</strong></TableCell>
                                 <TableCell align="center"><strong>Kích hoạt</strong></TableCell>
                                 <TableCell align="center"><strong>Hành động</strong></TableCell>

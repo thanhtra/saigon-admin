@@ -15,13 +15,23 @@ import {
     DialogContent,
     DialogActions,
     Button,
+    useTheme,
+    useMediaQuery,
 } from '@mui/material';
+import MenuIcon from '@mui/icons-material/Menu';
 import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
 
-const Navbar: React.FC = () => {
+interface NavbarProps {
+    onToggleSidebar: () => void;
+}
+
+const Navbar: React.FC<NavbarProps> = ({ onToggleSidebar }) => {
     const router = useRouter();
     const { user, logout } = useAuth();
+
+    const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const [openLogoutDialog, setOpenLogoutDialog] = useState(false);
@@ -44,19 +54,30 @@ const Navbar: React.FC = () => {
                         justifyContent: 'space-between',
                     }}
                 >
-                    <Typography fontSize={16} fontWeight={600}>
-                        YYY
-                    </Typography>
+                    {/* LEFT */}
+                    <Box display="flex" alignItems="center" gap={1}>
+                        {isMobile && (
+                            <IconButton
+                                edge="start"
+                                onClick={onToggleSidebar}
+                                sx={{ color: 'inherit' }}
+                            >
+                                <MenuIcon />
+                            </IconButton>
+                        )}
 
-                    {/* PROFILE */}
+                        <Typography fontSize={16} fontWeight={600}>
+                            YYY
+                        </Typography>
+                    </Box>
+
+                    {/* RIGHT - PROFILE */}
                     <Box>
                         <IconButton
                             size="small"
                             onClick={(e) => setAnchorEl(e.currentTarget)}
                         >
-                            <Avatar
-                                sx={{ width: 32, height: 32, fontSize: 14 }}
-                            >
+                            <Avatar sx={{ width: 32, height: 32, fontSize: 14 }}>
                                 {user?.name?.charAt(0) || 'U'}
                             </Avatar>
                         </IconButton>
@@ -116,10 +137,7 @@ const Navbar: React.FC = () => {
                 </DialogContent>
 
                 <DialogActions sx={{ px: 3, pb: 2 }}>
-                    <Button
-                        size="small"
-                        onClick={() => setOpenLogoutDialog(false)}
-                    >
+                    <Button size="small" onClick={() => setOpenLogoutDialog(false)}>
                         Hủy
                     </Button>
                     <Button

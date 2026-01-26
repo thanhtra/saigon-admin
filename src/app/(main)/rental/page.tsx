@@ -165,16 +165,22 @@ export default function RentalPage() {
                 </HeaderRow>
 
                 <Paper sx={{ overflowX: 'auto' }}>
-                    <Table size="small">
+                    <Table
+                        size="small"
+                        sx={{
+                            minWidth: 1200,
+                        }}
+                    >
+
                         <TableHead sx={{ backgroundColor: '#f5f5f5' }}>
                             <TableRow>
-                                <TableCell><strong>Chủ nhà</strong></TableCell>
-                                <TableCell><strong>Người đăng</strong></TableCell>
-                                <TableCell><strong>Hoa hồng</strong></TableCell>
                                 <TableCell align="center"><strong>Trạng thái</strong></TableCell>
+                                <TableCell><strong>Người đăng</strong></TableCell>
+                                <TableCell><strong>Chủ nhà</strong></TableCell>
+                                <TableCell><strong>Địa chỉ thực tế</strong></TableCell>
                                 <TableCell><strong>Loại hình</strong></TableCell>
-                                <TableCell><strong>Địa chỉ</strong></TableCell>
                                 <TableCell><strong>Giá</strong></TableCell>
+                                <TableCell><strong>Hoa hồng</strong></TableCell>
                                 <TableCell><strong>Ngày tạo</strong></TableCell>
                                 <TableCell align="center"><strong>Kích hoạt</strong></TableCell>
                                 <TableCell align="center"><strong>Hành động</strong></TableCell>
@@ -191,11 +197,6 @@ export default function RentalPage() {
                             ) : rentalsWithPrice.length ? (
                                 rentalsWithPrice.map((r) => (
                                     <TableRow key={r.id} hover>
-                                        <TableCell>{r.collaborator?.user?.name} - {r.collaborator?.user?.phone}</TableCell>
-                                        <TableCell>{r.createdBy?.name} - {r.createdBy?.phone}</TableCell>
-                                        <TableCell>
-                                            {r.commission}
-                                        </TableCell>
                                         <TableCell align="center">
                                             <RentalStatusTag
                                                 status={r.status as RentalStatus}
@@ -206,15 +207,19 @@ export default function RentalPage() {
                                                 }}
                                             />
                                         </TableCell>
-                                        <TableCell>
-                                            {RentalTypeLabels[r.rental_type as RentalType]}
-                                        </TableCell>
+                                        <TableCell>{r.createdBy?.phone} - {r.createdBy?.name}</TableCell>
+                                        <TableCell>{r.collaborator?.user?.phone} - {r.collaborator?.user?.name}</TableCell>
                                         <TableCell>
                                             <TruncateWithTooltip text={r.address_detail} limit={50} />
                                         </TableCell>
                                         <TableCell>
+                                            {RentalTypeLabels[r.rental_type as RentalType]}
+                                        </TableCell>
+
+                                        <TableCell>
                                             {formatPriceRange(resolveRentalPrice(r))}
                                         </TableCell>
+                                        <TableCell>{r.commission}</TableCell>
                                         <TableCell>
                                             {dayjs(r.createdAt).format(
                                                 'DD/MM/YYYY HH:mm',

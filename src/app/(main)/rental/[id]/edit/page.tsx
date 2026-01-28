@@ -254,7 +254,7 @@ export default function EditRentalPage() {
                 fee_parking: data.fee_parking,
                 fee_other: data.fee_other,
 
-                ...(isBoardingHouse && {
+                ...(!isBoardingHouse && {
                     title: data.title,
                     price: data.price ? Number(data.price) : undefined,
                     area: data.area ? Number(data.area) : undefined,

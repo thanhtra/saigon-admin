@@ -1,5 +1,5 @@
 import { Controller } from 'react-hook-form';
-import { Autocomplete, TextField } from '@mui/material';
+import { Autocomplete, SxProps, TextField, Theme } from '@mui/material';
 import { Option } from '@/common/type';
 
 
@@ -10,6 +10,7 @@ type Props = {
     options: Option[];
     disabled?: boolean;
     required?: boolean;
+    sx?: SxProps<Theme>;
 };
 
 export default function FormAutocomplete({
@@ -19,6 +20,7 @@ export default function FormAutocomplete({
     options,
     disabled,
     required,
+    sx
 }: Props) {
     return (
         <Controller
@@ -31,6 +33,7 @@ export default function FormAutocomplete({
             }
             render={({ field, fieldState }) => (
                 <Autocomplete
+                    sx={sx}
                     options={options}
                     getOptionLabel={(option) => option.label}
                     isOptionEqualToValue={(opt, val) => opt.value === val.value}

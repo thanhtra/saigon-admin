@@ -224,6 +224,10 @@ export default function EditRentalPage() {
 
     const onSubmit: SubmitHandler<RentalForm> = async (data) => {
         try {
+            if (data.address_detail === data.address_detail_display) {
+                toast.error('Cần sửa địa chỉ hiển thị');
+                return;
+            }
 
             setLoading(true);
 
@@ -439,6 +443,9 @@ export default function EditRentalPage() {
                         name="fee_other"
                         control={control}
                         label="Phí khác"
+                        sx={{
+                            gridColumn: 'span 2',
+                        }}
                     />
 
                     <FormTextField
@@ -447,7 +454,17 @@ export default function EditRentalPage() {
                         label="Note"
                         multiline
                         rows={1}
-                        sx={formGridStyles.fullWidth}
+                        sx={{
+                            gridColumn: 'span 4',
+                        }}
+                    />
+
+                    <FormTextField
+                        name="commission"
+                        control={control}
+                        label="Giá trị hoa hồng"
+                        multiline
+                        sx={{ gridColumn: 'span 4' }}
                     />
 
                     <FormAutocomplete
@@ -458,14 +475,6 @@ export default function EditRentalPage() {
                             { label: '-- Chọn chủ nhà --', value: '' },
                             ...collaboratorOptions,
                         ]}
-                        required
-                    />
-
-                    <FormTextField
-                        name="commission"
-                        control={control}
-                        label="Giá trị hoa hồng"
-                        multiline
                     />
 
                     <FormTextField

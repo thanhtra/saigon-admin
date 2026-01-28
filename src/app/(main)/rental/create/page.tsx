@@ -368,6 +368,9 @@ export default function CreateRental() {
                         name="fee_other"
                         control={control}
                         label="Phí khác"
+                        sx={{
+                            gridColumn: 'span 2',
+                        }}
                     />
 
                     <FormTextField
@@ -376,7 +379,17 @@ export default function CreateRental() {
                         label="Note"
                         multiline
                         rows={1}
-                        sx={formGridStyles.fullWidth}
+                        sx={{
+                            gridColumn: 'span 4',
+                        }}
+                    />
+
+                    <FormTextField
+                        name="commission"
+                        control={control}
+                        label="Giá trị hoa hồng"
+                        multiline
+                        sx={{ gridColumn: 'span 4' }}
                     />
 
                     <FormAutocomplete
@@ -390,12 +403,6 @@ export default function CreateRental() {
                         required
                     />
 
-                    <FormTextField
-                        name="commission"
-                        control={control}
-                        label="Giá trị hoa hồng"
-                        multiline
-                    />
 
                     <FormTextField
                         name="status"

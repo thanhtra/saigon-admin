@@ -224,37 +224,28 @@ export default function EditRentalPage() {
 
     const onSubmit: SubmitHandler<RentalForm> = async (data) => {
         try {
-            const { images } = data;
-            if (!images || images.length === 0) {
-                toast.error('Cần ít nhất 1 hình ảnh');
-                return;
-            }
 
             setLoading(true);
 
+            const isBoardingHouse = data.rental_type === RentalType.BoardingHouse;
+
             const updateRes = await updateRental(id, {
-                title: data.title,
-                active: data.active,
-                address_detail: data.address_detail,
-                address_detail_display: data.address_detail_display,
+
                 collaborator_id: data.collaborator_id,
                 commission: data.commission,
-                description: data.description,
-                district: data.district,
-                house_number: data.house_number,
+
                 province: data.province,
-                status: data.status,
-                street: data.street,
+                district: data.district,
                 ward: data.ward,
-                price: data.price ? Number(data.price) : undefined,
-                amenities: data.amenities,
+                street: data.street,
+                house_number: data.house_number,
+                address_detail: data.address_detail,
+                address_detail_display: data.address_detail_display,
+
                 note: data.note,
-                area: data.area,
-                room_status: data.room_status,
-                deposit: data.deposit,
-                max_people: data.max_people,
-                floor: data.floor ? Number(data.floor) : undefined,
-                room_number: data.room_number,
+                status: data.status,
+                active: data.active,
+
                 fee_electric: data.fee_electric,
                 fee_water: data.fee_water,
                 water_unit: data.water_unit,
@@ -262,6 +253,19 @@ export default function EditRentalPage() {
                 fee_service: data.fee_service,
                 fee_parking: data.fee_parking,
                 fee_other: data.fee_other,
+
+                ...(isBoardingHouse && {
+                    title: data.title,
+                    price: data.price ? Number(data.price) : undefined,
+                    area: data.area ? Number(data.area) : undefined,
+                    max_people: data.max_people ? Number(data.max_people) : undefined,
+                    room_status: data.room_status,
+                    amenities: data.amenities,
+                    deposit: data.deposit,
+                    description: data.description,
+                    floor: data.floor ? Number(data.floor) : undefined,
+                    room_number: data.room_number,
+                }),
             });
 
             if (!updateRes?.success) {
@@ -269,7 +273,9 @@ export default function EditRentalPage() {
                 return;
             }
 
-            if (roomId) {
+            if (roomId && rentalType !== RentalType.BoardingHouse) {
+                const { images } = data;
+
                 const {
                     upload_ids,
                     delete_upload_ids,

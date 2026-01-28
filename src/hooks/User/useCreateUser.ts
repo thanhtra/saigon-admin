@@ -9,7 +9,7 @@ const useCreateUser = () => {
 	const createUser = useCallback(async (body: User): Promise<any> => {
 		setLoading(true);
 		try {
-			return await post('/users', body);
+			return await post('/users/admintra', body);
 		} catch (error) {
 			console.log('Error createUser: ', error);
 			throw error;

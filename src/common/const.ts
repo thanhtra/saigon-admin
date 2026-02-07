@@ -27,7 +27,7 @@ export const LOGOUT_FLAG = 'force_logout';
 
 export const UserRoleOptions: Record<UserRole, string> = {
     [UserRole.Admin]: 'Quản trị hệ thống',
-    [UserRole.Sale]: 'Nhân viên Sale',
+    [UserRole.Sale]: 'Nhân viên Sales',
     [UserRole.Owner]: 'Chủ nhà',
     [UserRole.Broker]: 'Môi giới',
     [UserRole.Tenant]: 'Khách hàng',
@@ -108,6 +108,8 @@ export const BookingStatusLabels: Record<BookingStatus, string> = {
     [BookingStatus.Pending]: 'Đã đặt lịch',
     [BookingStatus.Confirmed]: 'Đã xác nhận',
     [BookingStatus.Completed]: 'Đã đi xem',
+    [BookingStatus.Deposited]: 'Đã cọc giữ phòng',
+    [BookingStatus.MovedIn]: 'Đã vào ở',
     [BookingStatus.Cancelled]: 'Đã huỷ',
     [BookingStatus.NoShow]: 'Không đến',
 };
@@ -116,10 +118,11 @@ export const BookingStatusAdminLabels: Record<BookingStatus, string> = {
     [BookingStatus.Pending]: 'Lịch mới',
     [BookingStatus.Confirmed]: 'Đã xác nhận',
     [BookingStatus.Completed]: 'Đã đi xem',
+    [BookingStatus.Deposited]: 'Đã cọc giữ phòng',
+    [BookingStatus.MovedIn]: 'Đã vào ở',
     [BookingStatus.Cancelled]: 'Khách huỷ',
     [BookingStatus.NoShow]: 'Không đến',
 };
-
 
 
 export const CollaboratorTypeLabels: Record<CollaboratorType, string> = {

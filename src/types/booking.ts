@@ -14,6 +14,7 @@ export type Booking = BaseEntity & {
     viewing_at: string;
     referrer_phone?: string | null;
     status: BookingStatus;
+    is_paid_commission?: boolean;
 };
 
 

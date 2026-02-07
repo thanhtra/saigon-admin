@@ -42,6 +42,7 @@ const UserForm: React.FC<UserFormProps> = ({
                 control={control}
                 label="Số điện thoại"
                 required
+                disabled={isEdit}
             />
 
             <FormTextField
@@ -82,26 +83,29 @@ const UserForm: React.FC<UserFormProps> = ({
             />
 
             <Box sx={formGridStyles.actionRow}>
-                <FormSwitch
-                    name="active"
-                    control={control}
-                    label="Kích hoạt"
-                />
+                <Box sx={formGridStyles.actionRight}></Box>
+                <Box sx={formGridStyles.actionRight}>
+                    <FormSwitch
+                        name="active"
+                        control={control}
+                        label="Kích hoạt"
+                    />
 
-                <Button
-                    type="submit"
-                    variant="contained"
-                    disabled={loading}
-                    sx={formGridStyles.submitButton}
-                >
-                    {loading
-                        ? isEdit
-                            ? 'Đang cập nhật...'
-                            : 'Đang tạo...'
-                        : isEdit
-                            ? 'Cập nhật'
-                            : 'Tạo mới'}
-                </Button>
+                    <Button
+                        type="submit"
+                        variant="contained"
+                        disabled={loading}
+                        sx={formGridStyles.submitButton}
+                    >
+                        {loading
+                            ? isEdit
+                                ? 'Đang cập nhật...'
+                                : 'Đang tạo...'
+                            : isEdit
+                                ? 'Cập nhật'
+                                : 'Tạo mới'}
+                    </Button>
+                </Box>
             </Box>
         </Box>
     );

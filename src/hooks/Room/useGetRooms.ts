@@ -10,6 +10,7 @@ export type Params = {
     rental_type?: RentalType;
     rental_id?: string;
     status?: RoomStatus;
+    ctv_collaborator_id?: string;
 };
 
 const useGetRooms = () => {

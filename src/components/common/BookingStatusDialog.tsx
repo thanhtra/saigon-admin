@@ -57,7 +57,7 @@ const BookingStatusDialog: React.FC<BookingStatusDialogProps> = ({
             maxWidth="xs"
             fullWidth
         >
-            <DialogTitle fontWeight={600}>
+            <DialogTitle fontWeight={500}>
                 Cập nhật trạng thái lịch xem
             </DialogTitle>
 

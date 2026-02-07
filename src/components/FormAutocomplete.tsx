@@ -11,6 +11,7 @@ type Props = {
     disabled?: boolean;
     required?: boolean;
     sx?: SxProps<Theme>;
+    size?: 'small' | 'medium';
 };
 
 export default function FormAutocomplete({
@@ -20,7 +21,8 @@ export default function FormAutocomplete({
     options,
     disabled,
     required,
-    sx
+    sx,
+    size = 'medium'
 }: Props) {
     return (
         <Controller
@@ -41,6 +43,7 @@ export default function FormAutocomplete({
                     onChange={(_, newValue) =>
                         field.onChange(newValue?.value || '')
                     }
+                    size={size}
                     disabled={disabled}
                     renderInput={(params) => (
                         <TextField

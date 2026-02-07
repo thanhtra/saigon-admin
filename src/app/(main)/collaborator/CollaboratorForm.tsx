@@ -84,8 +84,8 @@ const CollaboratorForm: React.FC<Props> = ({
             />
 
             <Box sx={formGridStyles.actionRow}>
-                <Box sx={formGridStyles.actionLeft}>
-                    <FormSwitch name="is_confirmed_ctv" control={control} label="Đã đăng kí CTV" />
+                <Box sx={formGridStyles.actionRight}>
+                    <FormSwitch name="is_confirmed_ctv" control={control} label="Đăng kí CTV" />
                 </Box>
                 <Box sx={formGridStyles.actionRight}>
                     <FormSwitch name="active" control={control} label="Kích hoạt" />

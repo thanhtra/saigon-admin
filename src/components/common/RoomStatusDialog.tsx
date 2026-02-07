@@ -58,7 +58,7 @@ const RoomStatusDialog: React.FC<RoomStatusDialogProps> = ({
             maxWidth="xs"
             fullWidth
         >
-            <DialogTitle fontWeight={600}>
+            <DialogTitle fontWeight={500}>
                 Cập nhật trạng thái phòng
             </DialogTitle>
 

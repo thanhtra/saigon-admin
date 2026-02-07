@@ -229,6 +229,7 @@ export default function RentalPage() {
                                         <TableCell align="center">
                                             <Tooltip
                                                 title={r.active ? 'Đang hoạt động' : 'Tạm ẩn'}
+                                                placement="top"
                                             >
                                                 {r.active ? (
                                                     <CheckCircleIcon

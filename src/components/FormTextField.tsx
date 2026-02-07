@@ -237,6 +237,8 @@ type FormTextFieldProps<T extends FieldValues> = {
 
     /** 🔥 NEW: ẩn hiển thị khi value = 0 */
     hideZero?: boolean;
+
+    size?: 'small' | 'medium'
 };
 
 /* ================= COMPONENT ================= */
@@ -259,6 +261,7 @@ function FormTextField<T extends FieldValues>({
     maxRows,
     inputProps,
     format,
+    size = 'medium',
     hideZero = true,
 }: FormTextFieldProps<T>) {
     const mergedRules: RegisterOptions<T> = {
@@ -300,6 +303,7 @@ function FormTextField<T extends FieldValues>({
                         disabled={disabled}
                         placeholder={placeholder}
                         sx={sx}
+                        size={size}
                         error={!!fieldState.error}
                         helperText={fieldState.error?.message || helperText}
                         inputProps={{

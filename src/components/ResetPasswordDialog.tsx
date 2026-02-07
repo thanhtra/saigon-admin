@@ -76,7 +76,7 @@ Anh/Chị vui lòng lưu lại mật khẩu tránh trường hợp quên nhé!`
 
     return (
         <Dialog open={open} onClose={undefined} maxWidth="xs" fullWidth>
-            <DialogTitle fontWeight={600}>
+            <DialogTitle fontWeight={500}>
                 {newPassword ? 'Reset thành công' : 'Xác nhận reset mật khẩu'}
             </DialogTitle>
 

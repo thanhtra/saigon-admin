@@ -197,11 +197,12 @@ export default function CollaboratorsPage() {
                             <TableRow>
                                 <TableCell><strong>Tên</strong></TableCell>
                                 <TableCell><strong>SĐT</strong></TableCell>
+                                <TableCell><strong>Email</strong></TableCell>
+                                <TableCell align="center"><strong>CTV</strong></TableCell>
                                 <TableCell align="left"><strong>Loại</strong></TableCell>
                                 <TableCell align="left"><strong>Lĩnh vực</strong></TableCell>
-                                <TableCell align="center"><strong>Cộng tác viên</strong></TableCell>
                                 <TableCell><strong>Note</strong></TableCell>
-                                <TableCell align="center"><strong>Kích hoạt</strong></TableCell>
+                                <TableCell align="center" width={100}><strong>Kích hoạt</strong></TableCell>
                                 <TableCell align="center"><strong>Hành động</strong></TableCell>
                             </TableRow>
                         </TableHead>
@@ -217,7 +218,32 @@ export default function CollaboratorsPage() {
                                 data.map((item) => (
                                     <TableRow key={item.id} hover>
                                         <TableCell>{item.user.name}</TableCell>
-                                        <TableCell>{item.user.phone}</TableCell>
+                                        <TableCell>
+                                            <Tooltip title="Sao chép số điện thoại" placement="top">
+                                                <span
+                                                    onClick={() => {
+                                                        navigator.clipboard.writeText(item.user.phone);
+                                                        toast.success('Đã sao chép');
+                                                    }}
+                                                    style={{ cursor: 'pointer', marginRight: 4 }}
+                                                >
+                                                    {item.user.phone}
+                                                </span>
+                                            </Tooltip>
+                                        </TableCell>
+                                        <TableCell>{item.user.email}</TableCell>
+                                        <TableCell align="center">
+                                            <Tooltip
+                                                title={item.is_confirmed_ctv ? 'Đã đăng kí' : 'Chưa đăng kí'}
+                                                placement="top"
+                                            >
+                                                {item.is_confirmed_ctv ? (
+                                                    <CheckCircleIcon color="success" fontSize="small" />
+                                                ) : (
+                                                    <></>
+                                                )}
+                                            </Tooltip>
+                                        </TableCell>
                                         <TableCell align="left">
                                             <CollaboratorTypeTag
                                                 clickable
@@ -238,21 +264,12 @@ export default function CollaboratorsPage() {
                                                 }}
                                             />
                                         </TableCell>
-                                        <TableCell align="center">
-                                            <Tooltip
-                                                title={item.is_confirmed_ctv ? 'Đã đăng kí' : 'Chưa đăng kí'}
-                                            >
-                                                {item.is_confirmed_ctv ? (
-                                                    <CheckCircleIcon color="success" fontSize="small" />
-                                                ) : (
-                                                    <></>
-                                                )}
-                                            </Tooltip>
-                                        </TableCell>
+
                                         <TableCell>{TruncateWithTooltip({ text: (item?.note || "") + ' - ' + (item?.user?.note || "") })}</TableCell>
                                         <TableCell align="center">
                                             <Tooltip
                                                 title={item.active ? 'Đang hoạt động' : 'Đã khoá'}
+                                                placement="top"
                                             >
                                                 {item.active ? (
                                                     <CheckCircleIcon color="success" fontSize="small" />

@@ -1,6 +1,6 @@
 'use client';
 
-import { ErrorMessage, UserRoleOptions } from '@/common/const';
+import { ErrorMessage } from '@/common/const';
 import { UserRole } from '@/common/enum';
 import { User } from '@/common/type';
 import PaginationWrapper from '@/components/common/PaginationWrapper';
@@ -156,8 +156,8 @@ export default function UsersPage() {
                             <TableRow>
                                 <TableCell><strong>Tên</strong></TableCell>
                                 <TableCell><strong>Số điện thoại</strong></TableCell>
-                                <TableCell align="left"><strong>Phân quyền</strong></TableCell>
                                 <TableCell><strong>Liên hệ</strong></TableCell>
+                                <TableCell align="left"><strong>Phân quyền</strong></TableCell>
                                 <TableCell><strong>Mô tả</strong></TableCell>
                                 <TableCell align="center"><strong>Kích hoạt</strong></TableCell>
                                 <TableCell align="center"><strong>Hành động</strong></TableCell>
@@ -176,8 +176,18 @@ export default function UsersPage() {
                                     <TableRow key={user.id} hover>
                                         <TableCell>{user.name}</TableCell>
                                         <TableCell width={180}>
-                                            {user.phone}
-                                            <Tooltip title="Reset mật khẩu">
+                                            <Tooltip title="Sao chép số điện thoại" placement="top">
+                                                <span
+                                                    onClick={() => {
+                                                        navigator.clipboard.writeText(user.phone);
+                                                        toast.success('Đã sao chép');
+                                                    }}
+                                                    style={{ cursor: 'pointer', marginRight: 4 }}
+                                                >
+                                                    {user.phone}
+                                                </span>
+                                            </Tooltip>
+                                            <Tooltip title="Reset mật khẩu" placement="top">
                                                 <IconButton
                                                     sx={{ float: 'right', height: '20px' }}
                                                     color="warning"
@@ -192,10 +202,6 @@ export default function UsersPage() {
                                                 </IconButton>
                                             </Tooltip>
                                         </TableCell>
-                                        <TableCell align="left">
-                                            <UserRoleTag value={user.role as UserRole} />
-                                        </TableCell>
-
                                         <TableCell>
                                             <Box display="flex" gap={1}>
                                                 {user?.link_facebook && (
@@ -229,9 +235,12 @@ export default function UsersPage() {
                                                 )}
                                             </Box>
                                         </TableCell>
+                                        <TableCell align="left">
+                                            <UserRoleTag value={user.role as UserRole} />
+                                        </TableCell>
                                         <TableCell>{TruncateWithTooltip({ text: user.note })}</TableCell>
                                         <TableCell align="center">
-                                            <Tooltip title={user.active ? 'Đang hoạt động' : 'Không hoạt động'}>
+                                            <Tooltip title={user.active ? 'Đang hoạt động' : 'Không hoạt động'} placement="top">
                                                 {user.active ? <CheckCircleIcon color="success" fontSize="small" /> : <CancelIcon color="error" fontSize="small" />}
                                             </Tooltip>
                                         </TableCell>

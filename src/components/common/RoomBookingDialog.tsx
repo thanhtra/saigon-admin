@@ -114,7 +114,7 @@ export default function RoomBookingDialog({
 
     return (
         <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
-            <DialogTitle fontWeight={600}>Thêm lịch xem phòng</DialogTitle>
+            <DialogTitle fontWeight={500}>Thêm lịch xem phòng</DialogTitle>
 
             <DialogContent dividers sx={formGridStyles.twoColumnGrid}>
                 <FormAutocomplete

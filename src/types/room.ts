@@ -2,6 +2,7 @@ import { BaseEntity } from './base.type';
 import { RoomStatus, RentalAmenity } from '@/common/enum';
 import { Upload, UploadPreview } from './upload';
 import { Rental } from './rental';
+import { Collaborator } from './collaborator';
 
 export type Room = BaseEntity & {
     title: string;
@@ -37,6 +38,8 @@ export type Room = BaseEntity & {
     rental?: Rental;
 
     video_url?: string;
+
+    ctv_collaborator?: Collaborator;
 };
 
 
@@ -83,4 +86,5 @@ export type RoomForm = {
     delete_upload_ids?: string[];
     video_url?: string;
     cover_upload_id?: string;
+    ctv_collaborator_id?: string;
 }

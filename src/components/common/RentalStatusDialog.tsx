@@ -57,7 +57,7 @@ const RentalStatusDialog: React.FC<RentalStatusDialogProps> = ({
             maxWidth="xs"
             fullWidth
         >
-            <DialogTitle fontWeight={600}>
+            <DialogTitle fontWeight={500}>
                 Cập nhật trạng thái nhà
             </DialogTitle>
 

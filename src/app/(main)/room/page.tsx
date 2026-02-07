@@ -8,7 +8,6 @@ import {
     Button,
     CircularProgress,
     IconButton,
-    MenuItem,
     Pagination,
     Paper,
     Table,
@@ -16,8 +15,7 @@ import {
     TableCell,
     TableHead,
     TableRow,
-    TextField,
-    Tooltip,
+    Tooltip
 } from '@mui/material';
 
 import CancelIcon from '@mui/icons-material/Cancel';
@@ -31,21 +29,35 @@ import RoomBookingDialog from '@/components/common/RoomBookingDialog';
 import RoomStatusDialog from '@/components/common/RoomStatusDialog';
 import RoomStatusTag from '@/components/common/RoomStatusTag';
 import ConfirmDialog from '@/components/ConfirmDialog';
-import { CardItem, HeaderRow, TitleMain } from '@/styles/common';
+import { CardItem, HeaderRowFilter, TitleMain } from '@/styles/common';
 
 import useDeleteRoom from '@/hooks/Room/useDeleteRoom';
 import useGetRooms from '@/hooks/Room/useGetRooms';
 import useUpdateRoom from '@/hooks/Room/useUpdateRoom';
 
 import { ErrorMessage, RentalTypeLabels } from '@/common/const';
-import { RentalStatus, RentalType, RoomStatus } from '@/common/enum';
+import { CollaboratorType, FieldCooperation, RentalStatus, RentalType, RoomStatus } from '@/common/enum';
 import { getErrorMessage, RoomErrorCode } from '@/common/error';
 import { RentalTypeOptions, RoomStatusOptions } from '@/common/option';
-import { formatArea, formatVnd, truncate } from '@/common/service';
+import { formatVnd, truncate } from '@/common/service';
 
-import type { Room } from '@/types/room';
-import { TruncateWithTooltip } from '@/components/TruncateWithTooltip';
 import RentalStatusTag from '@/components/common/RentalStatusTag';
+import { TruncateWithTooltip } from '@/components/TruncateWithTooltip';
+import type { Room } from '@/types/room';
+
+import { Option } from '@/common/type';
+import FormAutocomplete from '@/components/FormAutocomplete';
+import FormTextField from '@/components/FormTextField';
+import useGetCollaboratorsCtv from '@/hooks/Collaborator/useGetCollaboratorsCtv';
+import { useForm } from 'react-hook-form';
+
+type RoomFilterForm = {
+    key_search?: string;
+    rental_type?: RentalType | '';
+    status?: RoomStatus | '';
+    ctv_collaborator_id?: string;
+};
+
 
 export default function RoomPage() {
     const router = useRouter();
@@ -53,12 +65,9 @@ export default function RoomPage() {
     const { getRooms } = useGetRooms();
     const { deleteRoom } = useDeleteRoom();
     const { updateRoom } = useUpdateRoom();
+    const { getCollaboratorsCtv } = useGetCollaboratorsCtv();
 
-    /* ================= STATE ================= */
     const [rooms, setRooms] = useState<Room[]>([]);
-    const [keySearch, setKeySearch] = useState<string>('');
-    const [rentalType, setRentalType] = useState<RentalType | ''>('');
-    const [status, setStatus] = useState<RoomStatus | ''>('');
 
     const [page, setPage] = useState<number>(1);
     const [totalPages, setTotalPages] = useState<number>(1);
@@ -73,37 +82,64 @@ export default function RoomPage() {
 
     const [selectedRoomForBooking, setSelectedRoomForBooking] = useState<Room | null>(null);
     const [openBookingDialog, setOpenBookingDialog] = useState<boolean>(false);
+    const [collaboratorOptions, setCollaboratorOptions] = useState<Option[]>([]);
+    const [filters, setFilters] = useState<RoomFilterForm>({});
 
-    /* ================= FETCH ================= */
+    const {
+        control,
+        handleSubmit,
+        reset,
+    } = useForm<RoomFilterForm>({
+        defaultValues: {
+            key_search: '',
+            rental_type: '',
+            status: '',
+            ctv_collaborator_id: '',
+        },
+    });
+
     const fetchData = useCallback(async () => {
         setLoading(true);
-
         try {
             const res = await getRooms({
-                key_search: keySearch || undefined,
                 page,
                 size: 10,
-                rental_type: rentalType || undefined,
-                status: status || undefined,
+                key_search: filters.key_search || undefined,
+                rental_type: filters.rental_type || undefined,
+                status: filters.status || undefined,
+                ctv_collaborator_id: filters.ctv_collaborator_id || undefined,
             });
 
             if (res?.success) {
                 setRooms(res.result.data);
                 setTotalPages(res.result.meta.pageCount);
-            } else {
-                setRooms([]);
-                setTotalPages(1);
             }
-        } catch {
-            toast.error(ErrorMessage.SYSTEM);
         } finally {
             setLoading(false);
         }
-    }, [getRooms, keySearch, page, rentalType, status]);
+    }, [getRooms, filters, page]);
 
     useEffect(() => {
         fetchData();
     }, [fetchData]);
+
+    useEffect(() => {
+        (async () => {
+            const res = await getCollaboratorsCtv({
+                type: CollaboratorType.Broker,
+                field_cooperation: FieldCooperation.Rental,
+            });
+
+            if (res?.success) {
+                setCollaboratorOptions(
+                    res.result.map((c: any) => ({
+                        label: `${c.name} - ${c.phone}`,
+                        value: c.id,
+                    })),
+                );
+            }
+        })();
+    }, [getCollaboratorsCtv]);
 
     const handleDelete = async () => {
         if (!roomToDelete?.id) return;
@@ -151,73 +187,96 @@ export default function RoomPage() {
         }
     };
 
+    const onSearch = (data: RoomFilterForm) => {
+        setPage(1);
+        setFilters({
+            key_search: data.key_search || undefined,
+            rental_type: data.rental_type || undefined,
+            status: data.status || undefined,
+            ctv_collaborator_id: data.ctv_collaborator_id || undefined,
+        });
+    };
+
+    const onReset = () => {
+        reset({
+            key_search: '',
+            rental_type: '',
+            status: '',
+            ctv_collaborator_id: '',
+        });
+
+        setPage(1);
+        setFilters({});
+    };
+
 
     return (
         <>
             <TitleMain>Danh sách phòng</TitleMain>
 
             <CardItem>
-                <HeaderRow>
-                    {/* FILTERS */}
-                    <div className="header-filters">
-                        <TextField
-                            size="small"
-                            label="Tìm kiếm theo SĐT người đăng"
-                            value={keySearch}
-                            onChange={(e) => {
-                                setPage(1);
-                                setKeySearch(e.target.value);
-                            }}
-                            sx={{ minWidth: 320 }}
-                        />
+                <HeaderRowFilter>
+                    <form onSubmit={handleSubmit(onSearch)} className="filter-form">
+                        <div className="filter-bar">
 
-                        <TextField
-                            select
-                            size="small"
-                            label="Loại hình"
-                            value={rentalType}
-                            onChange={(e) => {
-                                setPage(1);
-                                setRentalType(e.target.value as RentalType | '');
-                            }}
-                            sx={{ minWidth: 180 }}
-                        >
-                            {RentalTypeOptions.map((opt) => (
-                                <MenuItem key={opt.value || 'all'} value={opt.value}>
-                                    {opt.label}
-                                </MenuItem>
-                            ))}
-                        </TextField>
+                            <div className="filter-inputs">
+                                <FormTextField
+                                    name="key_search"
+                                    control={control}
+                                    size="small"
+                                    label="SĐT người đăng"
+                                />
 
-                        <TextField
-                            select
-                            size="small"
-                            label="Trạng thái"
-                            value={status}
-                            onChange={(e) => {
-                                setPage(1);
-                                setStatus(e.target.value as RoomStatus | '');
-                            }}
-                            sx={{ minWidth: 180 }}
-                        >
-                            {RoomStatusOptions.map((opt) => (
-                                <MenuItem key={opt.value || 'all'} value={opt.value}>
-                                    {opt.label}
-                                </MenuItem>
-                            ))}
-                        </TextField>
-                    </div>
+                                <FormTextField
+                                    name="rental_type"
+                                    control={control}
+                                    size="small"
+                                    label="Loại hình"
+                                    options={RentalTypeOptions}
+                                />
 
-                    {/* ACTIONS */}
+                                <FormTextField
+                                    name="status"
+                                    control={control}
+                                    size="small"
+                                    label="Trạng thái"
+                                    options={RoomStatusOptions}
+                                />
+
+                                <FormAutocomplete
+                                    name="ctv_collaborator_id"
+                                    control={control}
+                                    size="small"
+                                    label="Cộng tác viên"
+                                    options={[
+                                        { label: 'Tất cả CTV', value: '' },
+                                        ...collaboratorOptions,
+                                    ]}
+                                />
+                            </div>
+
+                            <div className="filter-actions">
+                                <Button type="submit" variant="contained" size="small">
+                                    Tìm kiếm
+                                </Button>
+                                <Button variant="outlined" size="small" onClick={onReset}>
+                                    Đặt lại
+                                </Button>
+                            </div>
+
+                        </div>
+                    </form>
+
                     <div className="header-actions">
                         <Button
                             variant="contained"
                             onClick={() => router.push('/room/create')}
                         >
-                            + Thêm phòng
+                            Thêm
                         </Button>
                     </div>
-                </HeaderRow>
+                </HeaderRowFilter>
+
 
 
                 <Paper sx={{ overflowX: 'auto' }}>
@@ -226,14 +285,15 @@ export default function RoomPage() {
                     }}>
                         <TableHead sx={{ backgroundColor: '#f5f5f5' }}>
                             <TableRow>
-                                <TableCell align="left"><strong>Trạng thái phòng</strong></TableCell>
+                                <TableCell align="left"><strong>TT phòng</strong></TableCell>
                                 <TableCell sx={{ minWidth: "240px" }}><strong>Địa chỉ nhà</strong></TableCell>
                                 <TableCell><strong>Người đăng</strong></TableCell>
                                 <TableCell><strong>Chủ nhà</strong></TableCell>
-                                <TableCell><strong>Trạng thái nhà</strong></TableCell>
+                                <TableCell><strong>Nguồn CTV</strong></TableCell>
+                                <TableCell><strong>TT nhà</strong></TableCell>
                                 <TableCell sx={{ minWidth: "240px" }}><strong>Hoa hồng</strong></TableCell>
                                 <TableCell><strong>Mã phòng</strong></TableCell>
-                                <TableCell sx={{ minWidth: "80px" }}><strong>Loại phòng</strong></TableCell>
+                                <TableCell sx={{ minWidth: "200px" }}><strong>Loại phòng</strong></TableCell>
                                 <TableCell><strong>Tiêu đề</strong></TableCell>
                                 <TableCell><strong>Giá</strong></TableCell>
                                 <TableCell align="center"><strong>Kích hoạt</strong></TableCell>
@@ -266,6 +326,7 @@ export default function RoomPage() {
                                         </TableCell>
                                         <TableCell>{r.rental?.createdBy?.phone} - {r.rental?.createdBy?.name}</TableCell>
                                         <TableCell>{r.rental?.collaborator?.user?.phone} - {r.rental?.collaborator?.user?.name}</TableCell>
+                                        <TableCell>{r.ctv_collaborator?.user?.phone} - {r.ctv_collaborator?.user?.name}</TableCell>
                                         <TableCell align="center">
                                             <RentalStatusTag
                                                 status={r.rental?.status as RentalStatus}
@@ -283,6 +344,7 @@ export default function RoomPage() {
                                         <TableCell align="center">
                                             <Tooltip
                                                 title={r.active ? 'Đang hoạt động' : 'Tạm ẩn'}
+                                                placement="top"
                                             >
                                                 {r.active ? (
                                                     <CheckCircleIcon
@@ -298,7 +360,7 @@ export default function RoomPage() {
                                             </Tooltip>
                                         </TableCell>
                                         <TableCell align="center" sx={{ minWidth: "150px" }}>
-                                            <Tooltip title="Thêm lịch xem">
+                                            <Tooltip title="Thêm lịch xem" placement="top">
                                                 <IconButton
                                                     size="small"
                                                     color="primary"
@@ -315,6 +377,7 @@ export default function RoomPage() {
                                                 onClick={() =>
                                                     router.push(`/room/${r.id}/edit`)
                                                 }
+                                                sx={{ margin: "0px 5px" }}
                                             >
                                                 <EditIcon fontSize="small" />
                                             </IconButton>

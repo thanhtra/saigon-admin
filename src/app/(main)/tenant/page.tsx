@@ -144,7 +144,19 @@ export default function TenantsPage() {
                                 tenants.map((tenant) => (
                                     <TableRow key={tenant.id} hover>
                                         <TableCell>{tenant.user?.name}</TableCell>
-                                        <TableCell>{tenant.user?.phone}</TableCell>
+                                        <TableCell>
+                                            <Tooltip title="Sao chép số điện thoại" placement="top">
+                                                <span
+                                                    onClick={() => {
+                                                        navigator.clipboard.writeText(tenant.user?.phone);
+                                                        toast.success('Đã sao chép');
+                                                    }}
+                                                    style={{ cursor: 'pointer', marginRight: 4 }}
+                                                >
+                                                    {tenant.user?.phone}
+                                                </span>
+                                            </Tooltip>
+                                        </TableCell>
 
                                         <TableCell>
                                             {tenant.user?.link_facebook ? (
@@ -165,7 +177,7 @@ export default function TenantsPage() {
                                         <TableCell>{tenant.note || '-'}</TableCell>
 
                                         <TableCell align="center">
-                                            <Tooltip title={tenant.user?.active ? 'Đang hoạt động' : 'Không hoạt động'}>
+                                            <Tooltip title={tenant.user?.active ? 'Đang hoạt động' : 'Không hoạt động'} placement="top">
                                                 {tenant?.active ? (
                                                     <CheckCircleIcon color="success" fontSize="small" />
                                                 ) : (

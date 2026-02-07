@@ -30,15 +30,6 @@ export const Note = styled(Typography)(() => ({
     marginBottom: "20px",
 }));
 
-
-// export const HeaderRow = styled('div')({
-//     display: 'flex',
-//     justifyContent: 'space-between',
-//     alignItems: 'flex',
-//     marginBottom: '16px',
-//     width: '100%'
-// });
-
 export const HeaderRow = styled('div')(({ theme }) => ({
     display: 'flex',
     alignItems: 'center',
@@ -66,6 +57,98 @@ export const HeaderRow = styled('div')(({ theme }) => ({
         alignItems: 'center',
         gap: 8,
         whiteSpace: 'nowrap',
+    },
+}));
+
+export const HeaderRowFilter = styled('div')(({ theme }) => ({
+    display: 'flex',
+    alignItems: 'flex-start',
+    justifyContent: 'space-between',
+    gap: 16,
+    width: '100%',
+    marginBottom: 20,
+
+    /* ================= FILTER FORM ================= */
+    '& .filter-form': {
+        flex: 1,
+    },
+
+    '& .filter-bar': {
+        display: 'flex',
+        alignItems: 'center',
+        gap: 16,
+        padding: '5px 10px',
+        borderRadius: 12,
+        backgroundColor: theme.palette.background.paper,
+        border: `1px solid ${theme.palette.divider}`,
+        boxShadow: '0 1px 2px rgba(0,0,0,0.04)',
+    },
+
+    '& .filter-inputs': {
+        display: 'grid',
+        gridTemplateColumns: 'repeat(4, minmax(180px, 1fr))',
+        gap: 14,
+        flex: 1,
+    },
+
+    /* Action buttons */
+    '& .filter-actions': {
+        display: 'flex',
+        alignItems: 'center',
+        gap: 10,
+        paddingLeft: 4,
+        whiteSpace: 'nowrap',
+
+        '& .MuiButton-root': {
+            height: 36,
+            minWidth: 96,
+            fontWeight: 500,
+        },
+    },
+
+    /* ================= RIGHT ACTION ================= */
+    '& .header-actions': {
+        display: 'flex',
+        alignItems: 'center',
+
+        '& .MuiButton-root': {
+            height: 40,
+            padding: '0 18px',
+            fontWeight: 600,
+            borderRadius: 10,
+        },
+    },
+
+    /* ================= RESPONSIVE ================= */
+
+    /* Laptop nhỏ */
+    [theme.breakpoints.down('lg')]: {
+        '& .filter-bar': {
+            flexWrap: 'wrap',
+        },
+
+        '& .filter-inputs': {
+            gridTemplateColumns: 'repeat(2, 1fr)',
+        },
+
+        '& .filter-actions': {
+            width: '100%',
+            justifyContent: 'flex-end',
+        },
+    },
+
+    /* Mobile */
+    [theme.breakpoints.down('sm')]: {
+        flexDirection: 'column',
+        gap: 12,
+
+        '& .filter-inputs': {
+            gridTemplateColumns: '1fr',
+        },
+
+        '& .header-actions': {
+            justifyContent: 'flex-end',
+        },
     },
 }));
 

@@ -66,7 +66,7 @@ const Navbar: React.FC<NavbarProps> = ({ onToggleSidebar }) => {
                             </IconButton>
                         )}
 
-                        <Typography fontSize={16} fontWeight={600}>
+                        <Typography fontSize={16} fontWeight={500}>
                             YYY
                         </Typography>
                     </Box>
@@ -128,7 +128,7 @@ const Navbar: React.FC<NavbarProps> = ({ onToggleSidebar }) => {
                 onClose={() => setOpenLogoutDialog(false)}
                 PaperProps={{ sx: { borderRadius: 2 } }}
             >
-                <DialogTitle fontSize={16} fontWeight={600}>
+                <DialogTitle fontSize={16} fontWeight={500}>
                     Đăng xuất
                 </DialogTitle>
 

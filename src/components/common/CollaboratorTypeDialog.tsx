@@ -49,7 +49,7 @@ const CollaboratorTypeDialog: React.FC<Props> = ({
 
     return (
         <Dialog open={open} onClose={handleClose} maxWidth="xs" fullWidth>
-            <DialogTitle fontWeight={600}>
+            <DialogTitle fontWeight={500}>
                 Cập nhật loại cộng tác viên
             </DialogTitle>
 

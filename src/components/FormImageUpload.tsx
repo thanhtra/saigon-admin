@@ -111,7 +111,7 @@ export default function FormImageUpload({
                                 gap: 0.5,
                             }}
                         >
-                            <Tooltip title="Xoá">
+                            <Tooltip title="Xoá" placement="top">
                                 <IconButton
                                     size="small"
                                     color="error"

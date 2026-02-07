@@ -43,7 +43,7 @@ export default function RoomInfoDialog({
 
     return (
         <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
-            <DialogTitle fontWeight={600}>
+            <DialogTitle fontWeight={500}>
                 {room.title}
                 <Typography variant="body2" color="text.secondary">
                     Mã phòng: {room.room_code}
@@ -113,7 +113,7 @@ export default function RoomInfoDialog({
                         <Stack spacing={0.5}>
                             <Typography
                                 variant="body2"
-                                fontWeight={600}
+                                fontWeight={500}
                             >
                                 Mô tả
                             </Typography>
@@ -128,7 +128,7 @@ export default function RoomInfoDialog({
                         <Stack spacing={1}>
                             <Typography
                                 variant="body2"
-                                fontWeight={600}
+                                fontWeight={500}
                             >
                                 Tiện ích
                             </Typography>

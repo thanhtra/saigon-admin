@@ -1,6 +1,6 @@
 import React from 'react';
 import { Controller, Control } from 'react-hook-form';
-import { FormControlLabel } from '@mui/material';
+import { FormControlLabel, SxProps, Theme } from '@mui/material';
 import { IOSSwitch } from '@/styles/common';
 
 type FormSwitchProps = {
@@ -8,7 +8,7 @@ type FormSwitchProps = {
     control: Control<any>;
     label?: string;
     labelPlacement?: 'end' | 'start' | 'top' | 'bottom';
-    sx?: any;
+    sx?: SxProps<Theme>;
     defaultChecked?: boolean;
 };
 

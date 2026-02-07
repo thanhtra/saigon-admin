@@ -57,7 +57,7 @@ const FieldCooperationDialog: React.FC<FieldCooperationDialogProps> = ({
             maxWidth="xs"
             fullWidth
         >
-            <DialogTitle fontWeight={600}>
+            <DialogTitle fontWeight={500}>
                 Cập nhật lĩnh vực hợp tác
             </DialogTitle>
 

@@ -1,26 +1,30 @@
 'use client';
 
 import {
-    Dialog,
-    DialogTitle,
-    DialogContent,
-    DialogActions,
-    Button,
     Box,
+    Button,
+    Checkbox,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogTitle,
+    FormControlLabel,
+    Typography,
 } from '@mui/material';
 import { useEffect } from 'react';
-import { useForm } from 'react-hook-form';
+import { Controller, useForm, useWatch } from 'react-hook-form';
 import { toast } from 'react-toastify';
 
-import { Booking } from '@/types/booking';
-import { BookingStatus } from '@/common/enum';
 import { BookingStatusAdminLabels, ErrorMessage } from '@/common/const';
+import { BookingStatus } from '@/common/enum';
+import { Booking } from '@/types/booking';
 
-import FormTextField from '@/components/FormTextField';
+import { toDatetimeLocal } from '@/common/time.service';
 import FormAutocomplete from '@/components/FormAutocomplete';
+import FormTextField from '@/components/FormTextField';
 import useUpdateBooking from '@/hooks/Booking/useUpdateBooking';
-import { isAtLeastMinutesLater, toDatetimeLocal } from '@/common/time.service';
 import { formGridStyles } from '@/styles/formGrid';
+
 
 type Props = {
     open: boolean;
@@ -33,10 +37,11 @@ type BookingEditForm = {
     customer_name: string;
     customer_phone: string;
     referrer_phone?: string | undefined;
-    viewing_at: string; // datetime-local
+    viewing_at: string;
     customer_note?: string;
     admin_note?: string;
     status: BookingStatus;
+    is_paid_commission?: boolean;
 };
 
 export default function BookingEditDialog({
@@ -54,6 +59,11 @@ export default function BookingEditDialog({
         formState: { isSubmitting },
     } = useForm<BookingEditForm>();
 
+    const status = useWatch({
+        control,
+        name: 'status',
+    });
+
     useEffect(() => {
         if (booking) {
             reset({
@@ -63,7 +73,8 @@ export default function BookingEditDialog({
                 customer_note: booking.customer_note || '',
                 admin_note: booking.admin_note || '',
                 status: booking.status,
-                ...(booking.referrer_phone && { referrer_phone: booking.referrer_phone })
+                is_paid_commission: booking.is_paid_commission ?? false,
+                referrer_phone: booking.referrer_phone ?? ""
             });
         }
     }, [booking, reset]);
@@ -71,10 +82,13 @@ export default function BookingEditDialog({
     const onSubmit = async (data: BookingEditForm) => {
         if (!booking?.id) return;
 
+        const { is_paid_commission, ...payload } = data;
+
         try {
             const res = await updateBooking(booking.id, {
-                ...data,
-                viewing_at: data.viewing_at, // ✅ local VN string
+                ...payload,
+                ...(is_paid_commission !== undefined && { is_paid_commission: !!is_paid_commission }),
+                viewing_at: data.viewing_at,
             });
 
             if (!res?.success) {
@@ -121,9 +135,6 @@ export default function BookingEditDialog({
                     label="Thời gian xem"
                     type="datetime-local"
                     required
-                    rules={{
-                        validate: (value) => isAtLeastMinutesLater(value, 10),
-                    }}
                 />
 
                 <FormTextField
@@ -157,7 +168,29 @@ export default function BookingEditDialog({
                     )}
                 />
 
+                {status === BookingStatus.MovedIn && booking?.referrer_phone && (
+                    <Box>
+                        <Controller
+                            name="is_paid_commission"
+                            control={control}
+                            render={({ field }) => (
+                                <FormControlLabel
+                                    control={
+                                        <Checkbox
+                                            {...field}
+                                            checked={!!field.value}
+                                        />
+                                    }
+                                    label="Đã chi trả hoa hồng cho CTV"
+                                />
+                            )}
+                        />
 
+                        <Typography variant="caption" color="text.secondary">
+                            Chỉ áp dụng khi khách đã vào ở
+                        </Typography>
+                    </Box>
+                )}
             </DialogContent>
 
             <DialogActions>

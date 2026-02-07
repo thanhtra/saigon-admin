@@ -50,7 +50,7 @@ const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
             maxWidth="xs"
             fullWidth
         >
-            <DialogTitle fontWeight={600}>{title}</DialogTitle>
+            <DialogTitle fontWeight={500}>{title}</DialogTitle>
 
             <DialogContent>
                 <DialogContentText>{description}</DialogContentText>

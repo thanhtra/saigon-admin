@@ -20,6 +20,14 @@ export const BookingStatusTagStyles: Record<
         color: '#389E0D',      // green-7
         background: '#F6FFED', // green-1
     },
+    [BookingStatus.Deposited]: {
+        color: '#531DAB',      // purple-7
+        background: '#F9F0FF', // purple-1
+    },
+    [BookingStatus.MovedIn]: {
+        color: '#08979C',      // cyan-7
+        background: '#E6FFFB', // cyan-1
+    },
     [BookingStatus.Cancelled]: {
         color: '#CF1322',      // red-7
         background: '#FFF1F0', // red-1

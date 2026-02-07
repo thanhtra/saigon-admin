@@ -20,11 +20,15 @@ import FormTextField from '@/components/FormTextField';
 import { ErrorMessage, RoomStatusLabels } from '@/common/const';
 import { formGridStyles } from '@/styles/formGrid';
 
+import { CollaboratorType, FieldCooperation } from '@/common/enum';
+import { normalizeImagesPayload } from '@/common/page.service';
+import { resolveUploadUrl } from '@/common/service';
+import { Option } from '@/common/type';
+import FormAutocomplete from '@/components/FormAutocomplete';
+import useGetCollaboratorsCtv from '@/hooks/Collaborator/useGetCollaboratorsCtv';
 import useGetRoomDetail from '@/hooks/Room/useGetRoomDetail';
 import useUpdateRoom from '@/hooks/Room/useUpdateRoom';
 import useUploadImages from '@/hooks/Upload/uploadImages';
-import { resolveUploadUrl } from '@/common/service';
-import { normalizeImagesPayload } from '@/common/page.service';
 import { RoomForm, UploadPreview } from '@/types';
 
 
@@ -35,10 +39,12 @@ export default function EditRoomPage() {
     const { getRoomDetail } = useGetRoomDetail();
     const { updateRoom } = useUpdateRoom();
     const { uploadImages } = useUploadImages();
+    const { getCollaboratorsCtv } = useGetCollaboratorsCtv();
 
     const [loading, setLoading] = useState(false);
     const [pageLoading, setPageLoading] = useState(true);
     const [originalUploadIds, setOriginalUploadIds] = useState<string[]>([]);
+    const [collaboratorOptions, setCollaboratorOptions] = useState<Option[]>([]);
 
     const { control, handleSubmit, reset } = useForm<RoomForm>({
         shouldUnregister: false,
@@ -47,6 +53,24 @@ export default function EditRoomPage() {
             active: true,
         },
     });
+
+    useEffect(() => {
+        (async () => {
+            const res = await getCollaboratorsCtv({
+                type: CollaboratorType.Broker,
+                field_cooperation: FieldCooperation.Rental,
+            });
+
+            if (res?.success) {
+                setCollaboratorOptions(
+                    res.result.map((c: any) => ({
+                        label: `${c.name} - ${c.phone}`,
+                        value: c.id,
+                    })),
+                );
+            }
+        })();
+    }, [getCollaboratorsCtv]);
 
     useEffect(() => {
         if (!id) return;
@@ -79,6 +103,7 @@ export default function EditRoomPage() {
                 description: room.description ?? '',
                 active: room.active,
                 video_url: room.video_url,
+                ctv_collaborator_id: room.ctv_collaborator_id,
 
                 images: uploads.map((u: any, idx: number) => ({
                     id: u.id,
@@ -91,7 +116,6 @@ export default function EditRoomPage() {
             setPageLoading(false);
         })();
     }, [id, getRoomDetail, reset, router]);
-
 
     const onSubmit: SubmitHandler<RoomForm> = async (data) => {
         setLoading(true);
@@ -110,7 +134,8 @@ export default function EditRoomPage() {
                 amenities: data.amenities,
                 description: data.description,
                 active: data.active,
-                video_url: data.video_url
+                video_url: data.video_url,
+                ctv_collaborator_id: data.ctv_collaborator_id
             });
 
             if (!updateRes?.success) {
@@ -269,6 +294,17 @@ export default function EditRoomPage() {
 
                     <Box sx={formGridStyles.actionRow}>
                         <Box sx={formGridStyles.actionLeft}>
+                            <FormAutocomplete
+                                name="ctv_collaborator_id"
+                                control={control}
+                                label="Cộng tác viên"
+                                options={[
+                                    { label: '-- Chọn cộng tác viên --', value: '' },
+                                    ...collaboratorOptions,
+                                ]}
+                                sx={{ width: "50%" }}
+                            />
+
                             <FormTextField
                                 name="status"
                                 control={control}
@@ -280,6 +316,7 @@ export default function EditRoomPage() {
                                     }),
                                 )}
                                 required
+                                sx={{ width: "50%" }}
                             />
                         </Box>
 

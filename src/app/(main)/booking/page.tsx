@@ -2,12 +2,9 @@
 
 import ConfirmDialog from '@/components/ConfirmDialog';
 import PaginationWrapper from '@/components/common/PaginationWrapper';
-
 import { CardItem, HeaderRow, TitleMain } from '@/styles/common';
-
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
-
 import {
     CircularProgress,
     IconButton,
@@ -19,11 +16,13 @@ import {
     TableHead,
     TableRow,
     TextField,
+    Tooltip,
     Typography
 } from '@mui/material';
 
 import { ErrorMessage } from '@/common/const';
 import { BookingStatus } from '@/common/enum';
+import { formatVnd } from '@/common/service';
 import { formatDateTimeVN } from '@/common/time.service';
 import BookingStatusDialog from '@/components/common/BookingStatusDialog';
 import BookingStatusTag from '@/components/common/BookingStatusTag';
@@ -31,11 +30,62 @@ import RoomInfoDialog from '@/components/common/RoomInfoDialog.tsx';
 import useDeleteBooking from '@/hooks/Booking/useDeleteBooking';
 import useGetBookings from '@/hooks/Booking/useGetBookings';
 import useUpdateBooking from '@/hooks/Booking/useUpdateBooking';
+import { Room } from '@/types';
 import { Booking } from '@/types/booking';
 import { useCallback, useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import BookingEditDialog from './components/BookingEditDialog';
-import { Room } from '@/types';
+
+
+export const calculateCommission = (price: number): number => {
+    if (!price || price <= 0) return 0;
+
+    if (price <= 2_500_000) return 300_000;
+    if (price <= 4_000_000) return 500_000;
+    if (price <= 5_000_000) return 750_000;
+    if (price <= 6_000_000) return 1_000_000;
+    if (price <= 7_000_000) return 1_250_000;
+    if (price <= 8_000_000) return 1_500_000;
+    if (price <= 9_000_000) return 1_750_000;
+    if (price <= 10_000_000) return 2_000_000;
+    if (price <= 11_000_000) return 2_250_000;
+
+    // > 11tr
+    const extraMillion = Math.ceil((price - 11_000_000) / 1_000_000);
+    return 2_250_000 + extraMillion * 250_000;
+};
+
+export const calculateSourceCommission = (customerCommission: number): number => {
+    if (!customerCommission || customerCommission <= 0) return 0;
+    return Math.round(customerCommission * 0.5);
+};
+
+const getCustomerCommission = (booking: Booking) => {
+    if (
+        booking.status !== BookingStatus.MovedIn ||
+        !booking.referrer_phone ||
+        !booking.room?.price
+    ) {
+        return null;
+    }
+
+    return calculateCommission(Number(booking.room.price));
+};
+
+
+const getSourceCommission = (booking: Booking) => {
+    if (
+        booking.status !== BookingStatus.MovedIn ||
+        !booking.room?.ctv_collaborator ||
+        !booking.room?.price
+    ) {
+        return null;
+    }
+
+    const customerCommission = calculateCommission(Number(booking.room.price));
+    return calculateSourceCommission(customerCommission);
+};
+
 
 export default function BookingsPage() {
     const { getBookings } = useGetBookings();
@@ -57,8 +107,6 @@ export default function BookingsPage() {
 
     const [openEdit, setOpenEdit] = useState(false);
     const [bookingToEdit, setBookingToEdit] = useState<Booking | null>(null);
-
-
 
     const [openConfirm, setOpenConfirm] = useState(false);
     const [bookingToDelete, setBookingToDelete] =
@@ -160,12 +208,17 @@ export default function BookingsPage() {
                         <TableHead sx={{ backgroundColor: '#f5f5f5' }}>
                             <TableRow>
                                 <TableCell><strong>Khách hàng</strong></TableCell>
-                                <TableCell><strong>SĐT</strong></TableCell>
-                                <TableCell><strong>Người giới thiệu</strong></TableCell>
-                                <TableCell><strong>Thời gian xem</strong></TableCell>
+                                <TableCell><strong>SĐT khách</strong></TableCell>
+                                <TableCell><strong>CTV khách</strong></TableCell>
+                                <TableCell align="center" sx={{ minWidth: "120px" }}><strong>HH CTV khách</strong></TableCell>
+                                <TableCell><strong>CTV nguồn</strong></TableCell>
+                                <TableCell align="center" sx={{ minWidth: "120px" }}><strong>HH CTV nguồn</strong></TableCell>
+                                <TableCell align="center" sx={{ minWidth: "120px" }}><strong>Đã chi HH</strong></TableCell>
+                                <TableCell sx={{ minWidth: "120px" }}><strong>Thời gian xem</strong></TableCell>
                                 <TableCell align="center"><strong>Trạng thái</strong></TableCell>
-                                <TableCell><strong>Phòng</strong></TableCell>
-                                <TableCell align="center"><strong>Hành động</strong></TableCell>
+                                <TableCell sx={{ minWidth: "120px" }}><strong>Giá phòng</strong></TableCell>
+                                <TableCell sx={{ minWidth: "200px" }}><strong>Phòng</strong></TableCell>
+                                <TableCell align="center" sx={{ minWidth: "100px" }}><strong>Hành động</strong></TableCell>
                             </TableRow>
                         </TableHead>
 
@@ -180,8 +233,93 @@ export default function BookingsPage() {
                                 bookings.map((booking) => (
                                     <TableRow key={booking.id} hover>
                                         <TableCell>{booking.customer_name}</TableCell>
-                                        <TableCell>{booking.customer_phone}</TableCell>
-                                        <TableCell>{booking.referrer_phone || '-'}</TableCell>
+                                        <TableCell>
+                                            <Tooltip title="Sao chép số điện thoại" placement="top">
+                                                <span
+                                                    onClick={() => {
+                                                        navigator.clipboard.writeText(booking.customer_phone);
+                                                        toast.success('Đã sao chép');
+                                                    }}
+                                                    style={{ cursor: 'pointer', marginRight: 4 }}
+                                                >
+                                                    {booking.customer_phone}
+                                                </span>
+                                            </Tooltip>
+                                        </TableCell>
+                                        <TableCell>
+                                            <Tooltip title="Sao chép số điện thoại" placement="top">
+                                                <span
+                                                    onClick={() => {
+                                                        if (!booking.referrer_phone) return;
+                                                        navigator.clipboard.writeText(booking.referrer_phone);
+                                                        toast.success('Đã sao chép');
+                                                    }}
+                                                    style={{ cursor: 'pointer', marginRight: 4 }}
+                                                >
+                                                    {booking.referrer_phone}
+                                                </span>
+                                            </Tooltip>
+                                        </TableCell>
+                                        <TableCell align="center">
+                                            {(() => {
+                                                const commission = getCustomerCommission(booking);
+
+                                                if (!commission) {
+                                                    return <Typography variant="caption">—</Typography>;
+                                                }
+
+                                                return (
+                                                    <Typography fontWeight={500}>
+                                                        {formatVnd(commission)}
+                                                    </Typography>
+                                                );
+                                            })()}
+                                        </TableCell>
+
+                                        <TableCell>
+                                            {booking.room?.ctv_collaborator?.user
+                                                ? `${booking.room.ctv_collaborator.user.name} - ${booking.room.ctv_collaborator.user.phone}`
+                                                : '—'}
+                                        </TableCell>
+
+                                        <TableCell align="center">
+                                            {(() => {
+                                                const commission = getSourceCommission(booking);
+
+                                                if (!commission) {
+                                                    return <Typography variant="caption">—</Typography>;
+                                                }
+
+                                                return (
+                                                    <Typography fontWeight={500} color="info.main">
+                                                        {formatVnd(commission)}
+                                                    </Typography>
+                                                );
+                                            })()}
+                                        </TableCell>
+
+                                        <TableCell align="center">
+                                            {(() => {
+                                                const hasAnyCommission =
+                                                    getCustomerCommission(booking) ||
+                                                    getSourceCommission(booking);
+
+                                                if (!hasAnyCommission) {
+                                                    return <Typography variant="caption">—</Typography>;
+                                                }
+
+                                                return booking.is_paid_commission ? (
+                                                    <Typography color="success.main" fontWeight={500}>
+                                                        Đã chi
+                                                    </Typography>
+                                                ) : (
+                                                    <Typography color="warning.main">
+                                                        Chưa chi
+                                                    </Typography>
+                                                );
+                                            })()}
+                                        </TableCell>
+
                                         <TableCell>
                                             {formatDateTimeVN(booking.viewing_at)}
                                         </TableCell>
@@ -195,6 +333,8 @@ export default function BookingsPage() {
                                                 }}
                                             />
                                         </TableCell>
+
+                                        <TableCell>{formatVnd(Number(booking.room.price))}</TableCell>
                                         <TableCell>
                                             <Typography
                                                 sx={{

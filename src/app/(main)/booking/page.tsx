@@ -37,7 +37,7 @@ import { toast } from 'react-toastify';
 import BookingEditDialog from './components/BookingEditDialog';
 
 
-export const calculateCommission = (price: number): number => {
+const calculateCommission = (price: number): number => {
     if (!price || price <= 0) return 0;
 
     if (price <= 2_500_000) return 300_000;
@@ -55,7 +55,7 @@ export const calculateCommission = (price: number): number => {
     return 2_250_000 + extraMillion * 250_000;
 };
 
-export const calculateSourceCommission = (customerCommission: number): number => {
+const calculateSourceCommission = (customerCommission: number): number => {
     if (!customerCommission || customerCommission <= 0) return 0;
     return Math.round(customerCommission * 0.5);
 };
@@ -71,7 +71,6 @@ const getCustomerCommission = (booking: Booking) => {
 
     return calculateCommission(Number(booking.room.price));
 };
-
 
 const getSourceCommission = (booking: Booking) => {
     if (

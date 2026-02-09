@@ -40,6 +40,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                         ['/user', 'Tài khoản'],
                         ['/collaborator', 'Cộng tác'],
                         ['/tenant', 'Khách hàng'],
+                        ['/land', 'Bất động sản'],
                         ['/rental', 'Nhà cho thuê'],
                         ['/room', 'Phòng trọ'],
                         ['/booking', 'Lịch xem phòng'],

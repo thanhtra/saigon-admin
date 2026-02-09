@@ -36,8 +36,8 @@ const useUploadImages = () => {
                     formData.append('room_id', options.room_id);
                 }
 
-                if ('real_estate_id' in options && options.real_estate_id) {
-                    formData.append('real_estate_id', options.real_estate_id);
+                if ('land_id' in options && options.land_id) {
+                    formData.append('land_id', options.land_id);
                 }
 
                 if ('contract_id' in options && options.contract_id) {

@@ -12,6 +12,11 @@ export const formGridStyles = {
         gridTemplateColumns: 'repeat(4, 1fr)',
         gap: 2, // khoảng cách giữa các cột và hàng
     },
+    formTwo: {
+        display: 'grid',
+        gridTemplateColumns: 'repeat(2, 1fr)',
+        gap: 2, // khoảng cách giữa các cột và hàng
+    },
     fullWidthFormFour: {
         gridColumn: 'span 4',
     },

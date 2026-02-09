@@ -39,6 +39,7 @@ import { Controller } from 'react-hook-form';
 import useGetCollaboratorsAvailable from '@/hooks/Collaborator/useGetCollaboratorsAvailable';
 import useUpdateRoom from '@/hooks/Room/useUpdateRoom';
 import { RentalForm, UploadPreview } from '@/types';
+import FormTinyMCE from '@/components/FormTinyMCE';
 
 
 
@@ -517,14 +518,14 @@ export default function CreateRental() {
                                 />
                             </Box>
 
-                            <FormTextField
-                                name="description"
-                                control={control}
-                                label="Mô tả chi tiết"
-                                multiline
-                                rows={10}
-                                sx={formGridStyles.fullWidthFormFour}
-                            />
+                            <Box sx={formGridStyles.fullWidthFormFour}>
+                                <FormTinyMCE
+                                    name="description"
+                                    control={control}
+                                    label="Mô tả chi tiết"
+                                    height={500}
+                                />
+                            </Box>
                         </>
                     }
 

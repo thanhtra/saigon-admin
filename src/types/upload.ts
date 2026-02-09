@@ -5,7 +5,7 @@ import { Contract } from './contract';
 
 
 export type FileType = 'image' | 'video';
-export type Domain = UploadDomain.Rooms | UploadDomain.RealEstates | UploadDomain.Contracts;
+export type Domain = UploadDomain.Rooms | UploadDomain.Lands | UploadDomain.Contracts;
 
 interface BaseUploadOptions {
     // file_type: FileType;
@@ -18,8 +18,8 @@ export interface UploadRoomOptions extends BaseUploadOptions {
 }
 
 export interface UploadRealEstateOptions extends BaseUploadOptions {
-    domain: UploadDomain.RealEstates;
-    real_estate_id: string;
+    domain: UploadDomain.Lands;
+    land_id: string;
 }
 
 export interface UploadContractOptions extends BaseUploadOptions {
@@ -55,7 +55,7 @@ export type Upload = BaseEntity & {
     room?: Room;
 
     /* ===== REAL ESTATE (nếu dùng) ===== */
-    real_estate_id?: string | null;
+    land_id?: string | null;
 
     /* ===== CONTRACT ===== */
     contract_id?: string | null;
@@ -79,4 +79,9 @@ export interface UploadPreview {
 
 export type NormalizedUploadPreview = UploadPreview & {
     isCover: boolean;
+};
+
+export type UploadLandOptions = {
+    domain: UploadDomain.Lands;
+    land_id: string;
 };

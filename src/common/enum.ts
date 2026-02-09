@@ -30,14 +30,11 @@ export enum CustomerType {
 // ---------------------    UPLOAD    --------------------- //
 export enum UploadDomain {
     Rooms = 'rooms',
-    RealEstates = 'real_estates',
+    Lands = 'lands',
     Contracts = 'contracts',
 }
 
-
-
 // ---------------------    RENTAL    --------------------- //
-
 export enum RentalType {
     BoardingHouse = 'boarding_house',   // Dãy trọ (nhiều phòng)
     WholeHouse = 'whole_house',         // Nhà nguyên căn (1 unit)
@@ -140,4 +137,12 @@ export enum RentalAmenity {
 export enum WaterUnit {
     PerM3 = 'per_m3',
     PerPerson = 'per_person'
+}
+
+export enum LandType {
+    Apartment = 'apartment',                 // Chung cư
+    Townhouse = 'townhouse',                  // Nhà phố
+    ProjectHouse = 'project_house',           // Nhà dự án
+    Shophouse = 'shophouse',                  // Shophouse, nhà phố thương mại
+    VillaTownhouse = 'villa_townhouse',       // Biệt thự, liền kề
 }

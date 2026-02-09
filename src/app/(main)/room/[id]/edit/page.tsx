@@ -30,6 +30,7 @@ import useGetRoomDetail from '@/hooks/Room/useGetRoomDetail';
 import useUpdateRoom from '@/hooks/Room/useUpdateRoom';
 import useUploadImages from '@/hooks/Upload/uploadImages';
 import { RoomForm, UploadPreview } from '@/types';
+import FormTinyMCE from '@/components/FormTinyMCE';
 
 
 export default function EditRoomPage() {
@@ -256,14 +257,14 @@ export default function EditRoomPage() {
                         label="Link Video"
                     />
 
-                    <FormTextField
-                        name="description"
-                        control={control}
-                        label="Mô tả chi tiết"
-                        multiline
-                        rows={10}
-                        sx={formGridStyles.fullWidth}
-                    />
+                    <Box sx={formGridStyles.fullWidth}>
+                        <FormTinyMCE
+                            name="description"
+                            control={control}
+                            label="Mô tả chi tiết"
+                            height={500}
+                        />
+                    </Box>
 
                     <Box
                         sx={{

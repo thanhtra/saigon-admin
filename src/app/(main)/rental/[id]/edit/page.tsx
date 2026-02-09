@@ -48,6 +48,7 @@ import useUpdateRoom from '@/hooks/Room/useUpdateRoom';
 import useUploadImages from '@/hooks/Upload/uploadImages';
 import { normalizeImagesPayload } from '@/common/page.service';
 import { RentalForm, UploadPreview } from '@/types';
+import FormTinyMCE from '@/components/FormTinyMCE';
 
 export default function EditRentalPage() {
     const { id } = useParams<{ id: string }>();
@@ -588,14 +589,14 @@ export default function EditRentalPage() {
                                 />
                             </Box>
 
-                            <FormTextField
-                                name="description"
-                                control={control}
-                                label="Mô tả chi tiết"
-                                multiline
-                                rows={10}
-                                sx={formGridStyles.fullWidthFormFour}
-                            />
+                            <Box sx={formGridStyles.fullWidthFormFour}>
+                                <FormTinyMCE
+                                    name="description"
+                                    control={control}
+                                    label="Mô tả chi tiết"
+                                    height={500}
+                                />
+                            </Box>
                         </>
                     }
 

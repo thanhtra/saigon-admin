@@ -1,4 +1,4 @@
-import { BookingStatus, CollaboratorType, FieldCooperation, RentalAmenity, RentalStatus, RentalType, RoomStatus, UserRole, WaterUnit } from "./enum";
+import { BookingStatus, CollaboratorType, FieldCooperation, LandType, RentalAmenity, RentalStatus, RentalType, RoomStatus, UserRole, WaterUnit } from "./enum";
 import { StatusType } from "./type";
 
 
@@ -153,3 +153,10 @@ export const WaterUnitOptions: Record<WaterUnit, string> = {
     [WaterUnit.PerPerson]: 'đ / người',
 };
 
+export const LandTypeLabels: Record<LandType, string> = {
+    [LandType.Apartment]: 'Chung cư',
+    [LandType.Townhouse]: 'Nhà phố',
+    [LandType.ProjectHouse]: 'Nhà dự án',
+    [LandType.Shophouse]: 'Shophouse, nhà phố thương mại',
+    [LandType.VillaTownhouse]: 'Biệt thự, liền kề',
+};

@@ -389,7 +389,14 @@ export default function EditLandPage() {
                     </Box>
 
                     <Box sx={formGridStyles.formTwo}>
-                        <FormTextField name="price" control={control} label="Giá" format="currency" />
+                        <FormTextField
+                            name="price"
+                            control={control}
+                            label="Giá"
+                            type="number"
+                            inputProps={{ min: 1 }}
+                            required
+                        />
                         <FormTextField name="area" control={control} label="Diện tích (m²)" type="number" />
                     </Box>
 

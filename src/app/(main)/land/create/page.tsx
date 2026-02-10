@@ -408,10 +408,10 @@ export default function CreateLandPage() {
                             name="price"
                             control={control}
                             label="Giá"
-                            format="currency"
+                            type="number"
+                            inputProps={{ min: 1 }}
                             required
                         />
-
 
                         <FormTextField
                             name="area"

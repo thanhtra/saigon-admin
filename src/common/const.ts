@@ -1,4 +1,4 @@
-import { BookingStatus, CollaboratorType, FieldCooperation, LandType, RentalAmenity, RentalStatus, RentalType, RoomStatus, UserRole, WaterUnit } from "./enum";
+import { BookingStatus, CollaboratorType, FieldCooperation, FurnitureStatus, HouseDirection, LandAmenity, LandType, LegalStatus, RentalAmenity, RentalStatus, RentalType, RoomStatus, UserRole, WaterUnit } from "./enum";
 import { StatusType } from "./type";
 
 
@@ -159,4 +159,40 @@ export const LandTypeLabels: Record<LandType, string> = {
     [LandType.ProjectHouse]: 'Nhà dự án',
     [LandType.Shophouse]: 'Shophouse, nhà phố thương mại',
     [LandType.VillaTownhouse]: 'Biệt thự, liền kề',
+};
+
+export const LandAmenityOptions: Record<LandAmenity, string> = {
+    [LandAmenity.CarAccessible]: 'Đường ô tô',
+    [LandAmenity.StreetFront]: 'Mặt phố',
+    [LandAmenity.BusinessAllowed]: 'Kinh doanh',
+    [LandAmenity.CashFlow]: 'Dòng tiền',
+    [LandAmenity.Elevator]: 'Thang máy'
+};
+
+export const HouseDirectionOptions: Record<HouseDirection, string> = {
+    [HouseDirection.East]: 'Đông',
+    [HouseDirection.West]: 'Tây',
+    [HouseDirection.South]: 'Nam',
+    [HouseDirection.North]: 'Bắc',
+    [HouseDirection.NorthEast]: 'Đông Bắc',
+    [HouseDirection.NorthWest]: 'Tây Bắc',
+    [HouseDirection.SouthEast]: 'Đông Nam',
+    [HouseDirection.SouthWest]: 'Tây Nam',
+    [HouseDirection.Updating]: 'Đang cập nhật',
+};
+
+export const LegalStatusOptions: Record<LegalStatus, string> = {
+    [LegalStatus.RedBook]: 'Sổ đỏ / Sổ hồng',
+    [LegalStatus.PendingRedBook]: 'Đang chờ sổ',
+    [LegalStatus.Handwritten]: 'Giấy tay',
+    [LegalStatus.SaleContract]: 'Hợp đồng mua bán',
+    [LegalStatus.PlanningPending]: 'Đang chờ pháp lý / Quy hoạch',
+    [LegalStatus.Updating]: 'Đang cập nhật',
+};
+
+export const FurnitureStatusOptions: Record<FurnitureStatus, string> = {
+    [FurnitureStatus.Full]: 'Nội thất đầy đủ',
+    [FurnitureStatus.Basic]: 'Nội thất cơ bản',
+    [FurnitureStatus.None]: 'Không nội thất',
+    [FurnitureStatus.Updating]: 'Đang cập nhật',
 };

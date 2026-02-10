@@ -18,8 +18,8 @@ import FormImageUpload from '@/components/FormImageUpload';
 import FormTextField from '@/components/FormTextField';
 import FormTinyMCE from '@/components/FormTinyMCE';
 
-import { ErrorMessage, GO_VAP_DISTRICT_ID, LandTypeLabels } from '@/common/const';
-import { FieldCooperation, LandType } from '@/common/enum';
+import { ErrorMessage, FurnitureStatusOptions, GO_VAP_DISTRICT_ID, HouseDirectionOptions, LandTypeLabels, LegalStatusOptions } from '@/common/const';
+import { FieldCooperation, FurnitureStatus, HouseDirection, LandType, LegalStatus } from '@/common/enum';
 import { normalizeLandImagesPayload } from '@/common/page.service';
 import {
     buildAddressDetail,
@@ -38,6 +38,7 @@ import useUploadImages from '@/hooks/Upload/uploadImages';
 import { HCM_PROVINCE_ID } from '@/common/const';
 import { LandForm, UploadPreview } from '@/types';
 import useGetCollaboratorsAvailable from '@/hooks/Collaborator/useGetCollaboratorsAvailable';
+import FormLandAmenityCheckbox from '@/components/Land/FormLandAmenityCheckbox';
 
 export default function EditLandPage() {
     const { id } = useParams<{ id: string }>();
@@ -115,7 +116,8 @@ export default function EditLandPage() {
                 price: Number(land.price),
                 area: land.area ?? undefined,
                 structure: land.structure ?? '',
-
+                bedrooms: land.bedrooms,
+                toilets: land.toilets,
                 width_top: land.width_top ?? undefined,
                 width_bottom: land.width_bottom ?? undefined,
                 length_left: land.length_left ?? undefined,
@@ -134,6 +136,11 @@ export default function EditLandPage() {
                 video_url: land.video_url ?? '',
                 daitheky_link: land.daitheky_link ?? '',
                 active: land.active,
+
+                house_direction: land.house_direction,
+                legal_status: land.legal_status,
+                furniture_status: land.furniture_status,
+                amenities: land.amenities,
 
                 images: uploads.map((u: any) => ({
                     id: u.id,
@@ -318,7 +325,7 @@ export default function EditLandPage() {
                             control={control}
                             label="Quận / Huyện"
                             options={districtOptions}
-                            disabled
+                            required
                         />
                     </Box>
 
@@ -328,7 +335,7 @@ export default function EditLandPage() {
                             control={control}
                             label="Phường / Xã"
                             options={wardOptions}
-                            disabled
+                            required
                         />
 
                         <FormTextField
@@ -388,7 +395,22 @@ export default function EditLandPage() {
                         <FormTextField name="length_right" control={control} label="Dài phải" type="number" />
                     </Box>
 
-                    <Box sx={formGridStyles.formTwo}>
+                    <Box sx={formGridStyles.formFour}>
+                        <FormTextField
+                            name="bedrooms"
+                            control={control}
+                            label="Số phòng ngủ"
+                            type="number"
+                            inputProps={{ min: 0 }}
+                        />
+                        <FormTextField
+                            name="toilets"
+                            control={control}
+                            label="Số WC"
+                            type="number"
+                            inputProps={{ min: 0 }}
+                        />
+
                         <FormTextField
                             name="price"
                             control={control}
@@ -418,7 +440,48 @@ export default function EditLandPage() {
                         />
                     </Box>
 
-                    <Box sx={{ gridColumn: 'span 2' }}>
+                    <Box sx={formGridStyles.formTwo}>
+                        <FormTextField
+                            name="house_direction"
+                            control={control}
+                            label="Hướng nhà"
+                            options={Object.entries(HouseDirectionOptions).map(([key, label]) => ({
+                                value: key as HouseDirection,
+                                label,
+                            }))}
+                        />
+
+                        <FormTextField
+                            name="legal_status"
+                            control={control}
+                            label="Pháp lý"
+                            options={Object.entries(LegalStatusOptions).map(([key, label]) => ({
+                                value: key as LegalStatus,
+                                label,
+                            }))}
+                        />
+                    </Box>
+
+                    <Box sx={formGridStyles.formTwo}>
+                        <FormTextField
+                            name="furniture_status"
+                            control={control}
+                            label="Nội thất"
+                            options={Object.entries(FurnitureStatusOptions).map(([key, label]) => ({
+                                value: key as FurnitureStatus,
+                                label,
+                            }))}
+                        />
+                    </Box>
+
+                    <Box
+                        sx={{
+                            gridColumn: 'span 2',
+                            display: 'grid',
+                            gridTemplateColumns: '1fr 1fr',
+                            gap: 2,
+                        }}
+                    >
                         <Controller
                             name="images"
                             control={control}
@@ -429,6 +492,11 @@ export default function EditLandPage() {
                                     label="Hình ảnh bất động sản"
                                 />
                             )}
+                        />
+
+                        <FormLandAmenityCheckbox
+                            name="amenities"
+                            control={control}
                         />
                     </Box>
 

@@ -1,5 +1,5 @@
 import { BaseEntity } from './base.type';
-import { LandType } from '@/common/enum';
+import { FurnitureStatus, HouseDirection, LandAmenity, LandType, LegalStatus } from '@/common/enum';
 import { Upload, UploadPreview } from './upload';
 import { Collaborator } from './collaborator';
 
@@ -18,7 +18,8 @@ export type Land = BaseEntity & {
     area?: number | null;
 
     structure?: string | null;
-
+    bedrooms?: number | undefined;
+    toilets?: number | undefined;
     width_top?: string | null;
     width_bottom?: string | null;
     length_left?: string | null;
@@ -41,6 +42,11 @@ export type Land = BaseEntity & {
 
     uploads?: Upload[];
     collaborator?: Collaborator;
+
+    house_direction?: HouseDirection;
+    legal_status?: LegalStatus;
+    furniture_status?: FurnitureStatus;
+    amenities?: LandAmenity[];
 };
 
 export type LandOption = {
@@ -64,6 +70,8 @@ export type LandForm = {
     area?: number;
 
     structure?: string;
+    bedrooms?: number | undefined;
+    toilets?: number | undefined;
 
     width_top?: number;
     width_bottom?: number;
@@ -86,6 +94,11 @@ export type LandForm = {
     description: string;
     private_note?: string;
     video_url?: string;
+
+    amenities?: LandAmenity[];
+    house_direction?: HouseDirection | null;
+    legal_status?: LegalStatus | null;
+    furniture_status?: FurnitureStatus | null;
 
     active?: boolean;
 };

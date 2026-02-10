@@ -13,8 +13,8 @@ import FormTextField from '@/components/FormTextField';
 import { BackLink, CardItem, HeaderRowOneItem, TitleMain } from '@/styles/common';
 import { formGridStyles } from '@/styles/formGrid';
 
-import { ErrorMessage, GO_VAP_DISTRICT_ID, LandTypeLabels } from '@/common/const';
-import { FieldCooperation, LandType, UploadDomain } from '@/common/enum';
+import { ErrorMessage, FurnitureStatusOptions, GO_VAP_DISTRICT_ID, HouseDirectionOptions, LandTypeLabels, LegalStatusOptions } from '@/common/const';
+import { FieldCooperation, FurnitureStatus, HouseDirection, LandType, LegalStatus, UploadDomain } from '@/common/enum';
 
 import useGetCollaboratorsAvailable from '@/hooks/Collaborator/useGetCollaboratorsAvailable';
 import useUploadImages from '@/hooks/Upload/uploadImages';
@@ -37,6 +37,7 @@ import {
 } from '@/common/const';
 
 import FormTinyMCE from '@/components/FormTinyMCE';
+import FormLandAmenityCheckbox from '@/components/Land/FormLandAmenityCheckbox';
 
 
 export default function CreateLandPage() {
@@ -59,6 +60,8 @@ export default function CreateLandPage() {
             price: undefined,
             area: undefined,
             structure: '',
+            bedrooms: undefined,
+            toilets: undefined,
             province: HCM_PROVINCE_ID,
             district: GO_VAP_DISTRICT_ID,
             ward: '',
@@ -70,7 +73,11 @@ export default function CreateLandPage() {
             video_url: '',
             active: true,
             private_note: '',
-            daitheky_link: ''
+            daitheky_link: '',
+            house_direction: HouseDirection.Updating,
+            legal_status: LegalStatus.Updating,
+            furniture_status: FurnitureStatus.Updating,
+            amenities: [],
         },
     });
 
@@ -152,6 +159,8 @@ export default function CreateLandPage() {
 
                 area: payload.area ? Number(payload.area) : undefined,
                 structure: payload.structure,
+                bedrooms: payload.bedrooms,
+                toilets: payload.toilets,
                 width_top: payload.width_top,
                 width_bottom: payload.width_bottom,
                 length_left: payload.length_left,
@@ -169,6 +178,11 @@ export default function CreateLandPage() {
                 private_note: payload.private_note,
                 video_url: payload.video_url,
                 daitheky_link: payload.daitheky_link,
+
+                house_direction: payload.house_direction,
+                legal_status: payload.legal_status,
+                furniture_status: payload.furniture_status,
+                amenities: payload.amenities,
 
                 active: payload.active
             });
@@ -361,7 +375,6 @@ export default function CreateLandPage() {
                         />
                     </Box>
 
-
                     <FormTextField
                         name="structure"
                         control={control}
@@ -403,7 +416,22 @@ export default function CreateLandPage() {
                         />
                     </Box>
 
-                    <Box sx={formGridStyles.formTwo}>
+                    <Box sx={formGridStyles.formFour}>
+                        <FormTextField
+                            name="bedrooms"
+                            control={control}
+                            label="Số phòng ngủ"
+                            type="number"
+                            inputProps={{ min: 0 }}
+                        />
+                        <FormTextField
+                            name="toilets"
+                            control={control}
+                            label="Số WC"
+                            type="number"
+                            inputProps={{ min: 0 }}
+                        />
+
                         <FormTextField
                             name="price"
                             control={control}
@@ -441,6 +469,40 @@ export default function CreateLandPage() {
                         />
                     </Box>
 
+                    <Box sx={formGridStyles.formTwo}>
+                        <FormTextField
+                            name="house_direction"
+                            control={control}
+                            label="Hướng nhà"
+                            options={Object.entries(HouseDirectionOptions).map(([key, label]) => ({
+                                value: key as HouseDirection,
+                                label,
+                            }))}
+                        />
+
+                        <FormTextField
+                            name="legal_status"
+                            control={control}
+                            label="Pháp lý"
+                            options={Object.entries(LegalStatusOptions).map(([key, label]) => ({
+                                value: key as LegalStatus,
+                                label,
+                            }))}
+                        />
+                    </Box>
+
+                    <Box sx={formGridStyles.formTwo}>
+                        <FormTextField
+                            name="furniture_status"
+                            control={control}
+                            label="Nội thất"
+                            options={Object.entries(FurnitureStatusOptions).map(([key, label]) => ({
+                                value: key as FurnitureStatus,
+                                label,
+                            }))}
+                        />
+                    </Box>
+
                     <Box
                         sx={{
                             gridColumn: 'span 2',
@@ -459,6 +521,11 @@ export default function CreateLandPage() {
                                     label="Hình ảnh bất động sản"
                                 />
                             )}
+                        />
+
+                        <FormLandAmenityCheckbox
+                            name="amenities"
+                            control={control}
                         />
                     </Box>
 

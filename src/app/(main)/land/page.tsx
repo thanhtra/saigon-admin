@@ -263,7 +263,7 @@ export default function LandPage() {
                                         </TableCell>
 
                                         <TableCell>
-                                            {l.area ? `${l.area} m²` : '--'}
+                                            {l.area ? `${Number(l.area)} m²` : '--'}
                                         </TableCell>
 
                                         <TableCell>

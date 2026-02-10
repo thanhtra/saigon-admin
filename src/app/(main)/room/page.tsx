@@ -224,7 +224,7 @@ export default function RoomPage() {
                                     name="key_search"
                                     control={control}
                                     size="small"
-                                    label="SĐT người đăng"
+                                    label="Code, Giá, Địa chỉ, SĐT"
                                 />
 
                                 <FormTextField

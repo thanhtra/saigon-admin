@@ -10,7 +10,7 @@ import FormAutocomplete from '@/components/FormAutocomplete';
 import FormImageUpload from '@/components/FormImageUpload';
 import FormTextField from '@/components/FormTextField';
 
-import { BackLink, CardItem, HeaderRowOneItem, TitleMain } from '@/styles/common';
+import { BackLink, CardItem, HeaderRow, TitleMain } from '@/styles/common';
 import { formGridStyles } from '@/styles/formGrid';
 
 import { ErrorMessage, FurnitureStatusOptions, GO_VAP_DISTRICT_ID, HouseDirectionOptions, LandTypeLabels, LegalStatusOptions } from '@/common/const';
@@ -27,8 +27,8 @@ import { useWatch } from 'react-hook-form';
 
 import {
     buildAddressDetail,
-    getProvinceOptions,
     getDistrictOptions,
+    getProvinceOptions,
     getWardOptions,
 } from '@/common/service';
 
@@ -38,15 +38,20 @@ import {
 
 import FormTinyMCE from '@/components/FormTinyMCE';
 import FormLandAmenityCheckbox from '@/components/Land/FormLandAmenityCheckbox';
+import useCheckLinkDaitheky from '@/hooks/Land/useCheckLinkDaitheky';
 
 
 export default function CreateLandPage() {
     const { createLand } = useCreateLand();
     const { uploadImages } = useUploadImages();
     const { getCollaboratorsAvailable } = useGetCollaboratorsAvailable();
+    const { checkLinkDaitheky } = useCheckLinkDaitheky();
 
     const [loading, setLoading] = useState(false);
     const [collaboratorOptions, setCollaboratorOptions] = useState<any[]>([]);
+
+    const [checkingLink, setCheckingLink] = useState(false);
+    const [linkStatus, setLinkStatus] = useState<null | 'exist' | 'not_exist'>(null);
 
     const {
         control,
@@ -237,15 +242,71 @@ export default function CreateLandPage() {
         [provinceId, districtId],
     );
 
+    const daithekyLink = useWatch({ control, name: 'daitheky_link_check' }) || "";
+    const checkDaithekyLink = async (link: string) => {
+        if (!link) {
+            toast.error('Nhập link trước');
+            return;
+        }
+        setCheckingLink(true);
+
+        try {
+            const res = await checkLinkDaitheky(link);
+            if (res?.success && res.result === true) {
+                setLinkStatus('exist');
+            } else {
+                setLinkStatus('not_exist');
+            }
+        } catch {
+            toast.error('Không kiểm tra được link');
+        } finally {
+            setCheckingLink(false);
+        }
+    };
+
 
     return (
         <>
             <TitleMain>Thêm mới bất động sản</TitleMain>
 
             <CardItem>
-                <HeaderRowOneItem>
+                <HeaderRow>
+                    <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
+                        <FormTextField
+                            name="daitheky_link_check"
+                            control={control}
+                            label=""
+                            placeholder="Dán link Daitheky để kiểm tra"
+                            size="small"
+                            rules={{
+                                onChange: () => setLinkStatus(null)
+                            }}
+                            sx={{ width: "400px", margin: "0px" }}
+                        />
+
+                        <Button
+                            variant="outlined"
+                            disabled={checkingLink}
+                            onClick={() => checkDaithekyLink(daithekyLink)}
+                        >
+                            {checkingLink ? '...' : 'Check'}
+                        </Button>
+
+                        {linkStatus === 'exist' && (
+                            <span style={{ color: 'orange', fontSize: 13 }}>
+                                Đã tồn tại
+                            </span>
+                        )}
+
+                        {linkStatus === 'not_exist' && (
+                            <span style={{ color: 'green', fontSize: 13 }}>
+                                Chưa có
+                            </span>
+                        )}
+                    </Box>
+
                     <BackLink href="/land">← Trở về danh sách</BackLink>
-                </HeaderRowOneItem>
+                </HeaderRow>
 
                 <Box
                     component="form"
@@ -359,6 +420,66 @@ export default function CreateLandPage() {
                         required
                     />
 
+                    <Box sx={formGridStyles.formFour}>
+                        <FormTextField
+                            name="area"
+                            control={control}
+                            label="Diện tích (m²)"
+                            type="number"
+                            inputProps={{ min: 1 }}
+                        />
+
+                        <FormTextField
+                            name="structure"
+                            control={control}
+                            label="Kết cấu"
+                            placeholder="VD: 1 trệt 2 lầu"
+                        />
+
+                        <FormTextField
+                            name="width_top"
+                            control={control}
+                            label="Ngang trên"
+                            type="number"
+                            inputProps={{ min: 1 }}
+                        />
+
+                        <FormTextField
+                            name="width_bottom"
+                            control={control}
+                            label="Ngang dưới"
+                            type="number"
+                            inputProps={{ min: 1 }}
+                        />
+                    </Box>
+
+                    <Box sx={formGridStyles.formFour}>
+                        <FormTextField
+                            name="length_left"
+                            control={control}
+                            label="Dài trái"
+                            type="number"
+                            inputProps={{ min: 1 }}
+                        />
+
+                        <FormTextField
+                            name="length_right"
+                            control={control}
+                            label="Dài phải"
+                            type="number"
+                            inputProps={{ min: 1 }}
+                        />
+
+                        <FormTextField
+                            name="price"
+                            control={control}
+                            label="Giá"
+                            type="number"
+                            inputProps={{ min: 1 }}
+                            required
+                        />
+                    </Box>
+
                     <Box sx={formGridStyles.formTwo}>
                         <FormTextField
                             name="daitheky_link"
@@ -375,48 +496,7 @@ export default function CreateLandPage() {
                         />
                     </Box>
 
-                    <FormTextField
-                        name="structure"
-                        control={control}
-                        label="Kết cấu"
-                        placeholder="VD: 1 trệt 2 lầu"
-                    />
-
-                    <Box sx={formGridStyles.formFour}>
-                        <FormTextField
-                            name="width_top"
-                            control={control}
-                            label="Ngang trên"
-                            type="number"
-                            inputProps={{ min: 1 }}
-                        />
-
-                        <FormTextField
-                            name="width_bottom"
-                            control={control}
-                            label="Ngang dưới"
-                            type="number"
-                            inputProps={{ min: 1 }}
-                        />
-
-                        <FormTextField
-                            name="length_left"
-                            control={control}
-                            label="Dài trái"
-                            type="number"
-                            inputProps={{ min: 1 }}
-                        />
-
-                        <FormTextField
-                            name="length_right"
-                            control={control}
-                            label="Dài phải"
-                            type="number"
-                            inputProps={{ min: 1 }}
-                        />
-                    </Box>
-
-                    <Box sx={formGridStyles.formFour}>
+                    <Box sx={formGridStyles.formTwo}>
                         <FormTextField
                             name="bedrooms"
                             control={control}
@@ -430,23 +510,6 @@ export default function CreateLandPage() {
                             label="Số WC"
                             type="number"
                             inputProps={{ min: 0 }}
-                        />
-
-                        <FormTextField
-                            name="price"
-                            control={control}
-                            label="Giá"
-                            type="number"
-                            inputProps={{ min: 1 }}
-                            required
-                        />
-
-                        <FormTextField
-                            name="area"
-                            control={control}
-                            label="Diện tích (m²)"
-                            type="number"
-                            inputProps={{ min: 1 }}
                         />
                     </Box>
 

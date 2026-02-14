@@ -366,6 +366,31 @@ export default function EditLandPage() {
                         label="Địa chỉ hiển thị"
                     />
 
+                    <Box sx={formGridStyles.formFour}>
+                        <FormTextField name="area" control={control} label="Diện tích (m²)" type="number" />
+                        <FormTextField
+                            name="structure"
+                            control={control}
+                            label="Kết cấu"
+                        />
+                        <FormTextField name="width_top" control={control} label="Ngang trên" type="number" />
+                        <FormTextField name="width_bottom" control={control} label="Ngang dưới" type="number" />
+                    </Box>
+
+                    <Box sx={formGridStyles.formFour}>
+                        <FormTextField name="length_left" control={control} label="Dài trái" type="number" />
+                        <FormTextField name="length_right" control={control} label="Dài phải" type="number" />
+
+                        <FormTextField
+                            name="price"
+                            control={control}
+                            label="Giá"
+                            type="number"
+                            inputProps={{ min: 1 }}
+                            required
+                        />
+                    </Box>
+
                     <Box sx={formGridStyles.formTwo}>
                         <FormTextField
                             name="daitheky_link"
@@ -382,20 +407,7 @@ export default function EditLandPage() {
                         />
                     </Box>
 
-                    <FormTextField
-                        name="structure"
-                        control={control}
-                        label="Kết cấu"
-                    />
-
-                    <Box sx={formGridStyles.formFour}>
-                        <FormTextField name="width_top" control={control} label="Ngang trên" type="number" />
-                        <FormTextField name="width_bottom" control={control} label="Ngang dưới" type="number" />
-                        <FormTextField name="length_left" control={control} label="Dài trái" type="number" />
-                        <FormTextField name="length_right" control={control} label="Dài phải" type="number" />
-                    </Box>
-
-                    <Box sx={formGridStyles.formFour}>
+                    <Box sx={formGridStyles.formTwo}>
                         <FormTextField
                             name="bedrooms"
                             control={control}
@@ -410,16 +422,6 @@ export default function EditLandPage() {
                             type="number"
                             inputProps={{ min: 0 }}
                         />
-
-                        <FormTextField
-                            name="price"
-                            control={control}
-                            label="Giá"
-                            type="number"
-                            inputProps={{ min: 1 }}
-                            required
-                        />
-                        <FormTextField name="area" control={control} label="Diện tích (m²)" type="number" />
                     </Box>
 
                     <Box sx={formGridStyles.fullWidth}>

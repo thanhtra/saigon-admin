@@ -63,6 +63,7 @@ export type LandForm = {
     land_type: LandType;
 
     daitheky_link?: string;
+    daitheky_link_check?: string;
 
     commission?: string;
 

@@ -16,6 +16,7 @@ FROM node:18-alpine
 
 WORKDIR /app
 ENV NODE_ENV=production
+ENV PORT=3002
 
 RUN addgroup -S app && adduser -S app -G app
 

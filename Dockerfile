@@ -25,23 +25,18 @@ WORKDIR /app
 ENV NODE_ENV=production
 ENV PORT=3002
 
-# ✅ install runtime deps
+# install minimal runtime deps (optional but safe)
 RUN apk add --no-cache curl
 
-# ✅ create app user
+# create non-root user
 RUN addgroup -S app && adduser -S app -G app
 
-# ✅ FIX crash: create expected config path
-RUN mkdir -p /tmp/.XIN-unix \
-    && echo '{"user":"docker"}' > /tmp/.XIN-unix/config.json \
-    && chmod -R 777 /tmp/.XIN-unix
-
-# ✅ copy standalone build
+# copy standalone output
 COPY --from=builder /app/.next/standalone ./
 COPY --from=builder /app/.next/static ./.next/static
 COPY --from=builder /app/public ./public
 
-# ensure permission
+# permissions
 RUN chown -R app:app /app
 
 USER app
@@ -49,8 +44,6 @@ USER app
 EXPOSE 3002
 
 CMD ["node", "server.js"]
-
-
 
 # FROM node:18-alpine AS builder
 

@@ -36,6 +36,9 @@ export default function RoomInfoDialog({
     onClose,
     room,
 }: RoomInfoDialogProps) {
+
+    console.log('dsafdsaf', room);
+
     const [copied, setCopied] = React.useState(false);
 
     if (!open || !room) return null;
@@ -60,7 +63,7 @@ export default function RoomInfoDialog({
     };
 
     const handleOpenZalo = () => {
-        const zl = `https://zalo.me/${room.ctv_collaborator?.user?.zalo || room.ctv_collaborator?.user?.phone}`
+        const zl = `https://zalo.me/${room?.rental?.collaborator?.user?.zalo || room?.rental?.collaborator?.user?.phone}`
         window.open(zl, '_blank', 'noopener,noreferrer');
     };
 

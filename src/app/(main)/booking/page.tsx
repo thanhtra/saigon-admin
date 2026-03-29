@@ -103,6 +103,7 @@ export default function BookingsPage() {
 
     const [openRoomDialog, setOpenRoomDialog] = useState(false);
     const [selectedRoom, setSelectedRoom] = useState<Room | null>(null);
+    const [customerPhone, setCustomerPhone] = useState<string>('');
 
     const [openEdit, setOpenEdit] = useState(false);
     const [bookingToEdit, setBookingToEdit] = useState<Booking | null>(null);
@@ -344,6 +345,7 @@ export default function BookingsPage() {
                                                 }}
                                                 onClick={() => {
                                                     setSelectedRoom(booking.room);
+                                                    setCustomerPhone(booking.customer_phone || '');
                                                     setOpenRoomDialog(true);
                                                 }}
                                             >
@@ -426,6 +428,7 @@ export default function BookingsPage() {
                         setSelectedRoom(null);
                     }}
                     room={selectedRoom}
+                    customerPhone={customerPhone}
                 />
 
                 <BookingEditDialog

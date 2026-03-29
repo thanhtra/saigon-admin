@@ -29,12 +29,14 @@ interface RoomInfoDialogProps {
     open: boolean;
     onClose: () => void;
     room: Room | null;
+    customerPhone: string;
 }
 
 export default function RoomInfoDialog({
     open,
     onClose,
     room,
+    customerPhone
 }: RoomInfoDialogProps) {
 
     console.log('dsafdsaf', room);
@@ -71,6 +73,14 @@ export default function RoomInfoDialog({
         const zl = `https://zalo.me/${room?.ctv_collaborator?.user?.zalo || room?.ctv_collaborator?.user?.phone}`
         window.open(zl, '_blank', 'noopener,noreferrer');
     };
+
+    const handleOpenZaloCustomerPhone = () => {
+        if (!customerPhone) return;
+
+        const zl = `https://zalo.me/${customerPhone}`
+        window.open(zl, '_blank', 'noopener,noreferrer');
+    };
+
 
 
     return (
@@ -230,31 +240,32 @@ export default function RoomInfoDialog({
                 </Stack>
             </DialogContent>
 
-            <DialogActions sx={{ px: 3, pb: 2 }}>
-                <Button
-                    variant="outlined"
-                    onClick={handleCopyLink}
-                >
-                    {copied ? 'Đã copy' : 'Link'}
-                </Button>
+            <DialogActions sx={{ px: 3, pb: 2, flexWrap: 'wrap', gap: 1 }}>
+                {/* Hàng 1 */}
+                <Box sx={{ ml: 'auto', display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+                    <Button variant="outlined" onClick={handleCopyLink}>
+                        Link
+                    </Button>
 
-                <Button
-                    variant="outlined"
-                    onClick={handleOpenZaloCTV}
-                >
-                    CTV
-                </Button>
+                    <Button variant="outlined" onClick={handleOpenZaloCTV}>
+                        CTV
+                    </Button>
 
-                <Button
-                    variant="outlined"
-                    onClick={handleOpenZalo}
-                >
-                    Chủ nhà
-                </Button>
+                    <Button variant="outlined" onClick={handleOpenZaloCustomerPhone}>
+                        Khách
+                    </Button>
+                </Box>
 
-                <Button variant="contained" onClick={onClose}>
-                    Đóng
-                </Button>
+                {/* Hàng 2 */}
+                <Box sx={{ ml: 'auto', display: 'flex', gap: 1, flexWrap: 'wrap', mt: 1 }}>
+                    <Button variant="outlined" onClick={handleOpenZalo}>
+                        Chủ nhà
+                    </Button>
+
+                    <Button variant="contained" onClick={onClose}>
+                        Đóng
+                    </Button>
+                </Box>
             </DialogActions>
         </Dialog>
     );

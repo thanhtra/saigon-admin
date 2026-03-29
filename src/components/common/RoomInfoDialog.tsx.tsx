@@ -24,6 +24,7 @@ import {
 } from '@mui/material';
 import * as React from 'react';
 
+
 interface RoomInfoDialogProps {
     open: boolean;
     onClose: () => void;
@@ -35,11 +36,33 @@ export default function RoomInfoDialog({
     onClose,
     room,
 }: RoomInfoDialogProps) {
+    const [copied, setCopied] = React.useState(false);
+
     if (!open || !room) return null;
 
     const images = room.uploads?.filter(
         (u) => u.file_type === 'image',
     );
+
+    const handleCopyLink = async () => {
+        if (!room?.slug) return;
+
+        const url = `https://tratimnha.com/nha-o-cho-thue/${room.slug}`;
+
+        try {
+            await navigator.clipboard.writeText(url);
+
+            setCopied(true);
+            setTimeout(() => setCopied(false), 2000);
+        } catch (err) {
+            console.error('Copy failed', err);
+        }
+    };
+
+    const handleOpenZalo = () => {
+        const zl = `https://zalo.me/${room.ctv_collaborator?.user?.zalo || room.ctv_collaborator?.user?.phone}`
+        window.open(zl, '_blank', 'noopener,noreferrer');
+    };
 
     return (
         <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
@@ -117,8 +140,7 @@ export default function RoomInfoDialog({
                             >
                                 Mô tả
                             </Typography>
-                            <Typography>
-                                {room.description}
+                            <Typography dangerouslySetInnerHTML={{ __html: room.description }}>
                             </Typography>
                         </Stack>
                     )}
@@ -147,6 +169,20 @@ export default function RoomInfoDialog({
             </DialogContent>
 
             <DialogActions sx={{ px: 3, pb: 2 }}>
+                <Button
+                    variant="outlined"
+                    onClick={handleCopyLink}
+                >
+                    {copied ? 'Đã copy' : 'Copy link'}
+                </Button>
+
+                <Button
+                    variant="outlined"
+                    onClick={handleOpenZalo}
+                >
+                    Zalo
+                </Button>
+
                 <Button variant="contained" onClick={onClose}>
                     Đóng
                 </Button>

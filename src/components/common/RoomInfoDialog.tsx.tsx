@@ -67,6 +67,12 @@ export default function RoomInfoDialog({
         window.open(zl, '_blank', 'noopener,noreferrer');
     };
 
+    const handleOpenZaloCTV = () => {
+        const zl = `https://zalo.me/${room?.ctv_collaborator?.user?.zalo || room?.ctv_collaborator?.user?.phone}`
+        window.open(zl, '_blank', 'noopener,noreferrer');
+    };
+
+
     return (
         <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
             <DialogTitle fontWeight={500}>
@@ -105,6 +111,59 @@ export default function RoomInfoDialog({
                             strong
                         />
                     </Box>
+
+                    {/* ===== ADDRESSES ===== */}
+                    <Stack spacing={1}>
+                        <Typography variant="body2" fontWeight={500}>
+                            Địa chỉ
+                        </Typography>
+
+                        {/* Địa chỉ hiển thị */}
+                        <Box display="flex" alignItems="center" gap={1}>
+                            <Typography variant="body2" color="text.secondary" fontWeight={500}>
+                                Hiển thị:
+                            </Typography>
+                            <Typography variant="body2" color="text.secondary" flex={1}>
+                                {room.rental?.address_detail_display ?? '-'}
+                            </Typography>
+                            <Button
+                                size="small"
+                                variant="outlined"
+                                onClick={async () => {
+                                    try {
+                                        await navigator.clipboard.writeText(room.rental?.address_detail_display ?? '');
+                                    } catch (err) {
+                                        console.error('Copy failed', err);
+                                    }
+                                }}
+                            >
+                                Copy
+                            </Button>
+                        </Box>
+
+                        {/* Địa chỉ thực tế */}
+                        <Box display="flex" alignItems="center" gap={1}>
+                            <Typography variant="body2" color="text.secondary" fontWeight={500}>
+                                Thực tế:
+                            </Typography>
+                            <Typography variant="body2" color="text.secondary" flex={1}>
+                                {room.rental?.address_detail ?? '-'}
+                            </Typography>
+                            <Button
+                                size="small"
+                                variant="outlined"
+                                onClick={async () => {
+                                    try {
+                                        await navigator.clipboard.writeText(room.rental?.address_detail ?? '');
+                                    } catch (err) {
+                                        console.error('Copy failed', err);
+                                    }
+                                }}
+                            >
+                                Copy
+                            </Button>
+                        </Box>
+                    </Stack>
 
                     <Divider />
 
@@ -176,14 +235,21 @@ export default function RoomInfoDialog({
                     variant="outlined"
                     onClick={handleCopyLink}
                 >
-                    {copied ? 'Đã copy' : 'Copy link'}
+                    {copied ? 'Đã copy' : 'Link'}
+                </Button>
+
+                <Button
+                    variant="outlined"
+                    onClick={handleOpenZaloCTV}
+                >
+                    CTV
                 </Button>
 
                 <Button
                     variant="outlined"
                     onClick={handleOpenZalo}
                 >
-                    Zalo
+                    Chủ nhà
                 </Button>
 
                 <Button variant="contained" onClick={onClose}>

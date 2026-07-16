@@ -36,7 +36,7 @@ export default function FormTinyMCE({
                     )}
 
                     <Editor
-                        apiKey={process.env.NEXT_PUBLIC_TINYMCE_API_KEY || 'f9ktuir6ojue58jjipwb83a997lszn3ut2ppmdg4zve0fcpk'}
+                        apiKey={'70bsw19dc8jxsrusrxy23cch72b6f3c6wxs7r3bw3yza9xij'}
                         value={field.value || ''}
                         onEditorChange={(content) => field.onChange(content)}
                         init={{

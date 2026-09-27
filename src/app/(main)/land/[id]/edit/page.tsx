@@ -433,15 +433,6 @@ export default function EditLandPage() {
                         />
                     </Box>
 
-                    <Box sx={formGridStyles.fullWidth}>
-                        <FormTinyMCE
-                            name="private_note"
-                            control={control}
-                            label="Lưu ý"
-                            height={300}
-                        />
-                    </Box>
-
                     <Box sx={formGridStyles.formTwo}>
                         <FormTextField
                             name="house_direction"
@@ -499,6 +490,15 @@ export default function EditLandPage() {
                         <FormLandAmenityCheckbox
                             name="amenities"
                             control={control}
+                        />
+                    </Box>
+
+                    <Box sx={formGridStyles.fullWidth}>
+                        <FormTinyMCE
+                            name="private_note"
+                            control={control}
+                            label="Lưu ý"
+                            height={100}
                         />
                     </Box>
 

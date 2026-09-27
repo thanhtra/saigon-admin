@@ -175,6 +175,7 @@ export default function RentalPage() {
                         <TableHead sx={{ backgroundColor: '#f5f5f5' }}>
                             <TableRow>
                                 <TableCell align="center"><strong>Trạng thái</strong></TableCell>
+                                <TableCell align="center"><strong>Hành động</strong></TableCell>
                                 <TableCell><strong>Người đăng</strong></TableCell>
                                 <TableCell><strong>Chủ nhà</strong></TableCell>
                                 <TableCell sx={{ minWidth: "240px" }}><strong>Địa chỉ thực tế</strong></TableCell>
@@ -183,7 +184,6 @@ export default function RentalPage() {
                                 <TableCell sx={{ minWidth: "240px" }}><strong>Hoa hồng</strong></TableCell>
                                 <TableCell><strong>Ngày tạo</strong></TableCell>
                                 <TableCell align="center"><strong>Kích hoạt</strong></TableCell>
-                                <TableCell align="center"><strong>Hành động</strong></TableCell>
                             </TableRow>
                         </TableHead>
 
@@ -206,6 +206,26 @@ export default function RentalPage() {
                                                     setOpenStatusDialog(true);
                                                 }}
                                             />
+                                        </TableCell>
+                                        <TableCell align="center" sx={{ minWidth: 100 }}>
+                                            <IconButton
+                                                size="small"
+                                                onClick={() =>
+                                                    router.push(`/rental/${r.id}/edit`)
+                                                }
+                                            >
+                                                <EditIcon fontSize="small" />
+                                            </IconButton>
+                                            <IconButton
+                                                size="small"
+                                                color="error"
+                                                onClick={() => {
+                                                    setRentalToDelete(r);
+                                                    setOpenConfirm(true);
+                                                }}
+                                            >
+                                                <DeleteIcon fontSize="small" />
+                                            </IconButton>
                                         </TableCell>
                                         <TableCell>{r.createdBy?.phone} - {r.createdBy?.name}</TableCell>
                                         <TableCell>{r.collaborator?.user?.phone} - {r.collaborator?.user?.name}</TableCell>
@@ -244,26 +264,7 @@ export default function RentalPage() {
                                                 )}
                                             </Tooltip>
                                         </TableCell>
-                                        <TableCell align="center" sx={{ minWidth: 100 }}>
-                                            <IconButton
-                                                size="small"
-                                                onClick={() =>
-                                                    router.push(`/rental/${r.id}/edit`)
-                                                }
-                                            >
-                                                <EditIcon fontSize="small" />
-                                            </IconButton>
-                                            <IconButton
-                                                size="small"
-                                                color="error"
-                                                onClick={() => {
-                                                    setRentalToDelete(r);
-                                                    setOpenConfirm(true);
-                                                }}
-                                            >
-                                                <DeleteIcon fontSize="small" />
-                                            </IconButton>
-                                        </TableCell>
+                                        
                                     </TableRow>
                                 ))
                             ) : (

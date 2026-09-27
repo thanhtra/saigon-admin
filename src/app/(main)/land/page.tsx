@@ -253,7 +253,7 @@ export default function LandPage() {
 
                                         <TableCell>
                                             <TruncateWithTooltip
-                                                text={l.address_detail_display}
+                                                text={l.address_detail}
                                                 limit={40}
                                             />
                                         </TableCell>

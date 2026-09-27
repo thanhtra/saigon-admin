@@ -383,9 +383,10 @@ export default function EditRentalPage() {
                         rows={1}
                         required
                         disabled
+                        sx={formGridStyles.fullWidth}
                     />
 
-                    <FormTextField
+                    {/* <FormTextField
                         name="address_detail_display"
                         control={control}
                         label="Địa chỉ hiển thị"
@@ -393,7 +394,7 @@ export default function EditRentalPage() {
                         rows={1}
                         required
                         sx={formGridStyles.fullWidth}
-                    />
+                    /> */}
 
                     <FormTextField
                         name="fee_electric"
@@ -458,6 +459,16 @@ export default function EditRentalPage() {
                         sx={{
                             gridColumn: 'span 4',
                         }}
+                    />
+
+                    <FormTextField
+                        name="address_detail_display"
+                        control={control}
+                        label="Địa chỉ hiển thị"
+                        multiline
+                        rows={1}
+                        required
+                        sx={{ gridColumn: 'span 4' }}
                     />
 
                     <FormTextField

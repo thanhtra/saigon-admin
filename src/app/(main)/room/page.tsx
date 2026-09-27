@@ -286,6 +286,7 @@ export default function RoomPage() {
                         <TableHead sx={{ backgroundColor: '#f5f5f5' }}>
                             <TableRow>
                                 <TableCell align="left"><strong>TT phòng</strong></TableCell>
+                                <TableCell align="center"><strong>Hành động</strong></TableCell>
                                 <TableCell sx={{ minWidth: "240px" }}><strong>Địa chỉ nhà</strong></TableCell>
                                 <TableCell><strong>Người đăng</strong></TableCell>
                                 <TableCell><strong>Chủ nhà</strong></TableCell>
@@ -297,7 +298,6 @@ export default function RoomPage() {
                                 <TableCell><strong>Tiêu đề</strong></TableCell>
                                 <TableCell><strong>Giá</strong></TableCell>
                                 <TableCell align="center"><strong>Kích hoạt</strong></TableCell>
-                                <TableCell align="center"><strong>Hành động</strong></TableCell>
                             </TableRow>
                         </TableHead>
 
@@ -320,6 +320,39 @@ export default function RoomPage() {
                                                     setOpenStatusDialog(true);
                                                 }}
                                             />
+                                        </TableCell>
+                                         <TableCell align="center" sx={{ minWidth: "150px" }}>
+                                            <Tooltip title="Thêm lịch xem" placement="top">
+                                                <IconButton
+                                                    size="small"
+                                                    color="primary"
+                                                    onClick={() => {
+                                                        setSelectedRoomForBooking(r);
+                                                        setOpenBookingDialog(true);
+                                                    }}
+                                                >
+                                                    <EventAvailableIcon fontSize="small" />
+                                                </IconButton>
+                                            </Tooltip>
+                                            <IconButton
+                                                size="small"
+                                                onClick={() =>
+                                                    router.push(`/room/${r.id}/edit`)
+                                                }
+                                                sx={{ margin: "0px 5px" }}
+                                            >
+                                                <EditIcon fontSize="small" />
+                                            </IconButton>
+                                            <IconButton
+                                                size="small"
+                                                color="error"
+                                                onClick={() => {
+                                                    setRoomToDelete(r);
+                                                    setOpenConfirm(true);
+                                                }}
+                                            >
+                                                <DeleteIcon fontSize="small" />
+                                            </IconButton>
                                         </TableCell>
                                         <TableCell>
                                             <TruncateWithTooltip text={r.rental?.address_detail} limit={50} />
@@ -359,39 +392,7 @@ export default function RoomPage() {
                                                 )}
                                             </Tooltip>
                                         </TableCell>
-                                        <TableCell align="center" sx={{ minWidth: "150px" }}>
-                                            <Tooltip title="Thêm lịch xem" placement="top">
-                                                <IconButton
-                                                    size="small"
-                                                    color="primary"
-                                                    onClick={() => {
-                                                        setSelectedRoomForBooking(r);
-                                                        setOpenBookingDialog(true);
-                                                    }}
-                                                >
-                                                    <EventAvailableIcon fontSize="small" />
-                                                </IconButton>
-                                            </Tooltip>
-                                            <IconButton
-                                                size="small"
-                                                onClick={() =>
-                                                    router.push(`/room/${r.id}/edit`)
-                                                }
-                                                sx={{ margin: "0px 5px" }}
-                                            >
-                                                <EditIcon fontSize="small" />
-                                            </IconButton>
-                                            <IconButton
-                                                size="small"
-                                                color="error"
-                                                onClick={() => {
-                                                    setRoomToDelete(r);
-                                                    setOpenConfirm(true);
-                                                }}
-                                            >
-                                                <DeleteIcon fontSize="small" />
-                                            </IconButton>
-                                        </TableCell>
+                                       
                                     </TableRow>
                                 ))
                             ) : (

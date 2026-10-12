@@ -7,6 +7,8 @@ export type Params = {
     key_search?: string;
     is_pagin?: boolean;
     profession?: string;
+    role?: string | undefined;
+    active?: boolean;
 };
 
 const useGetUsers = () => {

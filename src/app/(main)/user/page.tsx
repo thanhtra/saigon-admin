@@ -1,6 +1,6 @@
 'use client';
 
-import { ErrorMessage } from '@/common/const';
+import { ErrorMessage, UserRoleOptionsWithoutAdmin } from '@/common/const';
 import { UserRole } from '@/common/enum';
 import { User } from '@/common/type';
 import PaginationWrapper from '@/components/common/PaginationWrapper';
@@ -11,7 +11,7 @@ import { TruncateWithTooltip } from '@/components/TruncateWithTooltip';
 import useDeleteUser from '@/hooks/User/useDeleteUser';
 import useGetUsers from '@/hooks/User/useGetUsers';
 import useResetPassword from '@/hooks/User/useResetPassword';
-import { CardItem, HeaderRow, TitleMain } from '@/styles/common';
+import { CardItem, TitleMain, HeaderRowFilter } from '@/styles/common';
 import CancelIcon from '@mui/icons-material/Cancel';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -32,11 +32,13 @@ import {
     TableHead,
     TableRow,
     TextField,
-    Tooltip
+    Tooltip,
+    MenuItem
 } from '@mui/material';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
+
 
 export default function UsersPage() {
     const router = useRouter();
@@ -48,6 +50,8 @@ export default function UsersPage() {
     const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
     const [loading, setLoading] = useState(false);
+    const [role, setRole] = useState('');
+    const [active, setActive] = useState('');
 
     const [openConfirm, setOpenConfirm] = useState(false);
     const [userToDelete, setUserToDelete] = useState<User | null>(null);
@@ -62,8 +66,12 @@ export default function UsersPage() {
         try {
             const res = await getUsers({
                 key_search: search,
+                role: role || undefined,
                 page,
                 size: 10,
+                ...(active !== '' && {
+                    active: active === 'true',
+                }),
             });
 
             if (res?.success) {
@@ -79,7 +87,7 @@ export default function UsersPage() {
         } finally {
             setLoading(false);
         }
-    }, [getUsers, search, page]);
+    }, [getUsers, search, role, active, page]);
 
     useEffect(() => {
         fetchUsers();
@@ -130,25 +138,75 @@ export default function UsersPage() {
             <TitleMain>Danh sách tài khoản</TitleMain>
 
             <CardItem>
-                <HeaderRow>
-                    <TextField
-                        fullWidth
-                        size="small"
-                        label="Tìm kiếm"
-                        value={search}
-                        onChange={(e) => {
-                            setPage(1);
-                            setSearch(e.target.value);
-                        }}
-                        sx={{ width: 300 }}
-                    />
-                    <Button
-                        variant="contained"
-                        onClick={() => router.push('/user/create')}
-                    >
-                        + Thêm mới
-                    </Button>
-                </HeaderRow>
+                <HeaderRowFilter>
+                    <div className="filter-inputs">
+                        <TextField
+                            fullWidth
+                            size="small"
+                            label="Tìm kiếm"
+                            value={search}
+                            onChange={(e) => {
+                                setPage(1);
+                                setSearch(e.target.value);
+                            }}
+                        />
+
+                        <TextField
+                            select
+                            size="small"
+                            label="Lọc theo vai trò"
+                            value={role}
+                            onChange={(e) => {
+                                setRole(e.target.value);
+                                setPage(1);
+                            }}
+                        >
+                            <MenuItem value="">
+                                Tất cả vai trò
+                            </MenuItem>
+
+                            {Object.entries(UserRoleOptionsWithoutAdmin).map(
+                                ([value, label]) => (
+                                    <MenuItem key={value} value={value}>
+                                        {label}
+                                    </MenuItem>
+                                )
+                            )}
+                        </TextField>
+
+                        <TextField
+                            select
+                            size="small"
+                            label="Lọc theo trạng thái"
+                            value={active}
+                            onChange={(e) => {
+                                setActive(e.target.value);
+                                setPage(1);
+                            }}
+                        >
+                            <MenuItem value="">
+                                Tất cả trạng thái
+                            </MenuItem>
+
+                            <MenuItem value="true">
+                                Hoạt động
+                            </MenuItem>
+
+                            <MenuItem value="false">
+                                Không hoạt động
+                            </MenuItem>
+                        </TextField>
+                    </div>
+
+                    <div className="header-actions">
+                        <Button
+                            variant="contained"
+                            onClick={() => router.push('/user/create')}
+                        >
+                            + Thêm mới
+                        </Button>
+                    </div>
+                </HeaderRowFilter>
 
                 <Paper sx={{ overflowX: 'auto' }}>
                     <Table size="small">
@@ -307,7 +365,7 @@ export default function UsersPage() {
                     user={selectedUser}
                     onReset={resetPasswordApi}
                 />
-            </CardItem>
+            </CardItem >
         </>
     );
 }

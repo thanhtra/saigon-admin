@@ -41,7 +41,7 @@ import { useForm } from 'react-hook-form';
 type LandFilterForm = {
     key_search?: string;
     land_type?: LandType | '';
-    active?: boolean | '';
+    active?: 'true' | 'false' | '';
 };
 
 export default function LandPage() {
@@ -75,9 +75,10 @@ export default function LandPage() {
     const fetchData = useCallback(async () => {
         setLoading(true);
         try {
-            const fActive = filters.active === '' || filters.active === undefined
-                ? undefined
-                : filters.active === true;
+            const fActive =
+                filters.active === '' || filters.active === undefined
+                    ? undefined
+                    : filters.active === 'true';
 
             const res = await getLands({
                 page,

@@ -60,94 +60,259 @@ export const HeaderRow = styled('div')(({ theme }) => ({
     },
 }));
 
+// export const HeaderRowFilter = styled('div')(({ theme }) => ({
+//     display: 'flex',
+//     alignItems: 'flex-start',
+//     justifyContent: 'space-between',
+//     gap: 16,
+//     width: '100%',
+//     marginBottom: 20,
+
+//     /* ================= FILTER FORM ================= */
+//     '& .filter-form': {
+//         flex: 1,
+//     },
+
+//     '& .filter-bar': {
+//         display: 'flex',
+//         alignItems: 'center',
+//         gap: 16,
+//         padding: '5px 10px',
+//         borderRadius: 12,
+//         backgroundColor: theme.palette.background.paper,
+//         border: `1px solid ${theme.palette.divider}`,
+//         boxShadow: '0 1px 2px rgba(0,0,0,0.04)',
+//     },
+
+//     '& .filter-inputs': {
+//         display: 'grid',
+//         gridTemplateColumns: 'repeat(4, minmax(180px, 1fr))',
+//         gap: 14,
+//         flex: 1,
+//     },
+
+//     /* Action buttons */
+//     '& .filter-actions': {
+//         display: 'flex',
+//         alignItems: 'center',
+//         gap: 10,
+//         paddingLeft: 4,
+//         whiteSpace: 'nowrap',
+
+//         '& .MuiButton-root': {
+//             height: 36,
+//             minWidth: 96,
+//             fontWeight: 500,
+//         },
+//     },
+
+//     /* ================= RIGHT ACTION ================= */
+//     '& .header-actions': {
+//         display: 'flex',
+//         alignItems: 'center',
+
+//         '& .MuiButton-root': {
+//             height: 40,
+//             padding: '0 18px',
+//             fontWeight: 600,
+//             borderRadius: 10,
+//         },
+//     },
+
+//     /* ================= RESPONSIVE ================= */
+
+//     /* Laptop nhỏ */
+//     [theme.breakpoints.down('lg')]: {
+//         '& .filter-bar': {
+//             flexWrap: 'wrap',
+//         },
+
+//         '& .filter-inputs': {
+//             gridTemplateColumns: 'repeat(2, 1fr)',
+//         },
+
+//         '& .filter-actions': {
+//             width: '100%',
+//             justifyContent: 'flex-end',
+//         },
+//     },
+
+//     /* Mobile */
+//     [theme.breakpoints.down('sm')]: {
+//         flexDirection: 'column',
+//         gap: 12,
+
+//         '& .filter-inputs': {
+//             gridTemplateColumns: '1fr',
+//         },
+
+//         '& .header-actions': {
+//             justifyContent: 'flex-end',
+//         },
+//     },
+// }));
+
+
 export const HeaderRowFilter = styled('div')(({ theme }) => ({
+    width: '100%',
+    marginBottom: 20,
     display: 'flex',
     alignItems: 'flex-start',
     justifyContent: 'space-between',
     gap: 16,
-    width: '100%',
-    marginBottom: 20,
 
-    /* ================= FILTER FORM ================= */
+    /* Form lọc */
     '& .filter-form': {
         flex: 1,
+        minWidth: 0,
     },
 
+    /* Thanh chứa bộ lọc và nút tìm kiếm */
     '& .filter-bar': {
         display: 'flex',
         alignItems: 'center',
-        gap: 16,
-        padding: '5px 10px',
-        borderRadius: 12,
-        backgroundColor: theme.palette.background.paper,
-        border: `1px solid ${theme.palette.divider}`,
-        boxShadow: '0 1px 2px rgba(0,0,0,0.04)',
+        gap: 12,
+        width: '100%',
+        minWidth: 0,
     },
 
+    /* Các trường lọc */
     '& .filter-inputs': {
         display: 'grid',
-        gridTemplateColumns: 'repeat(4, minmax(180px, 1fr))',
-        gap: 14,
+        gridTemplateColumns:
+            'repeat(3, minmax(0, 1fr))',
+        gap: 12,
         flex: 1,
+        minWidth: 0,
+        alignItems: 'center',
     },
 
-    /* Action buttons */
+    '& .filter-inputs > *': {
+        width: '100%',
+        minWidth: 0,
+    },
+
+    '& .filter-inputs .MuiFormControl-root': {
+        width: '100%',
+        minWidth: 0,
+    },
+
+    '& .filter-inputs .MuiOutlinedInput-root': {
+        height: 42,
+        borderRadius: 2,
+        backgroundColor: theme.palette.background.paper,
+    },
+
+    '& .filter-inputs .MuiInputBase-input': {
+        fontSize: 14,
+    },
+
+    /* Nút tìm kiếm và đặt lại */
     '& .filter-actions': {
         display: 'flex',
         alignItems: 'center',
-        gap: 10,
-        paddingLeft: 4,
-        whiteSpace: 'nowrap',
+        gap: 8,
+        flexShrink: 0,
 
         '& .MuiButton-root': {
-            height: 36,
-            minWidth: 96,
-            fontWeight: 500,
+            height: 42,
+            padding: '0 16px',
+            borderRadius: 2,
+            fontWeight: 600,
+            whiteSpace: 'nowrap',
+            textTransform: 'none',
+            boxShadow: 'none',
+        },
+
+        '& .MuiButton-root:hover': {
+            boxShadow: 'none',
         },
     },
 
-    /* ================= RIGHT ACTION ================= */
+    /* Khu vực nút thêm mới */
     '& .header-actions': {
         display: 'flex',
         alignItems: 'center',
+        flexShrink: 0,
 
         '& .MuiButton-root': {
-            height: 40,
-            padding: '0 18px',
+            height: 42,
+            padding: '0 20px',
+            borderRadius: 2,
             fontWeight: 600,
-            borderRadius: 10,
+            whiteSpace: 'nowrap',
+            textTransform: 'none',
+            boxShadow: 'none',
+        },
+
+        '& .MuiButton-root:hover': {
+            boxShadow: 'none',
         },
     },
 
-    /* ================= RESPONSIVE ================= */
-
-    /* Laptop nhỏ */
+    /* Laptop và tablet */
     [theme.breakpoints.down('lg')]: {
+        flexWrap: 'wrap',
+
+        '& .filter-form': {
+            flexBasis: '100%',
+        },
+
         '& .filter-bar': {
-            flexWrap: 'wrap',
+            alignItems: 'stretch',
         },
 
         '& .filter-inputs': {
-            gridTemplateColumns: 'repeat(2, 1fr)',
+            gridTemplateColumns:
+                'repeat(2, minmax(0, 1fr))',
         },
 
         '& .filter-actions': {
-            width: '100%',
-            justifyContent: 'flex-end',
+            alignSelf: 'flex-end',
+        },
+
+        '& .header-actions': {
+            marginLeft: 'auto',
         },
     },
 
     /* Mobile */
     [theme.breakpoints.down('sm')]: {
         flexDirection: 'column',
+        alignItems: 'stretch',
         gap: 12,
 
+        '& .filter-form': {
+            width: '100%',
+            flexBasis: 'auto',
+        },
+
+        '& .filter-bar': {
+            flexDirection: 'column',
+            gap: 12,
+        },
+
         '& .filter-inputs': {
-            gridTemplateColumns: '1fr',
+            width: '100%',
+            gridTemplateColumns: 'minmax(0, 1fr)',
+            gap: 12,
+        },
+
+        '& .filter-actions': {
+            width: '100%',
+
+            '& .MuiButton-root': {
+                flex: 1,
+            },
         },
 
         '& .header-actions': {
-            justifyContent: 'flex-end',
+            width: '100%',
+            marginLeft: 0,
+
+            '& .MuiButton-root': {
+                width: '100%',
+            },
         },
     },
 }));

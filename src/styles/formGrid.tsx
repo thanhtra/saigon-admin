@@ -20,6 +20,7 @@ export const formGridStyles = {
     fullWidthFormFour: {
         gridColumn: 'span 4',
     },
+
     alignRight: {
         gridColumn: 'span 2',
         display: 'flex',
@@ -27,12 +28,18 @@ export const formGridStyles = {
         alignItems: 'center',
     },
     actionRow: {
-        gridColumn: 'span 2',
+        gridColumn: '1 / -1',
         display: 'grid',
-        gridTemplateColumns: '1fr 1fr', // chia 2 nửa trái / phải
+        gridTemplateColumns: {
+            xs: 'minmax(0, 1fr)',
+            md: 'minmax(0, 1fr) minmax(0, 1fr)',
+        },
         alignItems: 'center',
         mt: 2,
+        width: '100%',
+        minWidth: 0,
     },
+
     actionRowFormFour: {
         gridColumn: 'span 4',
         display: 'grid',
@@ -61,7 +68,12 @@ export const formGridStyles = {
         display: 'flex',
         justifyContent: 'flex-end',
         alignItems: 'center',
-        gap: '30px',
+        gap: {
+            xs: 1.5,
+            md: '30px',
+        },
+        minWidth: 0,
+        flexWrap: 'wrap',
     },
     submitButton: {
         gridColumn: 'span 2',
@@ -75,3 +87,4 @@ export const formGridStyles = {
         gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' },
     },
 };
+

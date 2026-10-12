@@ -471,8 +471,16 @@ export default function EditLandPage() {
                         sx={{
                             gridColumn: 'span 2',
                             display: 'grid',
-                            gridTemplateColumns: '1fr 1fr',
-                            gap: 2,
+                            gridTemplateColumns: {
+                                xs: '1fr',      // Điện thoại: 1 cột
+                                md: '1fr 1fr',  // Desktop: 2 cột
+                            },
+                            gap: {
+                                xs: 2,
+                                md: 3,
+                            },
+                            width: '100%',
+                            minWidth: 0,
                         }}
                     >
                         <Controller
@@ -498,7 +506,7 @@ export default function EditLandPage() {
                             name="private_note"
                             control={control}
                             label="Lưu ý"
-                            height={100}
+                            height={500}
                         />
                     </Box>
 

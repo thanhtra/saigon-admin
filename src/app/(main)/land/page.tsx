@@ -214,14 +214,12 @@ export default function LandPage() {
                     <Table size="small" sx={{ minWidth: 1200 }}>
                         <TableHead sx={{ backgroundColor: '#f5f5f5' }}>
                             <TableRow>
-                                <TableCell><strong>Mã BĐS</strong></TableCell>
                                 <TableCell align="center" sx={{ minWidth: "100px" }}>
                                     <strong>Hành động</strong>
                                 </TableCell>
+                                <TableCell sx={{ minWidth: 260 }}> <strong>Địa chỉ</strong></TableCell>
                                 <TableCell><strong>Cộng tác</strong></TableCell>
-                                <TableCell sx={{ minWidth: 260 }}>
-                                    <strong>Địa chỉ</strong>
-                                </TableCell>
+                                <TableCell><strong>Mã BĐS</strong></TableCell>
                                 <TableCell sx={{ minWidth: "70px" }}><strong>Giá</strong></TableCell>
                                 <TableCell><strong>Loại</strong></TableCell>
                                 <TableCell><strong>Diện tích</strong></TableCell>
@@ -244,14 +242,6 @@ export default function LandPage() {
                             ) : lands.length ? (
                                 lands.map((l) => (
                                     <TableRow key={l.id} hover>
-                                        <TableCell onClick={() => {
-                                            navigator.clipboard.writeText(l.land_code);
-                                            toast.success('Đã sao chép mã nhà');
-                                        }}
-                                            style={{ cursor: 'pointer' }}
-                                        >
-                                            {l.land_code}
-                                        </TableCell>
 
                                         <TableCell align="center" width={120}>
                                             <IconButton
@@ -276,7 +266,16 @@ export default function LandPage() {
                                             </IconButton>
                                         </TableCell>
 
-
+                                        <TableCell onClick={() => {
+                                            navigator.clipboard.writeText(l.address_detail);
+                                            toast.success('Đã sao chép địa chỉ nhà');
+                                        }}
+                                            style={{ cursor: 'pointer' }}>
+                                            <TruncateWithTooltip
+                                                text={l.address_detail}
+                                                limit={100}
+                                            />
+                                        </TableCell>
 
                                         <TableCell onClick={() => {
                                             if (l.collaborator?.user?.phone) {
@@ -293,15 +292,14 @@ export default function LandPage() {
                                         </TableCell>
 
                                         <TableCell onClick={() => {
-                                            navigator.clipboard.writeText(l.address_detail);
-                                            toast.success('Đã sao chép địa chỉ nhà');
+                                            navigator.clipboard.writeText(l.land_code);
+                                            toast.success('Đã sao chép mã nhà');
                                         }}
-                                            style={{ cursor: 'pointer' }}>
-                                            <TruncateWithTooltip
-                                                text={l.address_detail}
-                                                limit={100}
-                                            />
+                                            style={{ cursor: 'pointer' }}
+                                        >
+                                            {l.land_code}
                                         </TableCell>
+
 
                                         <TableCell>
                                             {Number(l.price)} tỷ

@@ -212,13 +212,13 @@ export default function UsersPage() {
                     <Table size="small">
                         <TableHead sx={{ backgroundColor: '#f5f5f5' }}>
                             <TableRow>
-                                <TableCell><strong>Tên</strong></TableCell>
-                                <TableCell><strong>Số điện thoại</strong></TableCell>
-                                <TableCell><strong>Liên hệ</strong></TableCell>
+                                <TableCell sx={{ minWidth: "140px" }}><strong>Tên</strong></TableCell>
+                                <TableCell sx={{ minWidth: "160px" }}><strong>SĐT</strong></TableCell>
+                                <TableCell sx={{ minWidth: "100px" }} align="center"><strong>Hành động</strong></TableCell>
                                 <TableCell align="left"><strong>Phân quyền</strong></TableCell>
-                                <TableCell><strong>Mô tả</strong></TableCell>
                                 <TableCell align="center"><strong>Kích hoạt</strong></TableCell>
-                                <TableCell align="center"><strong>Hành động</strong></TableCell>
+                                <TableCell><strong>Zalo</strong></TableCell>
+                                <TableCell><strong>Mô tả</strong></TableCell>
                             </TableRow>
                         </TableHead>
 
@@ -232,7 +232,12 @@ export default function UsersPage() {
                             ) : users.length ? (
                                 users.map((user) => (
                                     <TableRow key={user.id} hover>
-                                        <TableCell>{user.name}</TableCell>
+                                        <TableCell>
+                                            <TruncateWithTooltip
+                                                text={user.name}
+                                                limit={30}
+                                            />
+                                        </TableCell>
                                         <TableCell width={180}>
                                             <Tooltip title="Sao chép số điện thoại" placement="top">
                                                 <span
@@ -260,6 +265,42 @@ export default function UsersPage() {
                                                 </IconButton>
                                             </Tooltip>
                                         </TableCell>
+                                        <TableCell align="center">
+                                            {user.role !== UserRole.Admin &&
+                                                <>
+                                                    <IconButton
+                                                        size="small"
+                                                        onClick={() =>
+                                                            router.push(`/user/${user.id}/edit`)
+                                                        }
+                                                    >
+                                                        <EditIcon fontSize="small" />
+                                                    </IconButton>
+                                                    <IconButton
+                                                        size="small"
+                                                        color="error"
+                                                        disabled={deleting}
+                                                        onClick={() => {
+                                                            setUserToDelete(user);
+                                                            setOpenConfirm(true);
+                                                        }}
+                                                    >
+                                                        <DeleteIcon fontSize="small" />
+                                                    </IconButton>
+                                                </>
+                                            }
+                                        </TableCell>
+
+                                        <TableCell align="left">
+                                            <UserRoleTag value={user.role as UserRole} />
+                                        </TableCell>
+
+                                        <TableCell align="center">
+                                            <Tooltip title={user.active ? 'Đang hoạt động' : 'Không hoạt động'} placement="top">
+                                                {user.active ? <CheckCircleIcon color="success" fontSize="small" /> : <CancelIcon color="error" fontSize="small" />}
+                                            </Tooltip>
+                                        </TableCell>
+
                                         <TableCell>
                                             <Box display="flex" gap={1}>
                                                 {user?.link_facebook && (
@@ -293,40 +334,9 @@ export default function UsersPage() {
                                                 )}
                                             </Box>
                                         </TableCell>
-                                        <TableCell align="left">
-                                            <UserRoleTag value={user.role as UserRole} />
-                                        </TableCell>
+
                                         <TableCell>{TruncateWithTooltip({ text: user.note })}</TableCell>
-                                        <TableCell align="center">
-                                            <Tooltip title={user.active ? 'Đang hoạt động' : 'Không hoạt động'} placement="top">
-                                                {user.active ? <CheckCircleIcon color="success" fontSize="small" /> : <CancelIcon color="error" fontSize="small" />}
-                                            </Tooltip>
-                                        </TableCell>
-                                        <TableCell align="center">
-                                            {user.role !== UserRole.Admin &&
-                                                <>
-                                                    <IconButton
-                                                        size="small"
-                                                        onClick={() =>
-                                                            router.push(`/user/${user.id}/edit`)
-                                                        }
-                                                    >
-                                                        <EditIcon fontSize="small" />
-                                                    </IconButton>
-                                                    <IconButton
-                                                        size="small"
-                                                        color="error"
-                                                        disabled={deleting}
-                                                        onClick={() => {
-                                                            setUserToDelete(user);
-                                                            setOpenConfirm(true);
-                                                        }}
-                                                    >
-                                                        <DeleteIcon fontSize="small" />
-                                                    </IconButton>
-                                                </>
-                                            }
-                                        </TableCell>
+
                                     </TableRow>
                                 ))
                             ) : (

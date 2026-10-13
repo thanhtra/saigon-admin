@@ -30,11 +30,21 @@ export default function DashboardLayout({
 
       <Box
         component="main"
+        // sx={{
+        //   flexGrow: 1,
+        //   ml: { md: '240px' }, // chỉ chừa sidebar khi desktop
+        //   mt: '64px',
+        //   p: 2,
+        // }}
         sx={{
           flexGrow: 1,
-          ml: { md: '240px' }, // chỉ chừa sidebar khi desktop
+          ml: { md: '240px' },
           mt: '64px',
-          p: 2,
+          p: { xs: 1, md: 2 },
+
+          '& .MuiCard-root': {
+            p: { xs: '4px', md: '24px' },
+          },
         }}
       >
         {children}

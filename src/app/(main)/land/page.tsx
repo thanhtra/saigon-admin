@@ -215,22 +215,21 @@ export default function LandPage() {
                         <TableHead sx={{ backgroundColor: '#f5f5f5' }}>
                             <TableRow>
                                 <TableCell><strong>Mã BĐS</strong></TableCell>
+                                <TableCell align="center" sx={{ minWidth: "100px" }}>
+                                    <strong>Hành động</strong>
+                                </TableCell>
                                 <TableCell><strong>Cộng tác</strong></TableCell>
                                 <TableCell sx={{ minWidth: 260 }}>
                                     <strong>Địa chỉ</strong>
                                 </TableCell>
+                                <TableCell sx={{ minWidth: "70px" }}><strong>Giá</strong></TableCell>
                                 <TableCell><strong>Loại</strong></TableCell>
                                 <TableCell><strong>Diện tích</strong></TableCell>
                                 <TableCell sx={{ minWidth: 260 }}>
                                     <strong>Kích thước</strong>
                                 </TableCell>
-
-                                <TableCell sx={{ minWidth: "70px" }}><strong>Giá</strong></TableCell>
                                 <TableCell align="center">
                                     <strong>Kích hoạt</strong>
-                                </TableCell>
-                                <TableCell align="center" sx={{ minWidth: "100px" }}>
-                                    <strong>Hành động</strong>
                                 </TableCell>
                             </TableRow>
                         </TableHead>
@@ -245,18 +244,67 @@ export default function LandPage() {
                             ) : lands.length ? (
                                 lands.map((l) => (
                                     <TableRow key={l.id} hover>
-                                        <TableCell>{l.land_code}</TableCell>
+                                        <TableCell onClick={() => {
+                                            navigator.clipboard.writeText(l.land_code);
+                                            toast.success('Đã sao chép mã nhà');
+                                        }}
+                                            style={{ cursor: 'pointer' }}
+                                        >
+                                            {l.land_code}
+                                        </TableCell>
 
-                                        <TableCell>
+                                        <TableCell align="center" width={120}>
+                                            <IconButton
+                                                size="small"
+                                                onClick={() =>
+                                                    router.push(`/land/${l.id}/edit`)
+                                                }
+                                            >
+                                                <EditIcon fontSize="small" />
+                                            </IconButton>
+
+                                            <IconButton
+                                                size="small"
+                                                color="error"
+                                                onClick={() => {
+                                                    setLandToDelete(l);
+                                                    setOpenConfirm(true);
+                                                }}
+                                                sx={{ marginLeft: '10px' }}
+                                            >
+                                                <DeleteIcon fontSize="small" />
+                                            </IconButton>
+                                        </TableCell>
+
+
+
+                                        <TableCell onClick={() => {
+                                            if (l.collaborator?.user?.phone) {
+                                                navigator.clipboard.writeText(l.collaborator?.user?.phone);
+                                                toast.success('Đã sao chép zalo');
+                                            } else {
+                                                toast.error('Không có zalo để sao chép');
+                                            }
+                                        }}
+                                            style={{ cursor: 'pointer' }}
+                                        >
                                             {l.collaborator?.user?.phone} -{' '}
                                             {l.collaborator?.user?.name}
                                         </TableCell>
 
-                                        <TableCell>
+                                        <TableCell onClick={() => {
+                                            navigator.clipboard.writeText(l.address_detail);
+                                            toast.success('Đã sao chép địa chỉ nhà');
+                                        }}
+                                            style={{ cursor: 'pointer' }}>
                                             <TruncateWithTooltip
                                                 text={l.address_detail}
-                                                limit={40}
+                                                limit={100}
                                             />
+                                        </TableCell>
+
+                                        <TableCell>
+                                            {Number(l.price)} tỷ
                                         </TableCell>
 
                                         <TableCell>
@@ -281,10 +329,6 @@ export default function LandPage() {
                                                 .join(' | ') || '--'}
                                         </TableCell>
 
-                                        <TableCell>
-                                            {Number(l.price)} tỷ
-                                        </TableCell>
-
                                         <TableCell align="center">
                                             <Tooltip
                                                 title={
@@ -307,27 +351,6 @@ export default function LandPage() {
                                             </Tooltip>
                                         </TableCell>
 
-                                        <TableCell align="center">
-                                            <IconButton
-                                                size="small"
-                                                onClick={() =>
-                                                    router.push(`/land/${l.id}/edit`)
-                                                }
-                                            >
-                                                <EditIcon fontSize="small" />
-                                            </IconButton>
-
-                                            <IconButton
-                                                size="small"
-                                                color="error"
-                                                onClick={() => {
-                                                    setLandToDelete(l);
-                                                    setOpenConfirm(true);
-                                                }}
-                                            >
-                                                <DeleteIcon fontSize="small" />
-                                            </IconButton>
-                                        </TableCell>
                                     </TableRow>
                                 ))
                             ) : (

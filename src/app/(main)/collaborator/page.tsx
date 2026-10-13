@@ -195,15 +195,15 @@ export default function CollaboratorsPage() {
                     <Table size="small">
                         <TableHead sx={{ backgroundColor: '#f5f5f5' }}>
                             <TableRow>
-                                <TableCell><strong>Tên</strong></TableCell>
+                                <TableCell sx={{ minWidth: "140px" }}><strong>Tên</strong></TableCell>
                                 <TableCell><strong>SĐT</strong></TableCell>
-                                <TableCell><strong>Email</strong></TableCell>
-                                <TableCell align="center"><strong>CTV</strong></TableCell>
+                                <TableCell sx={{ minWidth: "120px" }} align="center"><strong>Hành động</strong></TableCell>
                                 <TableCell align="left"><strong>Loại</strong></TableCell>
                                 <TableCell align="left"><strong>Lĩnh vực</strong></TableCell>
-                                <TableCell><strong>Note</strong></TableCell>
+                                <TableCell align="center"><strong>CTV</strong></TableCell>
                                 <TableCell align="center" width={100}><strong>Kích hoạt</strong></TableCell>
-                                <TableCell align="center"><strong>Hành động</strong></TableCell>
+                                <TableCell><strong>Note</strong></TableCell>
+                                <TableCell><strong>Email</strong></TableCell>
                             </TableRow>
                         </TableHead>
 
@@ -217,7 +217,12 @@ export default function CollaboratorsPage() {
                             ) : data.length ? (
                                 data.map((item) => (
                                     <TableRow key={item.id} hover>
-                                        <TableCell>{item.user.name}</TableCell>
+                                        <TableCell>
+                                            <TruncateWithTooltip
+                                                text={item.user.name}
+                                                limit={30}
+                                            />
+                                        </TableCell>
                                         <TableCell>
                                             <Tooltip title="Sao chép số điện thoại" placement="top">
                                                 <span
@@ -231,62 +236,16 @@ export default function CollaboratorsPage() {
                                                 </span>
                                             </Tooltip>
                                         </TableCell>
-                                        <TableCell>{item.user.email}</TableCell>
-                                        <TableCell align="center">
-                                            <Tooltip
-                                                title={item.is_confirmed_ctv ? 'Đã đăng kí' : 'Chưa đăng kí'}
-                                                placement="top"
-                                            >
-                                                {item.is_confirmed_ctv ? (
-                                                    <CheckCircleIcon color="success" fontSize="small" />
-                                                ) : (
-                                                    <></>
-                                                )}
-                                            </Tooltip>
-                                        </TableCell>
-                                        <TableCell align="left">
-                                            <CollaboratorTypeTag
-                                                clickable
-                                                value={item.type}
-                                                onClick={() => {
-                                                    setSelectedCollaborator(item);
-                                                    setOpenTypeDialog(true);
-                                                }}
-                                            />
-                                        </TableCell>
-                                        <TableCell align="left">
-                                            <FieldCooperationTag
-                                                clickable
-                                                value={item.field_cooperation}
-                                                onClick={() => {
-                                                    setSelectedCollaborator(item);
-                                                    setOpenFieldDialog(true);
-                                                }}
-                                            />
-                                        </TableCell>
 
-                                        <TableCell>{TruncateWithTooltip({ text: (item?.note || "") + ' - ' + (item?.user?.note || "") })}</TableCell>
                                         <TableCell align="center">
-                                            <Tooltip
-                                                title={item.active ? 'Đang hoạt động' : 'Đã khoá'}
-                                                placement="top"
-                                            >
-                                                {item.active ? (
-                                                    <CheckCircleIcon color="success" fontSize="small" />
-                                                ) : (
-                                                    <CancelIcon color="error" fontSize="small" />
-                                                )}
-                                            </Tooltip>
-                                        </TableCell>
-                                        <TableCell align="center" width={150}>
-                                            <IconButton
+                                            {/* <IconButton
                                                 size="small"
                                                 onClick={() =>
                                                     router.push(`/collaborator/${item.id}`)
                                                 }
                                             >
                                                 <VisibilityIcon fontSize="small" />
-                                            </IconButton>
+                                            </IconButton> */}
                                             <IconButton
                                                 size="small"
                                                 onClick={() =>
@@ -309,6 +268,57 @@ export default function CollaboratorsPage() {
                                             </IconButton>
 
                                         </TableCell>
+
+                                        <TableCell align="left">
+                                            <CollaboratorTypeTag
+                                                clickable
+                                                value={item.type}
+                                                onClick={() => {
+                                                    setSelectedCollaborator(item);
+                                                    setOpenTypeDialog(true);
+                                                }}
+                                            />
+                                        </TableCell>
+                                        <TableCell align="left">
+                                            <FieldCooperationTag
+                                                clickable
+                                                value={item.field_cooperation}
+                                                onClick={() => {
+                                                    setSelectedCollaborator(item);
+                                                    setOpenFieldDialog(true);
+                                                }}
+                                            />
+                                        </TableCell>
+
+                                        <TableCell align="center">
+                                            <Tooltip
+                                                title={item.is_confirmed_ctv ? 'Đã đăng kí' : 'Chưa đăng kí'}
+                                                placement="top"
+                                            >
+                                                {item.is_confirmed_ctv ? (
+                                                    <CheckCircleIcon color="success" fontSize="small" />
+                                                ) : (
+                                                    <></>
+                                                )}
+                                            </Tooltip>
+                                        </TableCell>
+
+                                        <TableCell align="center">
+                                            <Tooltip
+                                                title={item.active ? 'Đang hoạt động' : 'Đã khoá'}
+                                                placement="top"
+                                            >
+                                                {item.active ? (
+                                                    <CheckCircleIcon color="success" fontSize="small" />
+                                                ) : (
+                                                    <CancelIcon color="error" fontSize="small" />
+                                                )}
+                                            </Tooltip>
+                                        </TableCell>
+
+                                        <TableCell>{TruncateWithTooltip({ text: (item?.note || "") + ' - ' + (item?.user?.note || "") })}</TableCell>
+                                        <TableCell>{item.user.email}</TableCell>
+
                                     </TableRow>
                                 ))
                             ) : (

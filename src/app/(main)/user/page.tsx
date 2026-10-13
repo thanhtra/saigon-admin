@@ -212,13 +212,13 @@ export default function UsersPage() {
                     <Table size="small">
                         <TableHead sx={{ backgroundColor: '#f5f5f5' }}>
                             <TableRow>
-                                <TableCell sx={{ minWidth: "140px" }}><strong>Tên</strong></TableCell>
-                                <TableCell sx={{ minWidth: "160px" }}><strong>SĐT</strong></TableCell>
+                                <TableCell sx={{ minWidth: "100px" }}><strong>Tên</strong></TableCell>
+                                <TableCell sx={{ minWidth: "90px" }}><strong>SĐT</strong></TableCell>
                                 <TableCell sx={{ minWidth: "100px" }} align="center"><strong>Hành động</strong></TableCell>
                                 <TableCell align="left"><strong>Phân quyền</strong></TableCell>
+                                <TableCell><strong>Mô tả</strong></TableCell>
                                 <TableCell align="center"><strong>Kích hoạt</strong></TableCell>
                                 <TableCell><strong>Zalo</strong></TableCell>
-                                <TableCell><strong>Mô tả</strong></TableCell>
                             </TableRow>
                         </TableHead>
 
@@ -295,6 +295,8 @@ export default function UsersPage() {
                                             <UserRoleTag value={user.role as UserRole} />
                                         </TableCell>
 
+                                        <TableCell>{TruncateWithTooltip({ text: user.note })}</TableCell>
+
                                         <TableCell align="center">
                                             <Tooltip title={user.active ? 'Đang hoạt động' : 'Không hoạt động'} placement="top">
                                                 {user.active ? <CheckCircleIcon color="success" fontSize="small" /> : <CancelIcon color="error" fontSize="small" />}
@@ -334,8 +336,6 @@ export default function UsersPage() {
                                                 )}
                                             </Box>
                                         </TableCell>
-
-                                        <TableCell>{TruncateWithTooltip({ text: user.note })}</TableCell>
 
                                     </TableRow>
                                 ))

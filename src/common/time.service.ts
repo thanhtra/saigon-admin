@@ -36,3 +36,28 @@ export const isAtLeastMinutesLater = (
         ? true
         : `Thời gian xem phải sau hiện tại ít nhất ${minutes} phút`;
 };
+
+export const formatDateTime = (
+    date: string | Date | null | undefined,
+): string => {
+    if (!date) return '';
+
+    const parsedDate = new Date(date);
+
+    if (Number.isNaN(parsedDate.getTime())) return '';
+
+    const formatted = new Intl.DateTimeFormat('vi-VN', {
+        timeZone: 'Asia/Ho_Chi_Minh',
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false,
+    }).formatToParts(parsedDate);
+
+    const get = (type: Intl.DateTimeFormatPartTypes) =>
+        formatted.find((part) => part.type === type)?.value ?? '';
+
+    return `${get('day')}/${get('month')}/${get('year')} ${get('hour')}:${get('minute')}`;
+};

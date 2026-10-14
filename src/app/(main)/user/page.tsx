@@ -38,6 +38,7 @@ import {
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
+import { formatDateTime } from '@/common/time.service';
 
 
 export default function UsersPage() {
@@ -217,6 +218,7 @@ export default function UsersPage() {
                                 <TableCell sx={{ minWidth: "100px" }} align="center"><strong>Hành động</strong></TableCell>
                                 <TableCell align="left"><strong>Phân quyền</strong></TableCell>
                                 <TableCell><strong>Mô tả</strong></TableCell>
+                                <TableCell><strong>Ngày tạo</strong></TableCell>
                                 <TableCell align="center"><strong>Kích hoạt</strong></TableCell>
                                 <TableCell><strong>Zalo</strong></TableCell>
                             </TableRow>
@@ -296,6 +298,10 @@ export default function UsersPage() {
                                         </TableCell>
 
                                         <TableCell>{TruncateWithTooltip({ text: user.note })}</TableCell>
+
+                                        <TableCell>
+                                            {formatDateTime(user.createdAt)}
+                                        </TableCell>
 
                                         <TableCell align="center">
                                             <Tooltip title={user.active ? 'Đang hoạt động' : 'Không hoạt động'} placement="top">

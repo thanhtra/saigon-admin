@@ -54,6 +54,7 @@ export type User = {
     note?: string;
     address?: string;
     active?: boolean;
+    createdAt?: any;
 }
 
 
